@@ -14,3 +14,4 @@ git clone https://github.com/sebastian-colomar/protech
 source protech/bin/ec2-config.sh
 ```
 - https://console-openshift-console.apps.hub.sebastian-colomar.com
+- https://coreos.github.io/ignition/configuration-v3_1/
