@@ -50,7 +50,7 @@ Metadata:
           - UserName07
           - UserName08
           - VPCCidrBlock
-          
+
     ParameterLabels:
       HostedZoneName:
         default: The name of the hosted zone that you want to create records in
@@ -104,7 +104,7 @@ Metadata:
         default: ''
       VPCCidrBlock:
         default: VPC CIDR
-                
+
 Parameters:
 
   HostedZoneName:
@@ -116,9 +116,9 @@ Parameters:
   InstanceImageId:
     Default: ami-019715e0d74f695be
     Description: >
-      Select AMI to use for the instances. 
+      Select AMI to use for the instances.
     Type: String
-    
+
   InstanceInstanceType:
     Default: t3a.medium
     Description: >
@@ -160,7 +160,7 @@ Parameters:
     Default: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCmWzCcdgOtstdRTFo1dYOqo02ekLWdap8OWJUdI3sQL9tJpVFukr8bI3TSg7myG54m6loPbbtw6O9Xtb4DmPrAfJ/64zFedHtlU6RyQUG+9zAvIqEVJ2QmvIG2jFt+RzUx5hgAieE6v4X4KklpaEbprQg0vflN8rR4tvhtMGmWjgzUWFTnc2MvZGmuSX18bj4wU8GGhXdAH5OIN0cuws5dTV6Fc6CDG473zMbwj9qOKWQPrcfyGtOgbf+kX92NwvVtv5okRMYIbtMH+ff8BTHAmkpbRkJnEsj4WnZs1NEAjDvrNQ98hEQgeyacGl9dObY2PL4OjDoEo95vnVNu8MxNgB5QX9eIBaN28LuYOhY8T7klqe18WX5YtAbiTpuF/+uNZH+Vc00GJaGdAPzUlkbnYGMmaeCGDlQF0iqTsYS3hTzREUAkDzPOPhh0FOs/Jtdd0Gn729ST+SH74PM0Yj5WzsmoMYYrRkVpIoWaaO1sSrbgRHG9ifDLr3Z4t6KnZ8M=
     Description: Public SSH key
     Type: String
-  
+
   PublicKeyMaterial06:
     Default: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCPVDFMZ5y3N7r/0SOlp5SPsWtgOpGkZRzoUiP+GRUHq3F7vwVhYcrCxxV1FgeKYf1L8RiW6V24vAwDa9YSEmQ2TTvsDIHgLI5T1emqNyYomN6kzZbsTqjGzlv8E4NIqw+dsSLSzIvIkBYU/piVQqFQX+L3I9H+cXrREwlZeqHsmtZcSaXAJ3BXGhz+ZQqNVZUpytdnkvT2949HUcQT+xlytPBpJ9dJpcQwEQErGk8YL0S6ZY7umxvzgS0KtmMvRNy3P5oeID6i+NYhxxI0/NfUF3VlWC9d9i3eelUPOoCVpVWIlJcczzcBG5MqYcM9YhHXqR69++qhhZHXYrMHWa0h/WprN81ZAl3LwL0haP1TRpyt3M0Q3FgylZMlRPUJ0/Q8GPy1nm1p4eg5Wy8y8ouG+TYSYF1LzfHG/lvPCpm/ZQm4Rsjsuirwds8HZcST0faeHr6/QpoA/tO+8Awr0qoOE0FHjUE6h5VxscP+JecdolpJnX+BfZvP7ueP3OuL8xM=
     Description: Public SSH key
@@ -181,20 +181,20 @@ Parameters:
     Description: >
       Region name.
     Type: String
-    
+
   SecurityGroupCidrIp:
     Default: 0.0.0.0/0
     Description: >
-      Allowed CIDR block for external web access. 
-      It defines the block of IPs that can access the application servers. 
+      Allowed CIDR block for external web access.
+      It defines the block of IPs that can access the application servers.
       Set it to 0.0.0.0/0 to make it accessible from anywhere.
     Type: String
-    
+
   SubnetCidrBlockPublic:
     Default: 10.168.2.0/24
     Description: >
-      CIDR block for public (DMZ) subnet located in Availability Zone 1. 
-      All resources located on this subnet are provided an IP within this address block. 
+      CIDR block for public (DMZ) subnet located in Availability Zone 1.
+      All resources located on this subnet are provided an IP within this address block.
     Type: String
 
   UserName00:
@@ -256,7 +256,7 @@ Parameters:
     Description: >
       CIDR block for the VPC. All the subnets and resources will have an IP within this address block.
     Type: String
-    
+
 #============================================================
 # Resources
 #============================================================
@@ -279,47 +279,47 @@ Resources:
     Type: AWS::IAM::AccessKey
     Properties:
       UserName: !Ref User01
-        
-  AccessKey02:
-    Type: AWS::IAM::AccessKey
-    Properties:
-      UserName: !Ref User02
-        
-  AccessKey03:
-    Type: AWS::IAM::AccessKey
-    Properties:
-      UserName: !Ref User03
-        
-  AccessKey04:
-    Type: AWS::IAM::AccessKey
-    Properties:
-      UserName: !Ref User04
-        
-  AccessKey05:
-    Type: AWS::IAM::AccessKey
-    Properties:
-      UserName: !Ref User05
-        
-  AccessKey06:
-    Type: AWS::IAM::AccessKey
-    Properties:
-      UserName: !Ref User06
-        
-  AccessKey07:
-    Type: AWS::IAM::AccessKey
-    Properties:
-      UserName: !Ref User07
-        
-  AccessKey08:
-    Type: AWS::IAM::AccessKey
-    Properties:
-      UserName: !Ref User08
-      
+
+  AccessKey02:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref User02
+
+  AccessKey03:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref User03
+
+  AccessKey04:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref User04
+
+  AccessKey05:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref User05
+
+  AccessKey06:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref User06
+
+  AccessKey07:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref User07
+
+  AccessKey08:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref User08
+
   EIP00:
     Properties:
       Domain: vpc
     Type: AWS::EC2::EIP
-    
+
   EIP01:
     Properties:
       Domain: vpc
@@ -329,17 +329,17 @@ Resources:
     Properties:
       Domain: vpc
     Type: AWS::EC2::EIP
-    
+
   EIP03:
     Properties:
       Domain: vpc
     Type: AWS::EC2::EIP
-    
+
   EIP04:
     Properties:
       Domain: vpc
     Type: AWS::EC2::EIP
-    
+
   EIP05:
     Properties:
       Domain: vpc
@@ -413,7 +413,7 @@ Resources:
       AllocationId: !GetAtt EIP08.AllocationId
       InstanceId: !Ref Instance08
     Type: AWS::EC2::EIPAssociation
-      
+
   Instance00:
     Properties:
       IamInstanceProfile: !Ref InstanceProfile
@@ -427,17 +427,17 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/sh
           sudo tee /root/.aws/credentials <<EOF
-          [default]
-          aws_access_key_id = ${AccessKey00}
-          aws_secret_access_key = ${AccessKey00.SecretAccessKey}
-          EOF
-          sudo chmod 600 /root/.aws/credentials
-          sudo tee /root/.aws/config <<EOF
-          [default]
-          region = ${RegionName}
-          format = ${OutputFormat}
-          EOF
-          sudo chmod 600 /root/.aws/config          
+          [default]
+          aws_access_key_id = ${AccessKey00}
+          aws_secret_access_key = ${AccessKey00.SecretAccessKey}
+          EOF
+          sudo chmod 600 /root/.aws/credentials
+          sudo tee /root/.aws/config <<EOF
+          [default]
+          region = ${RegionName}
+          format = ${OutputFormat}
+          EOF
+          sudo chmod 600 /root/.aws/config
           sudo apt update
           sudo apt upgrade -y
           sudo apt install awscli docker.io docker-compose -y
@@ -460,17 +460,17 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/sh
           sudo tee /root/.aws/credentials <<EOF
-          [default]
-          aws_access_key_id = ${AccessKey01}
-          aws_secret_access_key = ${AccessKey01.SecretAccessKey}
-          EOF
-          sudo chmod 600 /root/.aws/credentials
-          sudo tee /root/.aws/config <<EOF
-          [default]
-          region = ${RegionName}
-          format = ${OutputFormat}
-          EOF
-          sudo chmod 600 /root/.aws/config          
+          [default]
+          aws_access_key_id = ${AccessKey01}
+          aws_secret_access_key = ${AccessKey01.SecretAccessKey}
+          EOF
+          sudo chmod 600 /root/.aws/credentials
+          sudo tee /root/.aws/config <<EOF
+          [default]
+          region = ${RegionName}
+          format = ${OutputFormat}
+          EOF
+          sudo chmod 600 /root/.aws/config
           sudo apt update
           sudo apt upgrade -y
           sudo apt install awscli docker.io docker-compose -y
@@ -493,11 +493,11 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/sh
           sudo tee /root/.aws/credentials <<EOF
-          [default]
-          aws_access_key_id = ${AccessKey02}
-          aws_secret_access_key = ${AccessKey02.SecretAccessKey}
-          EOF
-          sudo chmod 600 /root/.aws/credentials
+          [default]
+          aws_access_key_id = ${AccessKey02}
+          aws_secret_access_key = ${AccessKey02.SecretAccessKey}
+          EOF
+          sudo chmod 600 /root/.aws/credentials
           sudo tee /root/.aws/config <<EOF
           [default]
           region = ${RegionName}
@@ -526,11 +526,11 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/sh
           sudo tee /root/.aws/credentials <<EOF
-          [default]
-          aws_access_key_id = ${AccessKey03}
-          aws_secret_access_key = ${AccessKey03.SecretAccessKey}
-          EOF
-          sudo chmod 600 /root/.aws/credentials
+          [default]
+          aws_access_key_id = ${AccessKey03}
+          aws_secret_access_key = ${AccessKey03.SecretAccessKey}
+          EOF
+          sudo chmod 600 /root/.aws/credentials
           sudo tee /root/.aws/config <<EOF
           [default]
           region = ${RegionName}
@@ -559,11 +559,11 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/sh
           sudo tee /root/.aws/credentials <<EOF
-          [default]
-          aws_access_key_id = ${AccessKey04}
-          aws_secret_access_key = ${AccessKey04.SecretAccessKey}
-          EOF
-          sudo chmod 600 /root/.aws/credentials
+          [default]
+          aws_access_key_id = ${AccessKey04}
+          aws_secret_access_key = ${AccessKey04.SecretAccessKey}
+          EOF
+          sudo chmod 600 /root/.aws/credentials
           sudo tee /root/.aws/config <<EOF
           [default]
           region = ${RegionName}
@@ -592,11 +592,11 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/sh
           sudo tee /root/.aws/credentials <<EOF
-          [default]
-          aws_access_key_id = ${AccessKey05}
-          aws_secret_access_key = ${AccessKey05.SecretAccessKey}
-          EOF
-          sudo chmod 600 /root/.aws/credentials
+          [default]
+          aws_access_key_id = ${AccessKey05}
+          aws_secret_access_key = ${AccessKey05.SecretAccessKey}
+          EOF
+          sudo chmod 600 /root/.aws/credentials
           sudo tee /root/.aws/config <<EOF
           [default]
           region = ${RegionName}
@@ -625,11 +625,11 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/sh
           sudo tee /root/.aws/credentials <<EOF
-          [default]
-          aws_access_key_id = ${AccessKey06}
-          aws_secret_access_key = ${AccessKey06.SecretAccessKey}
-          EOF
-          sudo chmod 600 /root/.aws/credentials
+          [default]
+          aws_access_key_id = ${AccessKey06}
+          aws_secret_access_key = ${AccessKey06.SecretAccessKey}
+          EOF
+          sudo chmod 600 /root/.aws/credentials
           sudo tee /root/.aws/config <<EOF
           [default]
           region = ${RegionName}
@@ -658,11 +658,11 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/sh
           sudo tee /root/.aws/credentials <<EOF
-          [default]
-          aws_access_key_id = ${AccessKey07}
-          aws_secret_access_key = ${AccessKey07.SecretAccessKey}
-          EOF
-          sudo chmod 600 /root/.aws/credentials
+          [default]
+          aws_access_key_id = ${AccessKey07}
+          aws_secret_access_key = ${AccessKey07.SecretAccessKey}
+          EOF
+          sudo chmod 600 /root/.aws/credentials
           sudo tee /root/.aws/config <<EOF
           [default]
           region = ${RegionName}
@@ -691,11 +691,11 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/sh
           sudo tee /root/.aws/credentials <<EOF
-          [default]
-          aws_access_key_id = ${AccessKey08}
-          aws_secret_access_key = ${AccessKey08.SecretAccessKey}
-          EOF
-          sudo chmod 600 /root/.aws/credentials
+          [default]
+          aws_access_key_id = ${AccessKey08}
+          aws_secret_access_key = ${AccessKey08.SecretAccessKey}
+          EOF
+          sudo chmod 600 /root/.aws/credentials
           sudo tee /root/.aws/config <<EOF
           [default]
           region = ${RegionName}
@@ -718,7 +718,7 @@ Resources:
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
-    
+
   KeyPair00:
     Type: AWS::EC2::KeyPair
     Properties:
@@ -772,7 +772,7 @@ Resources:
     Properties:
       KeyName: !Ref UserName08
       PublicKeyMaterial: !Ref PublicKeyMaterial08
-      
+
   RecordSet00:
     Properties:
       ResourceRecords:
@@ -896,23 +896,23 @@ Resources:
     Properties:
       GroupDescription: Allow access to the applications
       SecurityGroupIngress:
-      - 
+      -
         CidrIp: !Ref SecurityGroupCidrIp
         FromPort: 22
         IpProtocol: TCP
         ToPort: 22
-      - 
+      -
         CidrIp: !Ref SecurityGroupCidrIp
         FromPort: 30000
         IpProtocol: TCP
         ToPort: 32767
-      - 
+      -
         CidrIp: !Ref SecurityGroupCidrIp
         FromPort: 32768
         IpProtocol: TCP
         ToPort: 33000
       VpcId: !Ref VPC
-    Type: AWS::EC2::SecurityGroup   
+    Type: AWS::EC2::SecurityGroup
 
   SubnetPublic:
     Properties:
@@ -931,123 +931,123 @@ Resources:
       SubnetId: !Ref SubnetPublic
     Type: AWS::EC2::SubnetRouteTableAssociation
 
-  User00:
-    Type: AWS::IAM::User
-    Properties:
-      UserName: !Ref UserName00
-      Path: /
-      
-  User01:
-    Type: AWS::IAM::User
-    Properties:
-      UserName: !Ref UserName01
-      Path: /
-      
-  User02:
-    Type: AWS::IAM::User
-    Properties:
-      UserName: !Ref UserName02
-      Path: /
-      
-  User03:
-    Type: AWS::IAM::User
-    Properties:
-      UserName: !Ref UserName03
-      Path: /
-      
-  User04:
-    Type: AWS::IAM::User
-    Properties:
-      UserName: !Ref UserName04
-      Path: /
-      
-  User05:
-    Type: AWS::IAM::User
-    Properties:
-      UserName: !Ref UserName05
-      Path: /
-      
-  User06:
-    Type: AWS::IAM::User
-    Properties:
-      UserName: !Ref UserName06
-      Path: /
-      
-  User07:
-    Type: AWS::IAM::User
-    Properties:
-      UserName: !Ref UserName07
-      Path: /
-      
-  User08:
-    Type: AWS::IAM::User
-    Properties:
-      UserName: !Ref UserName08
-      Path: /
-      
-  UserToGroupAddition00:
-    Type: AWS::IAM::UserToGroupAddition
-    Properties:
-      GroupName: !Ref Group
-      Users:
-        - !Ref User00
-        
-  UserToGroupAddition01:
-    Type: AWS::IAM::UserToGroupAddition
-    Properties:
-      GroupName: !Ref Group
-      Users:
-        - !Ref User01
-        
-  UserToGroupAddition02:
-    Type: AWS::IAM::UserToGroupAddition
-    Properties:
-      GroupName: !Ref Group
-      Users:
-        - !Ref User02
-        
-  UserToGroupAddition03:
-    Type: AWS::IAM::UserToGroupAddition
-    Properties:
-      GroupName: !Ref Group
-      Users:
-        - !Ref User03
-      
-  UserToGroupAddition04:
-    Type: AWS::IAM::UserToGroupAddition
-    Properties:
-      GroupName: !Ref Group
-      Users:
-        - !Ref User04
-        
-  UserToGroupAddition05:
-    Type: AWS::IAM::UserToGroupAddition
-    Properties:
-      GroupName: !Ref Group
-      Users:
-        - !Ref User05
-        
-  UserToGroupAddition06:
-    Type: AWS::IAM::UserToGroupAddition
-    Properties:
-      GroupName: !Ref Group
-      Users:
-        - !Ref User06
-        
-  UserToGroupAddition07:
-    Type: AWS::IAM::UserToGroupAddition
-    Properties:
-      GroupName: !Ref Group
-      Users:
-        - !Ref User07
-        
-  UserToGroupAddition08:
-    Type: AWS::IAM::UserToGroupAddition
-    Properties:
-      GroupName: !Ref Group
-      Users:
-        - !Ref User08
-        
+  User00:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName00
+      Path: /
+
+  User01:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName01
+      Path: /
+
+  User02:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName02
+      Path: /
+
+  User03:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName03
+      Path: /
+
+  User04:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName04
+      Path: /
+
+  User05:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName05
+      Path: /
+
+  User06:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName06
+      Path: /
+
+  User07:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName07
+      Path: /
+
+  User08:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName08
+      Path: /
+
+  UserToGroupAddition00:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User00
+
+  UserToGroupAddition01:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User01
+
+  UserToGroupAddition02:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User02
+
+  UserToGroupAddition03:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User03
+
+  UserToGroupAddition04:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User04
+
+  UserToGroupAddition05:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User05
+
+  UserToGroupAddition06:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User06
+
+  UserToGroupAddition07:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User07
+
+  UserToGroupAddition08:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User08
+
   VPC:
     Properties:
       CidrBlock: !Ref VPCCidrBlock
