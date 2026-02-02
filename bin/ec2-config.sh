@@ -10,7 +10,9 @@ output = ${OutputFormat}
 EOF
 sudo apt update
 sudo apt upgrade -y
-sudo apt install awscli docker.io docker-compose -y
+sudo apt install awscli -y
+sudo apt install docker.io -y
+sudo apt install docker-compose -y
 sudo docker swarm init
 sudo usermod -aG docker ubuntu
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
