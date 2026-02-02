@@ -1,4 +1,5 @@
 #!/bin/sh
+sudo mkdir --parents /root/.aws
 sudo tee /root/.aws/config <<EOF
 [default]
 region = ${RegionName}
