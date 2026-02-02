@@ -7,13 +7,111 @@
 
 AWSTemplateFormatVersion: "2010-09-09"
 
-Description: This template creates a new VPC and deploys a VM in AWS
+Description: Lab for ProTech
 
 #============================================================
 # UI Definition
 #============================================================
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: Instance Configuration
+        Parameters:
+          - InstanceImageId
+          - InstanceInstanceType
+          - OutputFormat
+          - PublicKeyMaterial00
+          - PublicKeyMaterial01
+          - PublicKeyMaterial02
+          - PublicKeyMaterial03
+          - PublicKeyMaterial04
+          - PublicKeyMaterial05
+          - PublicKeyMaterial06
+          - PublicKeyMaterial07
+          - PublicKeyMaterial08
+          - RegionName
+      -
+        Label:
+          default: Network Configuration
+        Parameters:
+          - HostedZoneName
+          - SecurityGroupCidrIp
+          - SubnetCidrBlockPublic
+          - UserName00
+          - UserName01
+          - UserName02
+          - UserName03
+          - UserName04
+          - UserName05
+          - UserName06
+          - UserName07
+          - UserName08
+          - VPCCidrBlock
+          
+    ParameterLabels:
+      HostedZoneName:
+        default: The name of the hosted zone that you want to create records in
+      InstanceImageId:
+        default: AMI to use for Instances
+      InstanceInstanceType:
+        default: Instance Size
+      OutputFormat:
+        default: ''
+      PublicKeyMaterial00:
+        default: ''
+      PublicKeyMaterial01:
+        default: ''
+      PublicKeyMaterial02:
+        default: ''
+      PublicKeyMaterial03:
+        default: ''
+      PublicKeyMaterial04:
+        default: ''
+      PublicKeyMaterial05:
+        default: ''
+      PublicKeyMaterial06:
+        default: ''
+      PublicKeyMaterial07:
+        default: ''
+      PublicKeyMaterial08:
+        default: ''
+      RegionName:
+        default: ''
+      SecurityGroupCidrIp:
+        default: Allowed CIDR for Access
+      SubnetCidrBlockPublic:
+        default: Public Subnet CIDR
+      UserName00:
+        default: ''
+      UserName01:
+        default: ''
+      UserName02:
+        default: ''
+      UserName03:
+        default: ''
+      UserName04:
+        default: ''
+      UserName05:
+        default: ''
+      UserName06:
+        default: ''
+      UserName07:
+        default: ''
+      UserName08:
+        default: ''
+      VPCCidrBlock:
+        default: VPC CIDR
                 
 Parameters:
+
+  HostedZoneName:
+    Default: sebastian-colomar.es
+    Description: >
+      The name of the hosted zone that you want to create records in.
+    Type: String
 
   InstanceImageId:
     Default: ami-019715e0d74f695be
@@ -21,12 +119,6 @@ Parameters:
       Select AMI to use for the instances. 
     Type: String
     
-  HostedZoneName:
-    Default: sebastian-colomar.es
-    Description: >
-      The name of the hosted zone that you want to create records in.
-    Type: String
-
   InstanceInstanceType:
     Default: t3a.medium
     Description: >
@@ -38,7 +130,6 @@ Parameters:
     Description: >
       Output format.
     Type: String
-    
 
   PublicKeyMaterial00:
     Default: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCf198fe5A8wTMqYCNVaI9U7gZTi/JZX/fxIT1UGuDFyMENNlipwxWDNxFYa0t+2JGYBX3fiFuwxBhM49dp2aNcNEAXDHtwJ+h7uVYICOeWrz7JAMpVViQOJV/1nI3fplTb457alqnYPugu53rX8xNyH7oPVFKanptKfmUxttC07UNvnv9vtKeiMtYHj2SIvSzit8R93o2/EVQvUeb/2xDv0oap+1LWc1RG4aimC3H511wgWxK+FSmsAibLJbkNV8MYQ5siVHvHBpJd4qqIIBn/LgOg9GkpphIlmSfMnqBTfgpj3gElfY3cmNjr2LoR9rD7hcDqVu6R0Ej9MdmvJo+TlAepEHuXt3XB0JF/j4UwbAkZ1upKGlG0LyeBwm/t+x6cZsUQDonV2MVkBq23aD2w7yYhAnZBk4a8+bkcOvRR5flH9+EgnBpyd+1GN5Zehr+snLRW9I5tpEubx2O4RySQ8Lpozg6nnBkqRK3z677Qfln+7ZklsPgg9PblbF7plHE=
