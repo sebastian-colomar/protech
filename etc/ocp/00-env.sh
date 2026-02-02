@@ -1,0 +1,10 @@
+export ClusterName=hub
+export ClusterNetworkCIDR=10.128.0.0/16
+export DomainName=sebastian-colomar.com
+export hostPrefix=20
+export MachineNetworkCIDR=10.0.0.0/16
+export master_type=r5ad.2xlarge
+export Publish=External
+export ServiceNetworkCIDR=172.30.0.0/16
+export version=4.20.10
+export worker_type=r5ad.4xlarge
