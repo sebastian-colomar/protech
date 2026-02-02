@@ -271,123 +271,6 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess
         
-  User00:
-    Type: AWS::IAM::User
-    Properties:
-      UserName: !Ref UserName00
-      Path: /
-      
-  User01:
-    Type: AWS::IAM::User
-    Properties:
-      UserName: !Ref UserName01
-      Path: /
-      
-  User02:
-    Type: AWS::IAM::User
-    Properties:
-      UserName: !Ref UserName02
-      Path: /
-      
-  User03:
-    Type: AWS::IAM::User
-    Properties:
-      UserName: !Ref UserName03
-      Path: /
-      
-  User04:
-    Type: AWS::IAM::User
-    Properties:
-      UserName: !Ref UserName04
-      Path: /
-      
-  User05:
-    Type: AWS::IAM::User
-    Properties:
-      UserName: !Ref UserName05
-      Path: /
-      
-  User06:
-    Type: AWS::IAM::User
-    Properties:
-      UserName: !Ref UserName06
-      Path: /
-      
-  User07:
-    Type: AWS::IAM::User
-    Properties:
-      UserName: !Ref UserName07
-      Path: /
-      
-  User08:
-    Type: AWS::IAM::User
-    Properties:
-      UserName: !Ref UserName08
-      Path: /
-      
-  UserToGroupAddition00:
-    Type: AWS::IAM::UserToGroupAddition
-    Properties:
-      GroupName: !Ref Group
-      Users:
-        - !Ref User00
-        
-  UserToGroupAddition01:
-    Type: AWS::IAM::UserToGroupAddition
-    Properties:
-      GroupName: !Ref Group
-      Users:
-        - !Ref User01
-        
-  UserToGroupAddition02:
-    Type: AWS::IAM::UserToGroupAddition
-    Properties:
-      GroupName: !Ref Group
-      Users:
-        - !Ref User02
-        
-  UserToGroupAddition03:
-    Type: AWS::IAM::UserToGroupAddition
-    Properties:
-      GroupName: !Ref Group
-      Users:
-        - !Ref User03
-      
-  UserToGroupAddition04:
-    Type: AWS::IAM::UserToGroupAddition
-    Properties:
-      GroupName: !Ref Group
-      Users:
-        - !Ref User04
-        
-  UserToGroupAddition05:
-    Type: AWS::IAM::UserToGroupAddition
-    Properties:
-      GroupName: !Ref Group
-      Users:
-        - !Ref User05
-        
-  UserToGroupAddition06:
-    Type: AWS::IAM::UserToGroupAddition
-    Properties:
-      GroupName: !Ref Group
-      Users:
-        - !Ref User06
-        
-  UserToGroupAddition07:
-    Type: AWS::IAM::UserToGroupAddition
-    Properties:
-      GroupName: !Ref Group
-      Users:
-        - !Ref User07
-        
-  UserToGroupAddition08:
-    Type: AWS::IAM::UserToGroupAddition
-    Properties:
-      GroupName: !Ref Group
-      Users:
-        - !Ref User08
-        
   AccessKey00:
     Type: AWS::IAM::AccessKey
     Properties:
@@ -985,7 +868,7 @@ Resources:
           - 0
           - Fn::GetAZs: !Ref 'AWS::Region'
       CidrBlock: !Ref SubnetCidrBlockPublic
-      MapPublicIpOnLaunch: false
+      MapPublicIpOnLaunch: true
       VpcId: !Ref VPC
     Type: AWS::EC2::Subnet
 
@@ -995,6 +878,123 @@ Resources:
       SubnetId: !Ref SubnetPublic
     Type: AWS::EC2::SubnetRouteTableAssociation
 
+  User00:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName00
+      Path: /
+      
+  User01:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName01
+      Path: /
+      
+  User02:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName02
+      Path: /
+      
+  User03:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName03
+      Path: /
+      
+  User04:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName04
+      Path: /
+      
+  User05:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName05
+      Path: /
+      
+  User06:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName06
+      Path: /
+      
+  User07:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName07
+      Path: /
+      
+  User08:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName08
+      Path: /
+      
+  UserToGroupAddition00:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User00
+        
+  UserToGroupAddition01:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User01
+        
+  UserToGroupAddition02:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User02
+        
+  UserToGroupAddition03:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User03
+      
+  UserToGroupAddition04:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User04
+        
+  UserToGroupAddition05:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User05
+        
+  UserToGroupAddition06:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User06
+        
+  UserToGroupAddition07:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User07
+        
+  UserToGroupAddition08:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User08
+        
   VPC:
     Properties:
       CidrBlock: !Ref VPCCidrBlock
