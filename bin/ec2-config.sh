@@ -8,6 +8,12 @@ tee .aws/config <<EOF
 region = ${RegionName}
 output = ${OutputFormat}
 EOF
+sudo mkdir --parents /root/.aws
+sudo tee /root/.aws/config <<EOF
+[default]
+region = ${RegionName}
+output = ${OutputFormat}
+EOF
 sudo apt update
 sudo apt upgrade -y
 sudo apt install awscli -y
