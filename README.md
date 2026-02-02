@@ -5,7 +5,7 @@ export YourName=me
 export YourKey=~/ProTech/protech00-key.txt
 ```
 ```
-ssh protech-{YourName}.sebastian-colomar.com -i {YourKey} -l ubuntu
+ssh protech-${YourName}.sebastian-colomar.com -i ${YourKey} -l ubuntu
 ```
 ```
 git clone https://github.com/sebastian-colomar/protech
