@@ -1,11 +1,13 @@
 #!/bin/sh
-sudo mkdir --parents /root/.aws
-sudo tee /root/.aws/config <<EOF
+export RegionName=ap-south-1
+export OutputFormat=json
+
+mkdir --parents .aws
+tee .aws/config <<EOF
 [default]
 region = ${RegionName}
 output = ${OutputFormat}
 EOF
-sudo chmod 600 /root/.aws/config
 sudo apt update
 sudo apt upgrade -y
 sudo apt install awscli docker.io docker-compose -y
