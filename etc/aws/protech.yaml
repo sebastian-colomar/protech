@@ -427,12 +427,18 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/sh
-          sudo tee /root/.aws/config <<EOF
-          [default]
-          region = ${RegionName}
-          output = ${OutputFormat}
-          EOF
-          sudo chmod 600 /root/.aws/config
+          sudo tee /root/.aws/credentials <<EOF
+          [default]
+          aws_access_key_id = ${AccessKey00}
+          aws_secret_access_key = ${AccessKey00.SecretAccessKey}
+          EOF
+          sudo chmod 600 /root/.aws/credentials
+          sudo tee /root/.aws/config <<EOF
+          [default]
+          region = ${RegionName}
+          format = ${OutputFormat}
+          EOF
+          sudo chmod 600 /root/.aws/config          
           sudo apt update
           sudo apt upgrade -y
           sudo apt install awscli docker.io docker-compose -y
@@ -454,12 +460,18 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/sh
-          sudo tee /root/.aws/config <<EOF
-          [default]
-          region = ${RegionName}
-          output = ${OutputFormat}
-          EOF
-          sudo chmod 600 /root/.aws/config
+          sudo tee /root/.aws/credentials <<EOF
+          [default]
+          aws_access_key_id = ${AccessKey01}
+          aws_secret_access_key = ${AccessKey01.SecretAccessKey}
+          EOF
+          sudo chmod 600 /root/.aws/credentials
+          sudo tee /root/.aws/config <<EOF
+          [default]
+          region = ${RegionName}
+          format = ${OutputFormat}
+          EOF
+          sudo chmod 600 /root/.aws/config          
           sudo apt update
           sudo apt upgrade -y
           sudo apt install awscli docker.io docker-compose -y
@@ -481,6 +493,12 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/sh
+          sudo tee /root/.aws/credentials <<EOF
+          [default]
+          aws_access_key_id = ${AccessKey02}
+          aws_secret_access_key = ${AccessKey02.SecretAccessKey}
+          EOF
+          sudo chmod 600 /root/.aws/credentials
           sudo tee /root/.aws/config <<EOF
           [default]
           region = ${RegionName}
@@ -508,6 +526,12 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/sh
+          sudo tee /root/.aws/credentials <<EOF
+          [default]
+          aws_access_key_id = ${AccessKey03}
+          aws_secret_access_key = ${AccessKey03.SecretAccessKey}
+          EOF
+          sudo chmod 600 /root/.aws/credentials
           sudo tee /root/.aws/config <<EOF
           [default]
           region = ${RegionName}
@@ -535,6 +559,12 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/sh
+          sudo tee /root/.aws/credentials <<EOF
+          [default]
+          aws_access_key_id = ${AccessKey04}
+          aws_secret_access_key = ${AccessKey04.SecretAccessKey}
+          EOF
+          sudo chmod 600 /root/.aws/credentials
           sudo tee /root/.aws/config <<EOF
           [default]
           region = ${RegionName}
@@ -562,6 +592,12 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/sh
+          sudo tee /root/.aws/credentials <<EOF
+          [default]
+          aws_access_key_id = ${AccessKey05}
+          aws_secret_access_key = ${AccessKey05.SecretAccessKey}
+          EOF
+          sudo chmod 600 /root/.aws/credentials
           sudo tee /root/.aws/config <<EOF
           [default]
           region = ${RegionName}
@@ -589,6 +625,12 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/sh
+          sudo tee /root/.aws/credentials <<EOF
+          [default]
+          aws_access_key_id = ${AccessKey06}
+          aws_secret_access_key = ${AccessKey06.SecretAccessKey}
+          EOF
+          sudo chmod 600 /root/.aws/credentials
           sudo tee /root/.aws/config <<EOF
           [default]
           region = ${RegionName}
@@ -616,6 +658,12 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/sh
+          sudo tee /root/.aws/credentials <<EOF
+          [default]
+          aws_access_key_id = ${AccessKey07}
+          aws_secret_access_key = ${AccessKey07.SecretAccessKey}
+          EOF
+          sudo chmod 600 /root/.aws/credentials
           sudo tee /root/.aws/config <<EOF
           [default]
           region = ${RegionName}
@@ -643,6 +691,12 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/sh
+          sudo tee /root/.aws/credentials <<EOF
+          [default]
+          aws_access_key_id = ${AccessKey08}
+          aws_secret_access_key = ${AccessKey08.SecretAccessKey}
+          EOF
+          sudo chmod 600 /root/.aws/credentials
           sudo tee /root/.aws/config <<EOF
           [default]
           region = ${RegionName}
