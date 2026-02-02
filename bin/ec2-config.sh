@@ -16,10 +16,13 @@ output = ${OutputFormat}
 EOF
 sudo apt update
 sudo apt upgrade -y
-sudo apt install awscli -y
 sudo apt install docker.io -y
 sudo apt install docker-compose -y
+sudo apt install unzip -y
 sudo docker swarm init
 sudo usermod -aG docker ubuntu
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
 sudo apt-get install ./minikube_latest_amd64.deb -y
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install --update
