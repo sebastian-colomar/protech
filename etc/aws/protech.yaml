@@ -261,7 +261,178 @@ Parameters:
 # Resources
 #============================================================
 Resources:
-    
+
+  Group:
+    Type: AWS::IAM::Group
+    Properties:
+      #GroupName: !Ref GroupName
+      GroupName: protech
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+        
+  User00:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName00
+      Path: /
+      
+  User01:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName01
+      Path: /
+      
+  User02:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName02
+      Path: /
+      
+  User03:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName03
+      Path: /
+      
+  User04:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName04
+      Path: /
+      
+  User05:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName05
+      Path: /
+      
+  User06:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName06
+      Path: /
+      
+  User07:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName07
+      Path: /
+      
+  User08:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName08
+      Path: /
+      
+  UserToGroupAddition00:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User00
+        
+  UserToGroupAddition01:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User01
+        
+  UserToGroupAddition02:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User02
+        
+  UserToGroupAddition03:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User03
+      
+  UserToGroupAddition04:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User04
+        
+  UserToGroupAddition05:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User05
+        
+  UserToGroupAddition06:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User06
+        
+  UserToGroupAddition07:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User07
+        
+  UserToGroupAddition08:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User08
+        
+  AccessKey00:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref User00
+        
+  AccessKey01:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref User01
+        
+  AccessKey02:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref User02
+        
+  AccessKey03:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref User03
+        
+  AccessKey04:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref User04
+        
+  AccessKey05:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref User05
+        
+  AccessKey06:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref User06
+        
+  AccessKey07:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref User07
+        
+  AccessKey08:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref User08
+      
   EIP00:
     Properties:
       Domain: vpc
@@ -769,7 +940,6 @@ Resources:
                 - ec2.amazonaws.com
         Version: 2012-10-17
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AdministratorAccess
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
     Type: AWS::IAM::Role
 
