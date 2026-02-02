@@ -12,7 +12,6 @@ Description: This template creates a new VPC and deploys a VM in AWS
 #============================================================
 # UI Definition
 #============================================================
-Metadata:
                 
 Parameters:
 
