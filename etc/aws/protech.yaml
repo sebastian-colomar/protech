@@ -265,13 +265,12 @@ Resources:
   Group:
     Type: AWS::IAM::Group
     Properties:
-      #GroupName: !Ref GroupName
       GroupName: protech
       Path: /
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess
-        
-  AccessKey00:
+
+  AccessKey00:
     Type: AWS::IAM::AccessKey
     Properties:
       UserName: !Ref User00
