@@ -108,7 +108,7 @@ Metadata:
 Parameters:
 
   HostedZoneName:
-    Default: sebastian-colomar.es
+    Default: sebastian-colomar.com
     Description: >
       The name of the hosted zone that you want to create records in.
     Type: String
