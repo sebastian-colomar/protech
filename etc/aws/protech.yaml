@@ -263,22 +263,22 @@ Parameters:
 Resources:
 
   Group:
-    Type: AWS::IAM::Group
-    Properties:
-      GroupName: protech
-      Path: /
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AdministratorAccess
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: protech
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
 
   AccessKey00:
-    Type: AWS::IAM::AccessKey
-    Properties:
-      UserName: !Ref User00
-        
-  AccessKey01:
-    Type: AWS::IAM::AccessKey
-    Properties:
-      UserName: !Ref User01
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref User00
+
+  AccessKey01:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref User01
         
   AccessKey02:
     Type: AWS::IAM::AccessKey
