@@ -1,0 +1,749 @@
+#########################################################################
+#      Copyright (C) 2025        Sebastian Francisco Colomar Bauza      #
+#      SPDX-License-Identifier:  GPL-2.0-only                           #
+#########################################################################
+
+---
+
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: This template creates a new VPC and deploys a VM in AWS
+
+#============================================================
+# UI Definition
+#============================================================
+Metadata:
+                
+Parameters:
+
+  InstanceImageId:
+    Default: ami-019715e0d74f695be
+    Description: >
+      Select AMI to use for the instances. 
+    Type: String
+    
+  HostedZoneName:
+    Default: sebastian-colomar.es
+    Description: >
+      The name of the hosted zone that you want to create records in.
+    Type: String
+
+  InstanceInstanceType:
+    Default: t3a.medium
+    Description: >
+      Select Amazon EC2 instance type.
+    Type: String
+
+  OutputFormat:
+    Default: json
+    Description: >
+      Output format.
+    Type: String
+    
+
+  PublicKeyMaterial00:
+    Default: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCf198fe5A8wTMqYCNVaI9U7gZTi/JZX/fxIT1UGuDFyMENNlipwxWDNxFYa0t+2JGYBX3fiFuwxBhM49dp2aNcNEAXDHtwJ+h7uVYICOeWrz7JAMpVViQOJV/1nI3fplTb457alqnYPugu53rX8xNyH7oPVFKanptKfmUxttC07UNvnv9vtKeiMtYHj2SIvSzit8R93o2/EVQvUeb/2xDv0oap+1LWc1RG4aimC3H511wgWxK+FSmsAibLJbkNV8MYQ5siVHvHBpJd4qqIIBn/LgOg9GkpphIlmSfMnqBTfgpj3gElfY3cmNjr2LoR9rD7hcDqVu6R0Ej9MdmvJo+TlAepEHuXt3XB0JF/j4UwbAkZ1upKGlG0LyeBwm/t+x6cZsUQDonV2MVkBq23aD2w7yYhAnZBk4a8+bkcOvRR5flH9+EgnBpyd+1GN5Zehr+snLRW9I5tpEubx2O4RySQ8Lpozg6nnBkqRK3z677Qfln+7ZklsPgg9PblbF7plHE=
+    Description: Public SSH key
+    Type: String
+
+  PublicKeyMaterial01:
+    Default: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCzZAP0w2S5EtA6oMj5YKP6XrpWUo9+zwQyZ0tyNd68AEdOBBml4bV1Ig3lxDS0BUxAZdq2+agVEG7B62LXK0HykOLCTOEvOW5CpY0X0kwA47tCoX1ofrg1f6GWLpmYo6mMCsPja/sLCF38Jdy63/4KgqIHoEFOLbWXmdBFB94ADK5Bhyk0ms7XNRi0w5vPrQYLtsKc8AMAjKzzK9nnyCqn2ZkbUlz+Azh84eQU5QCzeBjhdyKt53vgKeEJbiCPUSOOS/Hwg+998LbiFr6kt6faYvuyJKMYeSiLdGVMfooxy0VMKH9ndAtIJxRspxrj0JPDLjKnWnXn4lyRQJLLFaSzvVbrtoppZpkbb3SKhF2DcIBzzye8vyUwBWZTV8i7SmLdkxZfHkdcvo/0VAGfbbKAJZt51rmtrHR4UqHdZkYzA9PBP/9WDpxswH9J8aihqD3XKSKSnpFEge+s6eplcek4dZyU5xdVFc5/rWkX2vogKkMTOMynGtScgnMB8zYwCNc=
+    Description: Public SSH key
+    Type: String
+
+  PublicKeyMaterial02:
+    Default: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCWYErQMMYcZj8DZQuVgWs8UBr71fRI/pCgsJWFDa7bneGnKF/J0P4e+va/4KykM4w0PV0drqWbUIXs+Pgz+5kFe7wW8djthNE8ZauN2EQ872jWyBpbE5zeoP98LZAy/X14CC44Y9qzizxZa2BKoC+GG9n448iMLc6pMIHpVinbM5RjuZLPaQTfWk5BfHlInfHIqcuxVlu9jrUFcQ3Aq+CLGfo1gaOhRA0q9QMAZdx/GfemZkhG649iPucfl4Tax+09FhF8vpCdjtCU2vQpYJOXjlW4X8hYc8WukZhOkpREeZ9//+MuEwA8+YdQOsHC+8UZ3zHof0VNBIcnKEAUCxwjDnxV6MlOBjMhXz5uqPWYTohNjdjwQV/p6Rkw4VqXw4QSQ6bTdAdc+/jKz+XKLLvYSBKblrn5ltd+0XDyMdh8J5n1gjXBKVr3BxAxEdg4mq0FGT2Rh43JvZ25XWC1k4MMcCWziSE3yAYeW9G8SrK7iKXbGEbSd7xAU9bTDDjXu9c=
+    Description: Public SSH key
+    Type: String
+
+  PublicKeyMaterial03:
+    Default: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQClap3Oeb8JddaWtJHijqzNnzbJrIWOOa+iD5HmCAUxIax0wJlwuWs4V/469WmhRsf+ur8Pif+w9toH7C7hyX5cyrpJkbXVnq9Cozg6YNffvhtO/Zu6ZC+lGNSNqu6NMYY4+hOQ3n5tz5NTvl0nBvta4Y219ULKM3Gb+XLNRf1YjKA+FmBQYXS6km+ceCvPyv+q18ujD+lS0XX0h95n26FJx49+5noL0idIwE678mEH8KHkqdK9q/287g4egykU5JS1oFujs1oJ6DKKl+gKBJJ9MVEJ7SbLQwj7ERc0/fwboYJKpPlF/0c/NgNPp7YdlJohq5Up9J0reuMy8MIxwXLe7bRAmtyh2We20KRvaTh0wk+OKy6c2ucWF1irTETomqsLohQ1zBQxWiK/U+oOu64w6bhw9mNuDxWl/jAUSMHV4zUzyP5hnY/Dw3XE8N/WYKNVRGx9fNQcKX4a2tZ3JvY+9i/WMl1gD/Q/NZbxAHpdrDWwchOnjN7T1V6a5j4pht0=
+    Description: Public SSH key
+    Type: String
+
+  PublicKeyMaterial04:
+    Default: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDvI2hls2ikGdCzCE7LmtCd38oy6lO8+XZs4jY9e02WFmaMVT2Rza38+myfB0WN9jhUOftjkwH0zv8ZQbHlpSE6JAg7bNE/ggn7nUOaFvAr3as0V+jDkbrVOZJpPEccGW8RovzEjll3Bn/66Gps1sO3jd5rC5xSAdKpl7y2y/QinRVV1qjSuOwixWrM4/QLt0U8t7vYB63ca2rUIRHP0bE/Yjfhx7IoP2v35FBk5CGi8kQ+MYsq/9m3YYjYt2hsCVSpdSwFVZ6mVzTlI9Fs/sQzjO+CRmmaJBuaPIvNCxF4tVZ5Y9kKk+RZlnRLBj6M9wmJGixDdXb8LLbJBTtur+7QsVeqyPZDsqrMNozVpQCF4sYe33BIlGgkFJnwJySQHO4vvXcjGa0gXOB+R2SqO3c3lPL/xxKsXKsVnoiPeqaMlXoYc5GQX+69V7aMWBPaKb7XNUkM6atsXimX/OhyJL4Yk5QKVvsHm2odHFMc7HZrfj6zWpdPYmCelI7MufgAnL0=
+    Description: Public SSH key
+    Type: String
+
+  PublicKeyMaterial05:
+    Default: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCmWzCcdgOtstdRTFo1dYOqo02ekLWdap8OWJUdI3sQL9tJpVFukr8bI3TSg7myG54m6loPbbtw6O9Xtb4DmPrAfJ/64zFedHtlU6RyQUG+9zAvIqEVJ2QmvIG2jFt+RzUx5hgAieE6v4X4KklpaEbprQg0vflN8rR4tvhtMGmWjgzUWFTnc2MvZGmuSX18bj4wU8GGhXdAH5OIN0cuws5dTV6Fc6CDG473zMbwj9qOKWQPrcfyGtOgbf+kX92NwvVtv5okRMYIbtMH+ff8BTHAmkpbRkJnEsj4WnZs1NEAjDvrNQ98hEQgeyacGl9dObY2PL4OjDoEo95vnVNu8MxNgB5QX9eIBaN28LuYOhY8T7klqe18WX5YtAbiTpuF/+uNZH+Vc00GJaGdAPzUlkbnYGMmaeCGDlQF0iqTsYS3hTzREUAkDzPOPhh0FOs/Jtdd0Gn729ST+SH74PM0Yj5WzsmoMYYrRkVpIoWaaO1sSrbgRHG9ifDLr3Z4t6KnZ8M=
+    Description: Public SSH key
+    Type: String
+  
+  PublicKeyMaterial06:
+    Default: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCPVDFMZ5y3N7r/0SOlp5SPsWtgOpGkZRzoUiP+GRUHq3F7vwVhYcrCxxV1FgeKYf1L8RiW6V24vAwDa9YSEmQ2TTvsDIHgLI5T1emqNyYomN6kzZbsTqjGzlv8E4NIqw+dsSLSzIvIkBYU/piVQqFQX+L3I9H+cXrREwlZeqHsmtZcSaXAJ3BXGhz+ZQqNVZUpytdnkvT2949HUcQT+xlytPBpJ9dJpcQwEQErGk8YL0S6ZY7umxvzgS0KtmMvRNy3P5oeID6i+NYhxxI0/NfUF3VlWC9d9i3eelUPOoCVpVWIlJcczzcBG5MqYcM9YhHXqR69++qhhZHXYrMHWa0h/WprN81ZAl3LwL0haP1TRpyt3M0Q3FgylZMlRPUJ0/Q8GPy1nm1p4eg5Wy8y8ouG+TYSYF1LzfHG/lvPCpm/ZQm4Rsjsuirwds8HZcST0faeHr6/QpoA/tO+8Awr0qoOE0FHjUE6h5VxscP+JecdolpJnX+BfZvP7ueP3OuL8xM=
+    Description: Public SSH key
+    Type: String
+
+  PublicKeyMaterial07:
+    Default: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC4sWi5xqEJnxcjR3coMeDJU0f058cGwrFl3qhzA0LUQ7Ou/YcYAWmiDSofeWwe5xpdNTMP9dyHWFzJEHzDwVhM/T237geQdCwywXop9huPgNt2H2s/DCcNXV0v2KpwY2UpgxKfs1hCc3QPxL3E5tSwJGZXct7jTKJgGWDVBDNIPocbEpHAqnYacDmlVOyTyf5pHBB9gH+kwpouj7ZanI0Qt29XPtXwMCEWtpCj4LBw9HqrGYQVDvK7YsQdfu58BLQ0yQM59nDTRqX4SG+MVOWvuYOq1F7Qnr/dMvaCK81/mIzp5QsbkvU/eiSjHcKC8kiJosS7nIOCdalfclxQ3yNZkYLJEmxs1AcdHXZsKkHYaCu5InYvTpBCZXoOrafW+ef6IxX+aUGKQ0shaV0O/rhMXbG5LPMgU0cLD0NUyu8vdlNDbxs/NWtsuHAIDUGitgSWn8y9dkkhKcN/lKJvmkkjiak40bJdeMutrGs1IRDh9BhvM/tBoY5KIt9RLzLn9Vs=
+    Description: Public SSH key
+    Type: String
+
+  PublicKeyMaterial08:
+    Default: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDP7/fEZv/bVoEDnaYQBKeEyrikADEZ5PZ6qMSBCm/LDEukGHwpLvd1l3UVIkVBrbKvrmqENuYFh9CPaLC8jaIhY9tCnwpIo8pMyj/lXggR3cNy2kTvogCOoX0bDYnPo3SuCQTPM1qqbari9bqmSIYvngXQmqK6MMHyY0Rqf8RVPKg8nXejdiclAvvM4vAj8puFuwl6a9lyi5JuKHcpdMIQcsslj850CS2DPXQMbEEmc5eKWnXnM3SmWtVvBOdmGma6pI5MNzlWraMREvqZV9YmEB0AEozRTnj5l4TZ9yW/u5fQKrFMDZOJK2rOmlGx6KgXBh3hp9BrsqaQiG6MgBdX+RNYmWsZki8O5rqHgGyQlX0DfHkeldafNLmImnji/Y8oM/wDYoQjU7QeEK0uK23ZvoZ/dQsNQIbjLKG1GVCWdcq2BrWx1E/2t1T7ekKx26Ikgl5Tbr+UMCH9xF6NykQakiBc96LQnYb/Dua/Xcen9pmijwy3eAOkQPSoBxt6VzU=
+    Description: Public SSH key
+    Type: String
+
+  RegionName:
+    Default: ap-south-1
+    Description: >
+      Region name.
+    Type: String
+    
+  SecurityGroupCidrIp:
+    Default: 0.0.0.0/0
+    Description: >
+      Allowed CIDR block for external web access. 
+      It defines the block of IPs that can access the application servers. 
+      Set it to 0.0.0.0/0 to make it accessible from anywhere.
+    Type: String
+    
+  SubnetCidrBlockPublic:
+    Default: 10.168.2.0/24
+    Description: >
+      CIDR block for public (DMZ) subnet located in Availability Zone 1. 
+      All resources located on this subnet are provided an IP within this address block. 
+    Type: String
+
+  UserName00:
+    Default: protech-me
+    Description: >
+      User name.
+    Type: String
+
+  UserName01:
+    Default: protech-marian
+    Description: >
+      User name.
+    Type: String
+
+  UserName02:
+    Default: protech-cecilia
+    Description: >
+      User name.
+    Type: String
+
+  UserName03:
+    Default: protech-shawn
+    Description: >
+      User name.
+    Type: String
+
+  UserName04:
+    Default: protech-ruosong
+    Description: >
+      User name.
+    Type: String
+
+  UserName05:
+    Default: protech-glenval
+    Description: >
+      User name.
+    Type: String
+
+  UserName06:
+    Default: protech-ming-yuan
+    Description: >
+      User name.
+    Type: String
+
+  UserName07:
+    Default: protech-huan
+    Description: >
+      User name.
+    Type: String
+
+  UserName08:
+    Default: protech-grace
+    Description: >
+      User name.
+    Type: String
+
+  VPCCidrBlock:
+    Default: 10.168.0.0/16
+    Description: >
+      CIDR block for the VPC. All the subnets and resources will have an IP within this address block.
+    Type: String
+    
+#============================================================
+# Resources
+#============================================================
+Resources:
+    
+  EIP00:
+    Properties:
+      Domain: vpc
+    Type: AWS::EC2::EIP
+    
+  EIP01:
+    Properties:
+      Domain: vpc
+    Type: AWS::EC2::EIP
+
+  EIP02:
+    Properties:
+      Domain: vpc
+    Type: AWS::EC2::EIP
+    
+  EIP03:
+    Properties:
+      Domain: vpc
+    Type: AWS::EC2::EIP
+    
+  EIP04:
+    Properties:
+      Domain: vpc
+    Type: AWS::EC2::EIP
+    
+  EIP05:
+    Properties:
+      Domain: vpc
+    Type: AWS::EC2::EIP
+
+  EIP06:
+    Properties:
+      Domain: vpc
+    Type: AWS::EC2::EIP
+
+  EIP07:
+    Properties:
+      Domain: vpc
+    Type: AWS::EC2::EIP
+
+  EIP08:
+    Properties:
+      Domain: vpc
+    Type: AWS::EC2::EIP
+
+  EIPAssociation00:
+    Properties:
+      AllocationId: !GetAtt EIP00.AllocationId
+      InstanceId: !Ref Instance00
+    Type: AWS::EC2::EIPAssociation
+
+  EIPAssociation01:
+    Properties:
+      AllocationId: !GetAtt EIP01.AllocationId
+      InstanceId: !Ref Instance01
+    Type: AWS::EC2::EIPAssociation
+
+  EIPAssociation02:
+    Properties:
+      AllocationId: !GetAtt EIP02.AllocationId
+      InstanceId: !Ref Instance02
+    Type: AWS::EC2::EIPAssociation
+
+  EIPAssociation03:
+    Properties:
+      AllocationId: !GetAtt EIP03.AllocationId
+      InstanceId: !Ref Instance03
+    Type: AWS::EC2::EIPAssociation
+
+  EIPAssociation04:
+    Properties:
+      AllocationId: !GetAtt EIP04.AllocationId
+      InstanceId: !Ref Instance04
+    Type: AWS::EC2::EIPAssociation
+
+  EIPAssociation05:
+    Properties:
+      AllocationId: !GetAtt EIP05.AllocationId
+      InstanceId: !Ref Instance05
+    Type: AWS::EC2::EIPAssociation
+
+  EIPAssociation06:
+    Properties:
+      AllocationId: !GetAtt EIP06.AllocationId
+      InstanceId: !Ref Instance06
+    Type: AWS::EC2::EIPAssociation
+
+  EIPAssociation07:
+    Properties:
+      AllocationId: !GetAtt EIP07.AllocationId
+      InstanceId: !Ref Instance07
+    Type: AWS::EC2::EIPAssociation
+
+  EIPAssociation08:
+    Properties:
+      AllocationId: !GetAtt EIP08.AllocationId
+      InstanceId: !Ref Instance08
+    Type: AWS::EC2::EIPAssociation
+      
+  Instance00:
+    Properties:
+      IamInstanceProfile: !Ref InstanceProfile
+      ImageId: !Ref InstanceImageId
+      InstanceType: !Ref InstanceInstanceType
+      KeyName: !Ref KeyPair00
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      SubnetId: !Ref SubnetPublic
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/sh
+          sudo tee /root/.aws/config <<EOF
+          [default]
+          region = ${RegionName}
+          output = ${OutputFormat}
+          EOF
+          sudo chmod 600 /root/.aws/config
+          sudo apt update
+          sudo apt upgrade -y
+          sudo apt install awscli docker.io docker-compose -y
+          sudo docker swarm init
+          sudo usermod -aG docker ubuntu
+          curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+          sudo apt-get install ./minikube_latest_amd64.deb -y
+    Type: AWS::EC2::Instance
+
+  Instance01:
+    Properties:
+      IamInstanceProfile: !Ref InstanceProfile
+      ImageId: !Ref InstanceImageId
+      InstanceType: !Ref InstanceInstanceType
+      KeyName: !Ref KeyPair01
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      SubnetId: !Ref SubnetPublic
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/sh
+          sudo tee /root/.aws/config <<EOF
+          [default]
+          region = ${RegionName}
+          output = ${OutputFormat}
+          EOF
+          sudo chmod 600 /root/.aws/config
+          sudo apt update
+          sudo apt upgrade -y
+          sudo apt install awscli docker.io docker-compose -y
+          sudo docker swarm init
+          sudo usermod -aG docker ubuntu
+          curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+          sudo apt-get install ./minikube_latest_amd64.deb -y
+    Type: AWS::EC2::Instance
+
+  Instance02:
+    Properties:
+      IamInstanceProfile: !Ref InstanceProfile
+      ImageId: !Ref InstanceImageId
+      InstanceType: !Ref InstanceInstanceType
+      KeyName: !Ref KeyPair02
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      SubnetId: !Ref SubnetPublic
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/sh
+          sudo tee /root/.aws/config <<EOF
+          [default]
+          region = ${RegionName}
+          output = ${OutputFormat}
+          EOF
+          sudo chmod 600 /root/.aws/config
+          sudo apt update
+          sudo apt upgrade -y
+          sudo apt install awscli docker.io docker-compose -y
+          sudo docker swarm init
+          sudo usermod -aG docker ubuntu
+          curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+          sudo apt-get install ./minikube_latest_amd64.deb -y
+    Type: AWS::EC2::Instance
+
+  Instance03:
+    Properties:
+      IamInstanceProfile: !Ref InstanceProfile
+      ImageId: !Ref InstanceImageId
+      InstanceType: !Ref InstanceInstanceType
+      KeyName: !Ref KeyPair03
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      SubnetId: !Ref SubnetPublic
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/sh
+          sudo tee /root/.aws/config <<EOF
+          [default]
+          region = ${RegionName}
+          output = ${OutputFormat}
+          EOF
+          sudo chmod 600 /root/.aws/config
+          sudo apt update
+          sudo apt upgrade -y
+          sudo apt install awscli docker.io docker-compose -y
+          sudo docker swarm init
+          sudo usermod -aG docker ubuntu
+          curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+          sudo apt-get install ./minikube_latest_amd64.deb -y
+    Type: AWS::EC2::Instance
+
+  Instance04:
+    Properties:
+      IamInstanceProfile: !Ref InstanceProfile
+      ImageId: !Ref InstanceImageId
+      InstanceType: !Ref InstanceInstanceType
+      KeyName: !Ref KeyPair04
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      SubnetId: !Ref SubnetPublic
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/sh
+          sudo tee /root/.aws/config <<EOF
+          [default]
+          region = ${RegionName}
+          output = ${OutputFormat}
+          EOF
+          sudo chmod 600 /root/.aws/config
+          sudo apt update
+          sudo apt upgrade -y
+          sudo apt install awscli docker.io docker-compose -y
+          sudo docker swarm init
+          sudo usermod -aG docker ubuntu
+          curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+          sudo apt-get install ./minikube_latest_amd64.deb -y
+    Type: AWS::EC2::Instance
+
+  Instance05:
+    Properties:
+      IamInstanceProfile: !Ref InstanceProfile
+      ImageId: !Ref InstanceImageId
+      InstanceType: !Ref InstanceInstanceType
+      KeyName: !Ref KeyPair05
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      SubnetId: !Ref SubnetPublic
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/sh
+          sudo tee /root/.aws/config <<EOF
+          [default]
+          region = ${RegionName}
+          output = ${OutputFormat}
+          EOF
+          sudo chmod 600 /root/.aws/config
+          sudo apt update
+          sudo apt upgrade -y
+          sudo apt install awscli docker.io docker-compose -y
+          sudo docker swarm init
+          sudo usermod -aG docker ubuntu
+          curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+          sudo apt-get install ./minikube_latest_amd64.deb -y
+    Type: AWS::EC2::Instance
+
+  Instance06:
+    Properties:
+      IamInstanceProfile: !Ref InstanceProfile
+      ImageId: !Ref InstanceImageId
+      InstanceType: !Ref InstanceInstanceType
+      KeyName: !Ref KeyPair06
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      SubnetId: !Ref SubnetPublic
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/sh
+          sudo tee /root/.aws/config <<EOF
+          [default]
+          region = ${RegionName}
+          output = ${OutputFormat}
+          EOF
+          sudo chmod 600 /root/.aws/config
+          sudo apt update
+          sudo apt upgrade -y
+          sudo apt install awscli docker.io docker-compose -y
+          sudo docker swarm init
+          sudo usermod -aG docker ubuntu
+          curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+          sudo apt-get install ./minikube_latest_amd64.deb -y
+    Type: AWS::EC2::Instance
+
+  Instance07:
+    Properties:
+      IamInstanceProfile: !Ref InstanceProfile
+      ImageId: !Ref InstanceImageId
+      InstanceType: !Ref InstanceInstanceType
+      KeyName: !Ref KeyPair07
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      SubnetId: !Ref SubnetPublic
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/sh
+          sudo tee /root/.aws/config <<EOF
+          [default]
+          region = ${RegionName}
+          output = ${OutputFormat}
+          EOF
+          sudo chmod 600 /root/.aws/config
+          sudo apt update
+          sudo apt upgrade -y
+          sudo apt install awscli docker.io docker-compose -y
+          sudo docker swarm init
+          sudo usermod -aG docker ubuntu
+          curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+          sudo apt-get install ./minikube_latest_amd64.deb -y
+    Type: AWS::EC2::Instance
+
+  Instance08:
+    Properties:
+      IamInstanceProfile: !Ref InstanceProfile
+      ImageId: !Ref InstanceImageId
+      InstanceType: !Ref InstanceInstanceType
+      KeyName: !Ref KeyPair08
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      SubnetId: !Ref SubnetPublic
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/sh
+          sudo tee /root/.aws/config <<EOF
+          [default]
+          region = ${RegionName}
+          output = ${OutputFormat}
+          EOF
+          sudo chmod 600 /root/.aws/config
+          sudo apt update
+          sudo apt upgrade -y
+          sudo apt install awscli docker.io docker-compose -y
+          sudo docker swarm init
+          sudo usermod -aG docker ubuntu
+          curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+          sudo apt-get install ./minikube_latest_amd64.deb -y
+    Type: AWS::EC2::Instance
+
+  InstanceProfile:
+    Properties:
+      Roles: [!Ref Role]
+    Type: AWS::IAM::InstanceProfile
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    
+  KeyPair00:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: !Ref UserName00
+      PublicKeyMaterial: !Ref PublicKeyMaterial00
+
+  KeyPair01:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: !Ref UserName01
+      PublicKeyMaterial: !Ref PublicKeyMaterial01
+
+  KeyPair02:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: !Ref UserName02
+      PublicKeyMaterial: !Ref PublicKeyMaterial02
+
+  KeyPair03:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: !Ref UserName03
+      PublicKeyMaterial: !Ref PublicKeyMaterial03
+
+  KeyPair04:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: !Ref UserName04
+      PublicKeyMaterial: !Ref PublicKeyMaterial04
+
+  KeyPair05:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: !Ref UserName05
+      PublicKeyMaterial: !Ref PublicKeyMaterial05
+
+  KeyPair06:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: !Ref UserName06
+      PublicKeyMaterial: !Ref PublicKeyMaterial06
+
+  KeyPair07:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: !Ref UserName07
+      PublicKeyMaterial: !Ref PublicKeyMaterial07
+
+  KeyPair08:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: !Ref UserName08
+      PublicKeyMaterial: !Ref PublicKeyMaterial08
+      
+  RecordSet00:
+    Properties:
+      ResourceRecords:
+        - !GetAtt EIP00.PublicIp
+      HostedZoneName: !Sub '${HostedZoneName}.'
+      Name: !Sub '${UserName00}.${HostedZoneName}'
+      TTL: 60
+      Type: A
+    Type: AWS::Route53::RecordSet
+
+  RecordSet01:
+    Properties:
+      ResourceRecords:
+        - !GetAtt EIP01.PublicIp
+      HostedZoneName: !Sub '${HostedZoneName}.'
+      Name: !Sub '${UserName01}.${HostedZoneName}'
+      TTL: 60
+      Type: A
+    Type: AWS::Route53::RecordSet
+
+  RecordSet02:
+    Properties:
+      ResourceRecords:
+        - !GetAtt EIP02.PublicIp
+      HostedZoneName: !Sub '${HostedZoneName}.'
+      Name: !Sub '${UserName02}.${HostedZoneName}'
+      TTL: 60
+      Type: A
+    Type: AWS::Route53::RecordSet
+
+  RecordSet03:
+    Properties:
+      ResourceRecords:
+        - !GetAtt EIP03.PublicIp
+      HostedZoneName: !Sub '${HostedZoneName}.'
+      Name: !Sub '${UserName03}.${HostedZoneName}'
+      TTL: 60
+      Type: A
+    Type: AWS::Route53::RecordSet
+
+  RecordSet04:
+    Properties:
+      ResourceRecords:
+        - !GetAtt EIP04.PublicIp
+      HostedZoneName: !Sub '${HostedZoneName}.'
+      Name: !Sub '${UserName04}.${HostedZoneName}'
+      TTL: 60
+      Type: A
+    Type: AWS::Route53::RecordSet
+
+  RecordSet05:
+    Properties:
+      ResourceRecords:
+        - !GetAtt EIP05.PublicIp
+      HostedZoneName: !Sub '${HostedZoneName}.'
+      Name: !Sub '${UserName05}.${HostedZoneName}'
+      TTL: 60
+      Type: A
+    Type: AWS::Route53::RecordSet
+
+  RecordSet06:
+    Properties:
+      ResourceRecords:
+        - !GetAtt EIP06.PublicIp
+      HostedZoneName: !Sub '${HostedZoneName}.'
+      Name: !Sub '${UserName06}.${HostedZoneName}'
+      TTL: 60
+      Type: A
+    Type: AWS::Route53::RecordSet
+
+  RecordSet07:
+    Properties:
+      ResourceRecords:
+        - !GetAtt EIP07.PublicIp
+      HostedZoneName: !Sub '${HostedZoneName}.'
+      Name: !Sub '${UserName07}.${HostedZoneName}'
+      TTL: 60
+      Type: A
+    Type: AWS::Route53::RecordSet
+
+  RecordSet08:
+    Properties:
+      ResourceRecords:
+        - !GetAtt EIP08.PublicIp
+      HostedZoneName: !Sub '${HostedZoneName}.'
+      Name: !Sub '${UserName08}.${HostedZoneName}'
+      TTL: 60
+      Type: A
+    Type: AWS::Route53::RecordSet
+
+  Role:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          -
+            Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+        Version: 2012-10-17
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+    Type: AWS::IAM::Role
+
+  RoutePublic:
+    DependsOn: [VPCGatewayAttachment]
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref RouteTablePublic
+    Type: AWS::EC2::Route
+
+  RouteTablePublic:
+    Properties:
+      VpcId: !Ref VPC
+    Type: AWS::EC2::RouteTable
+
+  SecurityGroup:
+    Properties:
+      GroupDescription: Allow access to the applications
+      SecurityGroupIngress:
+      - 
+        CidrIp: !Ref SecurityGroupCidrIp
+        FromPort: 22
+        IpProtocol: TCP
+        ToPort: 22
+      - 
+        CidrIp: !Ref SecurityGroupCidrIp
+        FromPort: 30000
+        IpProtocol: TCP
+        ToPort: 32767
+      - 
+        CidrIp: !Ref SecurityGroupCidrIp
+        FromPort: 32768
+        IpProtocol: TCP
+        ToPort: 33000
+      VpcId: !Ref VPC
+    Type: AWS::EC2::SecurityGroup   
+
+  SubnetPublic:
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: !Ref 'AWS::Region'
+      CidrBlock: !Ref SubnetCidrBlockPublic
+      MapPublicIpOnLaunch: false
+      VpcId: !Ref VPC
+    Type: AWS::EC2::Subnet
+
+  SubnetRouteTableAssociationPublic:
+    Properties:
+      RouteTableId: !Ref RouteTablePublic
+      SubnetId: !Ref SubnetPublic
+    Type: AWS::EC2::SubnetRouteTableAssociation
+
+  VPC:
+    Properties:
+      CidrBlock: !Ref VPCCidrBlock
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+    Type: "AWS::EC2::VPC"
+
+  VPCGatewayAttachment:
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+    Type: AWS::EC2::VPCGatewayAttachment
