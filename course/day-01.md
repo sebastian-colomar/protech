@@ -92,11 +92,3 @@ When prompted, select the **HTPASSWD** identity provider.
 * https://console-openshift-console.apps.hub.sebastian-colomar.com
 
 ---
-
-## 7. Reference: CoreOS Ignition configuration
-
-Official documentation for Ignition configuration (v3.1):
-
-* https://coreos.github.io/ignition/configuration-v3_1
-
----
