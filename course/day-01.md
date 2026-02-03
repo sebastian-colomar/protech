@@ -30,7 +30,7 @@ Since this is a test environment, you may use an online decoder:
 Alternatively, decode it directly on a Linux machine:
 
 ```bash
-echo ENCODED_TEXT | base64 -d && echo
+echo ENCODED_TEXT | base64 -d
 ```
 
 ---
