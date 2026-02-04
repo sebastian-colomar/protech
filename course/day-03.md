@@ -3,3 +3,6 @@ Red Hat OpenShift Container Platform Update Graph:
 
 Documentation for IBM Cloud Pak for Data System:
 - https://www.ibm.com/docs/en/cloud-paks/cloudpak-data-system/2.0.0
+
+Red Hat OpenShift mirror:
+- https://mirror.openshift.com/pub/openshift-v4/clients/ocp/
