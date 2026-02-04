@@ -129,7 +129,7 @@ sudo podman run -d --name registry --restart=always -p 5000:5000 -v /var/lib/reg
    ```
 8. Use the configuration file to generate the certificate ssl.cert:
    ```
-   openssl x509 -req -in ssl.csr -CA rootCA.pem -CAkey rootCA.key -CAcreateserial -out ssl.cert -days 356 -extensions v3_req -extfile openssl.cnf
+   openssl x509 -req -in ssl.csr -CA rootCA.pem -CAkey rootCA.key -CAcreateserial -out ssl.crt -days 356 -extensions v3_req -extfile openssl.cnf
    ```
 9. Confirm your created certificates and files by entering the following command:
    ```
