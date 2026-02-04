@@ -22,3 +22,4 @@ source protech/bin/ec2-config.sh
 - https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest/oc-mirror.tar.gz
 - https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/html/installing/validating-an-installation
 - https://docs.redhat.com/en/documentation/red_hat_quay/3/html-single/securing_red_hat_quay/index
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/html/installing/installing-mirroring-installation-images
