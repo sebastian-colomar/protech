@@ -136,6 +136,16 @@ sudo podman run -d --name registry --restart=always -p 5000:5000 -v /var/lib/reg
    find .
    ```
 
+#### Run registry with TLS
+
+```
+sudo mkdir -p /var/lib/registry
+sudo podman run -d --name registry --restart=always -p 5000:5000 -v /var/lib/registry:/var/lib/registry:Z -v /etc/pki/registry:/certs:Z -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/ssl.crt -e REGISTRY_HTTP_TLS_KEY=/certs/ssl.key docker.io/library/registry:2
+```
+```
+sudo podman login https://127.0.0.1:5000
+```
+
 ##### Configuring Podman to trust the Certificate Authority:
 
 Podman uses two paths to locate the Certificate Authority (CA) file: `/etc/containers/certs.d/` and `/etc/docker/certs.d/`. Use the following procedure to configure Podman to trust the CA.
@@ -149,7 +159,7 @@ Podman uses two paths to locate the Certificate Authority (CA) file: `/etc/conta
    ```
 2. Verify that you no longer need to use the `--tls-verify=false` option when logging in to your mirror registry:
    ```
-   sudo podman login quay-server.example.com
+   sudo podman login https://127.0.0.1:5000
    ```
 
 ##### Configuring the system to trust the certificate authority:
@@ -167,12 +177,6 @@ Use the following procedure to configure your system to trust the certificate au
    sudo update-ca-trust extract
    ```
 
-#### Run registry with TLS
-
-```
-sudo mkdir -p /var/lib/registry
-sudo podman run -d --name registry --restart=always -p 5000:5000 -v /var/lib/registry:/var/lib/registry:Z -v /etc/pki/registry:/certs:Z -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/ssl.crt -e REGISTRY_HTTP_TLS_KEY=/certs/ssl.key docker.io/library/registry:2
-```
 
 
 
