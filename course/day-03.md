@@ -53,6 +53,7 @@ for binary in ${binaries}
   done
 
 oc version
+```
 ---
 
 # Mirroring an Operator catalog:
