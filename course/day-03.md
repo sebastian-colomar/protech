@@ -35,6 +35,7 @@ When you populate your mirror registry with OpenShift Container Platform images,
 ## Preparing your mirror host
 
 ### Installing the OpenShift CLI by downloading the binary 
+
 ```
 BINARY_PATH=${HOME}/bin
 mkdir -p ${BINARY_PATH}
@@ -54,6 +55,131 @@ for binary in ${binaries}
 
 oc version
 ```
+## Mirror registry for Red Hat OpenShift introduction
+
+### OPTION 1: HTTP
+```
+sudo mkdir -p /var/lib/registry
+sudo podman run -d --name registry --restart=always -p 5000:5000 -v /var/lib/registry:/var/lib/registry:Z docker.io/library/registry:2
+```
+
+### OPTION 2: HTTPS
+
+- https://docs.redhat.com/en/documentation/red_hat_quay/3/html-single/securing_red_hat_quay/index
+
+#### Configuring SSL and TLS for the mirror registry
+
+##### Creating a Certificate Authority
+
+###### Procedure:
+
+1. Create the path for the certificates:
+   ```
+   sudo mkdir -p /etc/pki/registry
+   cd /etc/pki/registry
+   ```
+1. Generate the root CA key by entering the following command:
+   ```
+   openssl genrsa -out rootCA.key 2048
+   ```
+2. Generate the root CA certificate by entering the following command:
+   ```
+   openssl req -x509 -new -nodes -key rootCA.key -sha256 -days 1024 -out rootCA.pem
+   ```
+3. Enter the information that will be incorporated into your certificate request, including the server hostname, for example:
+   ```
+   Country Name (2 letter code) [XX]:IE
+   State or Province Name (full name) []:GALWAY
+   Locality Name (eg, city) [Default City]:GALWAY
+   Organization Name (eg, company) [Default Company Ltd]:QUAY
+   Organizational Unit Name (eg, section) []:DOCS
+   Common Name (eg, your name or your server's hostname) []:quay-server.example.com
+   ```
+4. Generate the server key by entering the following command:
+   ```
+   openssl genrsa -out ssl.key 2048
+   ```
+5. Generate a signing request by entering the following command:
+   ```
+   openssl req -new -key ssl.key -out ssl.csr
+   ```
+6. Enter the information that will be incorporated into your certificate request, including the server hostname, for example:
+   ```
+   Country Name (2 letter code) [XX]:IE
+   State or Province Name (full name) []:GALWAY
+   Locality Name (eg, city) [Default City]:GALWAY
+   Organization Name (eg, company) [Default Company Ltd]:QUAY
+   Organizational Unit Name (eg, section) []:DOCS
+   Common Name (eg, your name or your server's hostname) []:quay-server.example.com
+   Email Address []:
+   ```
+7. Create a configuration file `openssl.cnf`, specifying the server hostname, for example:
+   ```
+   [req]
+   req_extensions = v3_req
+   distinguished_name = req_distinguished_name
+   [req_distinguished_name]
+   [ v3_req ]
+   basicConstraints = CA:FALSE
+   keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+   subjectAltName = @alt_names
+   [alt_names]
+   DNS.1 = <quay-server.example.com>
+   IP.1 = 192.168.1.112
+   ```
+8. Use the configuration file to generate the certificate ssl.cert:
+   ```
+   openssl x509 -req -in ssl.csr -CA rootCA.pem -CAkey rootCA.key -CAcreateserial -out ssl.cert -days 356 -extensions v3_req -extfile openssl.cnf
+   ```
+9. Confirm your created certificates and files by entering the following command:
+   ```
+   find .
+   ```
+
+##### Configuring Podman to trust the Certificate Authority:
+
+Podman uses two paths to locate the Certificate Authority (CA) file: `/etc/containers/certs.d/` and `/etc/docker/certs.d/`. Use the following procedure to configure Podman to trust the CA.
+
+###### Procedure:
+
+1. Copy the root CA file to one of `/etc/containers/certs.d/` or `/etc/docker/certs.d/`. Use the exact path determined by the server hostname, and name the file `ca.crt`:
+   ```
+   sudo cp rootCA.pem /etc/containers/certs.d/quay-server.example.com/ca.crt
+   ```
+2. Verify that you no longer need to use the `--tls-verify=false` option when logging in to your mirror registry:
+   ```
+   sudo podman login quay-server.example.com
+   ```
+
+##### Configuring the system to trust the certificate authority:
+
+Use the following procedure to configure your system to trust the certificate authority.
+
+###### Procedure:
+
+1. Enter the following command to copy the rootCA.pem file to the consolidated system-wide trust store:
+   ```
+   sudo cp rootCA.pem /etc/pki/ca-trust/source/anchors/
+   ```
+2. Enter the following command to update the system-wide trust store configuration:
+   ```
+   sudo update-ca-trust extract
+   ```
+
+#### Run registry with TLS
+
+```
+sudo mkdir -p /var/lib/registry
+sudo podman run -d --name registry --restart=always -p 5000:5000 -v /var/lib/registry:/var/lib/registry:Z -v /etc/pki/registry:/certs:Z -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/ssl.crt -e REGISTRY_HTTP_TLS_KEY=/certs/ssl.key docker.io/library/registry:2
+```
+
+
+
+
+--- 
+## Configuring credentials that allow images to be mirrored
+
+
 ---
 
 # Mirroring an Operator catalog:
