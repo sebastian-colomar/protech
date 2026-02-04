@@ -144,8 +144,8 @@ Podman uses two paths to locate the Certificate Authority (CA) file: `/etc/conta
 
 1. Copy the root CA file to one of `/etc/containers/certs.d/` or `/etc/docker/certs.d/`. Use the exact path determined by the server hostname, and name the file `ca.crt`:
    ```
-   sudo mkdir -p /etc/containers/certs.d/
-   sudo cp rootCA.pem /etc/containers/certs.d/quay-server.example.com/ca.crt
+   sudo mkdir -p /etc/containers/certs.d/mirror.sebastian-colomar.com
+   sudo cp rootCA.pem /etc/containers/certs.d/mirror.sebastian-colomar.com/ca.crt
    ```
 2. Verify that you no longer need to use the `--tls-verify=false` option when logging in to your mirror registry:
    ```
