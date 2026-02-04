@@ -1,3 +1,8 @@
+### DISCLAIMER
+The following text is reproduced from the referenced guides and is provided without any express or implied guarantees
+
+---
+
 Red Hat OpenShift Container Platform Update Graph:
 - https://access.redhat.com/labs/ocpupgradegraph/update_path/
 - https://access.redhat.com/labs/ocpupgradegraph/update_path/?channel=stable-4.8&arch=x86_64&is_show_hot_fix=false&current_ocp_version=4.8.37&target_ocp_version=4.10.64
@@ -17,6 +22,41 @@ Documentation for IBM Cloud Pak for Data System:
 
 Red Hat OpenShift mirror:
 - https://mirror.openshift.com/pub/openshift-v4/clients/ocp/
+---
+# Mirroring images for a disconnected installation
+### DISCLAIMER
+The following text is reproduced from the referenced guide and is provided without any express or implied guarantees:
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/html/installing/installing-mirroring-installation-images
+
+When you populate your mirror registry with OpenShift Container Platform images, you can follow two scenarios. If you have a host that can access both the internet and your mirror registry, but not your cluster nodes, you can directly mirror the content from that machine. This process is referred to as connected mirroring. If you have no such host, you must mirror the images to a file system and then bring that host or removable media into your restricted environment. This process is referred to as disconnected mirroring.
+
+#### Our case is a disconnected mirroring
+
+## Preparing your mirror host
+
+### Installing the OpenShift CLI by downloading the binary 
+```
+BINARY_PATH=${HOME}/bin
+mkdir -p ${BINARY_PATH}
+
+grep -q ":${BINARY_PATH}:" ~/.bashrc || echo "export PATH=\"${BINARY_PATH}:\${PATH}\"" | tee -a ~/.bashrc
+source ~/.bashrc
+
+curl -O https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.9.59/openshift-client-linux.tar.gz
+tar fxvz openshift-client-linux.tar.gz
+rm openshift-client-linux.tar.gz
+
+binaries='kubectl oc'
+for binary in ${binaries}
+  do
+    mv ${binary} ${BINARY_PATH}
+  done
+
+oc version
+---
+
+# Mirroring an Operator catalog:
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/html/operators/administrator-tasks
 
 --- 
 # Upgrade the cluster from 4.8.37 to 4.10.64
