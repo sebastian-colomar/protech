@@ -20,3 +20,4 @@ source protech/bin/ec2-config.sh
 - https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.8.33/openshift-client-linux.tar.gz
 - https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.8.33/openshift-install-linux.tar.gz
 - https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest/oc-mirror.tar.gz
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/html/installing/validating-an-installation
