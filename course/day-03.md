@@ -170,6 +170,7 @@ Use the following procedure to configure your system to trust the certificate au
 
 1. Enter the following command to copy the rootCA.pem file to the consolidated system-wide trust store:
    ```
+   sudo mkdir -p /etc/pki/ca-trust/source/anchors/
    sudo cp rootCA.pem /etc/pki/ca-trust/source/anchors/
    ```
 2. Enter the following command to update the system-wide trust store configuration:
