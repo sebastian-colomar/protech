@@ -55,7 +55,7 @@ for binary in ${binaries}
 
 oc version
 ```
-## Mirror registry for Red Hat OpenShift introduction
+## Mirror registry for Red Hat OpenShift introduction [ LATER !!! ]
 
 ### OPTION 1: HTTP
 ```
