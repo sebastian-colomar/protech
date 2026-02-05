@@ -27,7 +27,7 @@ IMPORTANT:
    sudo su --login root
    ```
    ```
-   export KUBECONIFG=/root/environment/hub.sebastian-colomar.com/auth/kubeconfig
+   export KUBECONFIG=/root/environment/hub.sebastian-colomar.com/auth/kubeconfig
    ```
    ```
    oc -n openshift-config extract secret/pull-secret --to=-
