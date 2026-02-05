@@ -136,6 +136,8 @@ This procedure should be executed on a Linux machine with internet access and mo
 4. Mirror the images and configuration manifests to a directory on the removable media:
 
    ```
+   sudo mkdir -p ${REMOVABLE_MEDIA_PATH}/mirror
+   sudo chown ${USER}. ${REMOVABLE_MEDIA_PATH}/mirror
    oc adm release mirror -a ${LOCAL_SECRET_JSON} --to-dir=${REMOVABLE_MEDIA_PATH}/mirror quay.io/${PRODUCT_REPO}/${RELEASE_NAME}:${OCP_RELEASE}-${ARCHITECTURE}
    ```
    
