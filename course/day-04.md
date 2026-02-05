@@ -61,5 +61,89 @@ IMPORTANT:
    ```
    cat dockerconfigjson
    ```
+
+### Mirroring the OpenShift Container Platform image repository
+
+#### Procedure
+
+1. Set the required environment variables:
    
+   a. Export the release version:
+   
+      ```
+      export OCP_RELEASE=4.9.59
+      ```
+      Specify the tag that corresponds to the version of OpenShift Container Platform to which you want to update.
+   
+   b. Export the local registry name and host port:
+   
+      ```
+      export LOCAL_REGISTRY=mirror.hub.sebastian-colomar.com:5000
+      ```
+      Specify the registry domain name for your mirror repository, and the port that it serves content on.
+
+   c. Export the local repository name:
+
+      ```
+      export LOCAL_REPOSITORY=mirror
+      ```
+      Specify the name of the repository to create in your registry.
+
+   d. Export the name of the repository to mirror:
+
+      ```
+      export PRODUCT_REPO='openshift-release-dev'
+      ```
+
+   e. Export the path to your registry pull secret:
+
+      ```
+      export LOCAL_SECRET_JSON=${XDG_RUNTIME_DIR}/containers/auth.json
+      export LOCAL_SECRET_JSON=${HOME}/.docker/config.json
+      ```
+
+   f. Export the release mirror:
+
+      ```
+      export RELEASE_NAME="ocp-release"
+      ```
+
+   g. Export the type of architecture for your server, such as x86_64:
+
+      ```
+      export ARCHITECTURE=$(arch)
+      ```
+
+   h. Export the path to the directory to host the mirrored images:
+
+      ```
+      export REMOVABLE_MEDIA_PATH=/mnt
+      ```
+
+3. Review the images and configuration manifests to mirror:
+
+   ```
+   oc adm release mirror -a ${LOCAL_SECRET_JSON} --to-dir=${REMOVABLE_MEDIA_PATH}/mirror quay.io/${PRODUCT_REPO}/${RELEASE_NAME}:${OCP_RELEASE}-${ARCHITECTURE} --dry-run
+   ```
+
+4. Mirror the images and configuration manifests to a directory on the removable media:
+
+   ```
+   oc adm release mirror -a ${LOCAL_SECRET_JSON} --to-dir=${REMOVABLE_MEDIA_PATH}/mirror quay.io/${PRODUCT_REPO}/${RELEASE_NAME}:${OCP_RELEASE}-${ARCHITECTURE}
+   ```
+   
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
    
