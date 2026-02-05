@@ -41,21 +41,21 @@ IMPORTANT:
    ```
    ```
    scp -i key.txt ubuntu@protech-me.sebastian-colomar.com:.dockerconfigjson .
-   cat .dockerconfigjson | jq . | tee .dockerconfigjson
+   cat .dockerconfigjson | jq . | tee dockerconfigjson
    ```
    ```
    mkdir -p ${HOME}/.docker
-   cp -v .dockerconfigjson ${HOME}/.docker/config.json
+   cp -v dockerconfigjson ${HOME}/.docker/config.json
    ```
    ```
    mkdir -p ${XDG_RUNTIME_DIR}/containers
-   cp -v .dockerconfigjson ${XDG_RUNTIME_DIR}/containers/auth.json
+   cp -v dockerconfigjson ${XDG_RUNTIME_DIR}/containers/auth.json
    ```
    ```
    podman login registry.redhat.io
    ```
    ```
-   cat .dockerconfigjson | jq .
+   cat dockerconfigjson
    ```
    
    
