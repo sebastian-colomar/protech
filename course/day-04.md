@@ -37,9 +37,9 @@ IMPORTANT:
    ```
    ```
    sudo chmod +r .dockerconfigjson
-   
+   ```
+   ```
    exit
-   
    ```
    ```
    scp -i key.txt ubuntu@protech-me.sebastian-colomar.com:.dockerconfigjson .
