@@ -17,6 +17,7 @@ IMPORTANT:
 ##### Procedure
 
 1. Download your registry.redhat.io pull secret from the Red Hat OpenShift Cluster Manager and save it to a .json file.
+   
    ALTERNATIVELY:
    You can retrieve the secret pull-secret from openshift-config namespace that will contain the necessary credentials:
    - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-config/secrets/pull-secret
