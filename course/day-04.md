@@ -22,17 +22,29 @@ IMPORTANT:
    - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-config/secrets/pull-secret
    ```
    ssh -i key.txt -lubuntu protech-me.sebastian-colomar.com
+   ```
+   ```
    sudo su --login root
+   ```
+   ```
    oc -n openshift-config extract secret/pull-secret --to=-
    oc -n openshift-config extract secret/pull-secret --to .
    mv -v .dockerconfigjson /home/ubuntu/
    exit
+   ```
+   ```
    sudo chmod +r .dockerconfigjson
    exit
+   ```
+   ```
    scp -i key.txt ubuntu@protech-me.sebastian-colomar.com:.dockerconfigjson .
+   ```
+   ```
    mkdir -p ${HOME}/.docker
    cp -v .dockerconfigjson ${HOME}/.docker/config.json
    cp -v .dockerconfigjson ${XDG_RUNTIME_DIR}/containers/auth.json
+   ```
+   ```
    podman login registry.redhat.io
    ```
    
