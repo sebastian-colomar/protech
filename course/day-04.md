@@ -16,7 +16,7 @@ IMPORTANT:
 
 ##### Procedure
 
-1. Download your registry.redhat.io pull secret from the Red Hat OpenShift Cluster Manager and save it to a .json file.
+1. Download your registry.redhat.io pull secret from the Red Hat OpenShift Cluster Manager.
    
    ALTERNATIVELY:
    
@@ -45,6 +45,11 @@ IMPORTANT:
    ```
    ```
    scp -i key.txt ubuntu@protech-me.sebastian-colomar.com:.dockerconfigjson .
+   ```
+   
+2. Save it to a json file.
+
+   ```
    cat .dockerconfigjson | jq . | tee dockerconfigjson
    ```
    ```
@@ -63,6 +68,8 @@ IMPORTANT:
    ```
 
 ### Mirroring the OpenShift Container Platform image repository
+
+This procedure should be executed on a Linux machine with internet access and mounted a volume of at least 1TB.
 
 #### Procedure
 
