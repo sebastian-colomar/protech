@@ -60,7 +60,7 @@ oc version
 ### OPTION 1: HTTP
 ```
 sudo mkdir -p /var/lib/registry
-sudo podman run -d --name registry --restart=always -p 5000:5000 -v /var/lib/registry:/var/lib/registry:Z docker.io/library/registry:2
+sudo podman run -d --name registry --restart=always -p 5000:5000 -v /var/lib/registry:/var/lib/registry:Z docker.io/library/registry:2.7
 ```
 
 ### OPTION 2: HTTPS
