@@ -25,3 +25,4 @@ source protech/bin/ec2-config.sh
 - https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/html/installing/installing-mirroring-installation-images
 - https://github.com/distribution/distribution-library-image/blob/master/Dockerfile
 - https://github.com/distribution/distribution
+- https://hub.docker.com/_/registry
