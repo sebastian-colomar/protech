@@ -41,6 +41,7 @@ IMPORTANT:
    ```
    ```
    scp -i key.txt ubuntu@protech-me.sebastian-colomar.com:.dockerconfigjson .
+   cat .dockerconfigjson | jq . | tee .dockerconfigjson
    ```
    ```
    mkdir -p ${HOME}/.docker
