@@ -45,6 +45,9 @@ IMPORTANT:
    ```
    mkdir -p ${HOME}/.docker
    cp -v .dockerconfigjson ${HOME}/.docker/config.json
+   ```
+   ```
+   mkdir -p ${XDG_RUNTIME_DIR}/containers
    cp -v .dockerconfigjson ${XDG_RUNTIME_DIR}/containers/auth.json
    ```
    ```
