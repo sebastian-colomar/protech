@@ -23,3 +23,4 @@ source protech/bin/ec2-config.sh
 - https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/html/installing/validating-an-installation
 - https://docs.redhat.com/en/documentation/red_hat_quay/3/html-single/securing_red_hat_quay/index
 - https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/html/installing/installing-mirroring-installation-images
+- https://github.com/distribution/distribution-library-image/blob/master/Dockerfile
