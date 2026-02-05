@@ -53,6 +53,8 @@ IMPORTANT:
    ```
    podman login registry.redhat.io
    ```
-   
+   ```
+   cat .dockerconfigjson | jq .
+   ```
    
    
