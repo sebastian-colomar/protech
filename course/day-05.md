@@ -159,7 +159,7 @@ Make sure that:
 
 #### Procedure
 
-1. xxx
+1. xxx FROM THE MIRROR HOST (99)
 
    ```
    sudo tee /etc/containers/registries.conf.d/999-insecure-mirror.conf <<EOF
@@ -167,6 +167,8 @@ Make sure that:
    location = "mirror.hub.sebastian-colomar.com:5000"
    insecure = true
    EOF
+
+   oc adm release info ${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}@sha256:${SHA256_SUM_VALUE} --insecure
    ```
 
 1. Retrieve the sha256 sum value for the release from the image signature ConfigMap:
@@ -176,8 +178,24 @@ Make sure that:
    export LOCAL_REGISTRY=mirror.hub.sebastian-colomar.com:5000
    export LOCAL_REPOSITORY=mirror
    export RELEASE_NAME="ocp-release"
-   oc patch image.config.openshift.io/cluster --type=merge -p '{"spec":{"registrySources":{"insecureRegistries":["mirror.hub.sebastian-colomar.com:5000"]}}}'
-   oc adm upgrade --allow-explicit-upgrade --to-image ${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}/${RELEASE_NAME}@sha256:${SHA256_SUM_VALUE}
    ```
-3. Update the cluster:
+2. To Select the stable-4.9 channel, run this patch command on the CLI:
+
+   ```
+   oc patch clusterversion version --type merge -p '{"spec": {"channel": "stable-4.9"}}'
+   ```
+
+3. xxx:
+
+   ```
+   oc -n openshift-config patch cm admin-acks --patch '{"data":{"ack-4.8-kube-1.22-api-removals-in-4.9":"true"}}' --type=merge
+   ```
+   
+5. Update the cluster:
+
+   ```
+   oc patch image.config.openshift.io/cluster --type=merge -p '{"spec":{"registrySources":{"insecureRegistries":["mirror.hub.sebastian-colomar.com:5000"]}}}'
+   oc adm upgrade --allow-explicit-upgrade --to-image ${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}@sha256:${SHA256_SUM_VALUE}
+   ```
+   
 
