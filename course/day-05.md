@@ -196,6 +196,7 @@ Make sure that:
    ```
    oc apply -f xxxx/mirror/config/icsp.yaml
    ```
+   Check that the ICSP was rendered into a MachineConfig before proceeding
    
 5. Update the cluster:
 
