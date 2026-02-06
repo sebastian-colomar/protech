@@ -162,7 +162,7 @@ Make sure that:
 1. xxx
 
    ```
-   sudo tee /etc/containers/registries.conf.d/001-insecure-mirror.conf <<EOF
+   sudo tee /etc/containers/registries.conf.d/999-insecure-mirror.conf <<EOF
    [[registry]]
    location = "mirror.hub.sebastian-colomar.com:5000"
    insecure = true
