@@ -190,6 +190,12 @@ Make sure that:
    ```
    oc -n openshift-config patch cm admin-acks --patch '{"data":{"ack-4.8-kube-1.22-api-removals-in-4.9":"true"}}' --type=merge
    ```
+
+3. xxx:
+
+   ```
+   oc apply -f xxxx/mirror/config/icsp.yaml
+   ```
    
 5. Update the cluster:
 
