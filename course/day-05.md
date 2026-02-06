@@ -197,5 +197,11 @@ Make sure that:
    oc patch image.config.openshift.io/cluster --type=merge -p '{"spec":{"registrySources":{"insecureRegistries":["mirror.hub.sebastian-colomar.com:5000"]}}}'
    oc adm upgrade --allow-explicit-upgrade --to-image ${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}@sha256:${SHA256_SUM_VALUE}
    ```
+
+6. Monitor the upgrade:
+
+   ```
+   oc get clusterversion version -o jsonpath='{range .status.conditions[*]}{.type}{"\t"}{.status}{"\t"}{.reason}{"\t"}{.message}{"\n"}{end}'
+   ```
    
 
