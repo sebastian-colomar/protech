@@ -114,9 +114,9 @@ Parameters:
     Type: String
 
   InstanceImageId:
-    Default: ami-019715e0d74f695be
+    Default: ami-0cd556a55b5bf3cf3
     Description: >
-      Select AMI to use for the instances.
+      Select AMI to use for the instances. RHEL9
     Type: String
 
   InstanceInstanceType:
