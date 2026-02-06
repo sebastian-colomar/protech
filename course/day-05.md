@@ -114,4 +114,70 @@ oc version
    #oc image mirror -a ${LOCAL_SECRET_JSON} --from-dir=${REMOVABLE_MEDIA_PATH}/mirror "file://openshift/release:${OCP_RELEASE}*" ${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}
    oc image mirror --from-dir=${REMOVABLE_MEDIA_PATH}/mirror --insecure "file://openshift/release:${OCP_RELEASE}*" ${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}
    ```
-   
+
+6. 
+
+7. Print the mirrored release image signature config map to the standard output:
+
+   ```
+   cat ${REMOVABLE_MEDIA_PATH}/mirror/config/signature-sha256-*.yaml
+   ```
+
+8. Copy the content of the output and paste it as a new resource in the OpenShift cluster:
+   - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-config-managed/import
+
+---
+
+# Updating a cluster in a disconnected environment without the OpenShift Update Service
+
+## Prerequisites
+> You must have a recent etcd backup in case your update fails and you must restore your cluster to a previous state.
+
+### Before you begin
+Make sure that:
+- Cloud Pak for Data System version 2.0.2 is configured with houseconfig setup to access external network.
+- The cluster is in healthy state by running the following command:
+  ```
+  oc get nodes
+  ```
+- The machine config pools (MCP) are up to date by running the following command:
+  ```
+  oc get mcp
+  ```
+- All cluster operators are in healthy state by running the following command:
+  ```
+  oc get co
+  ```
+- OpenShift Container Storage (OCS) ceph status is HEALTH_OK by running the following command:
+  ```
+  oc -n openshift-storage rsh `oc get pods -n openshift-storage | grep ceph-tool | cut -d ' ' -f1` ceph status
+  ```
+
+#### Note: All the commands that are mentioned here are to be run from e1n1 except where it mentions otherwise.
+
+### Upgrading the disconnected cluster
+
+#### Procedure
+
+1. xxx
+
+   ```
+   sudo tee /etc/containers/registries.conf.d/001-insecure-mirror.conf <<EOF
+   [[registry]]
+   location = "mirror.hub.sebastian-colomar.com:5000"
+   insecure = true
+   EOF
+   ```
+
+1. Retrieve the sha256 sum value for the release from the image signature ConfigMap:
+
+   ```
+   SHA256_SUM_VALUE=$( oc get cm -n openshift-config-managed -o name | grep sha256 | cut -d- -f2- )
+   export LOCAL_REGISTRY=mirror.hub.sebastian-colomar.com:5000
+   export LOCAL_REPOSITORY=mirror
+   export RELEASE_NAME="ocp-release"
+   oc patch image.config.openshift.io/cluster --type=merge -p '{"spec":{"registrySources":{"insecureRegistries":["mirror.hub.sebastian-colomar.com:5000"]}}}'
+   oc adm upgrade --allow-explicit-upgrade --to-image ${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}/${RELEASE_NAME}@sha256:${SHA256_SUM_VALUE}
+   ```
+3. Update the cluster:
+
