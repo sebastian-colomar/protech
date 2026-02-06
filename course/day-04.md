@@ -184,7 +184,7 @@ This procedure should be executed on a Linux machine with internet access and mo
 5. Upload the tar ball of the directory on the removable media to your mirror host:
    ```
    cd ${HOME}
-   scp -i key.txt ${REMOVABLE_MEDIA_PATH}/mirror.tar ec2-user@bastion.hub.sebastian-colomar.com:
+   scp -i key.txt ${REMOVABLE_MEDIA_PATH}/mirror.tar ec2-user@mirror.sebastian-colomar.com:
    ```
    
    
