@@ -59,7 +59,7 @@ Export the required environment variables:
 
 ```bash
 export Domain=sebastian-colomar.com
-export UnixUser=ubuntu
+export UnixUser=ec2-user
 export YourName=me
 export YourKey=~/key.txt
 ```
