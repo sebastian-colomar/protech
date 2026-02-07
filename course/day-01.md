@@ -78,7 +78,7 @@ Once connected, clone the repository and run the configuration script:
 
 ```bash
 git clone https://github.com/sebastian-colomar/protech
-source protech/bin/ec2-config.sh
+source protech/bin/ec2-config-$(grep ^ID= /etc/os-release | cut -d'"' -f2).sh
 ```
 
 ---
