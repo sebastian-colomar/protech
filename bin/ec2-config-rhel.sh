@@ -15,6 +15,7 @@ region = ${RegionName}
 output = ${OutputFormat}
 EOF
 sudo dnf update -y
+sudo dnf install bind-utils -y
 sudo dnf install git -y
 sudo dnf install tmux -y
 sudo dnf install unzip -y
