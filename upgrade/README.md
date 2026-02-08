@@ -31,6 +31,6 @@ Check in the above link the table that presents which Cloud Pak for Data System 
 
 ## 4.14 upgrade
 
-# 4.16 upgrade
+## 4.16 upgrade
 
 
