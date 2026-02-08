@@ -12,7 +12,7 @@ export github_location=${HOME}/${github_repository}-$( date +%s )
 ```
 git clone https://github.com/sebastian-colomar/protech
 git clone --branch ${github_branch} --single-branch -- https://github.com/${github_username}/${github_repository} ${github_location}
-cp -v protech/etc/ocp/00-env.sh ${github_location}/${github_branch}/install/
-cd ${github_location}/${github_branch}/install/
+cp -v protech/etc/ocp/00-env.sh ${github_location}/install/
+cd ${github_location}/install/
 source ocp-aws-install.sh
 ```
