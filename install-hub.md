@@ -4,7 +4,7 @@
 sudo su --login root
 ```
 ```
-export github_branch=master
+export github_branch=v4.8.37
 export github_repository=openshift
 export github_username=sebastian-colomar
 export github_location=${HOME}/${github_repository}-$( date +%s )
