@@ -416,7 +416,6 @@ Resources:
 
   Instance00:
     Properties:
-      IamInstanceProfile: !Ref InstanceProfile
       ImageId: !Ref InstanceImageId
       InstanceType: !Ref InstanceInstanceType
       KeyName: !Ref KeyPair00
@@ -449,7 +448,6 @@ Resources:
 
   Instance01:
     Properties:
-      IamInstanceProfile: !Ref InstanceProfile
       ImageId: !Ref InstanceImageId
       InstanceType: !Ref InstanceInstanceType
       KeyName: !Ref KeyPair01
@@ -482,7 +480,6 @@ Resources:
 
   Instance02:
     Properties:
-      IamInstanceProfile: !Ref InstanceProfile
       ImageId: !Ref InstanceImageId
       InstanceType: !Ref InstanceInstanceType
       KeyName: !Ref KeyPair02
@@ -515,7 +512,6 @@ Resources:
 
   Instance03:
     Properties:
-      IamInstanceProfile: !Ref InstanceProfile
       ImageId: !Ref InstanceImageId
       InstanceType: !Ref InstanceInstanceType
       KeyName: !Ref KeyPair03
@@ -548,7 +544,6 @@ Resources:
 
   Instance04:
     Properties:
-      IamInstanceProfile: !Ref InstanceProfile
       ImageId: !Ref InstanceImageId
       InstanceType: !Ref InstanceInstanceType
       KeyName: !Ref KeyPair04
@@ -581,7 +576,6 @@ Resources:
 
   Instance05:
     Properties:
-      IamInstanceProfile: !Ref InstanceProfile
       ImageId: !Ref InstanceImageId
       InstanceType: !Ref InstanceInstanceType
       KeyName: !Ref KeyPair05
@@ -614,7 +608,6 @@ Resources:
 
   Instance06:
     Properties:
-      IamInstanceProfile: !Ref InstanceProfile
       ImageId: !Ref InstanceImageId
       InstanceType: !Ref InstanceInstanceType
       KeyName: !Ref KeyPair06
@@ -647,7 +640,6 @@ Resources:
 
   Instance07:
     Properties:
-      IamInstanceProfile: !Ref InstanceProfile
       ImageId: !Ref InstanceImageId
       InstanceType: !Ref InstanceInstanceType
       KeyName: !Ref KeyPair07
@@ -680,7 +672,6 @@ Resources:
 
   Instance08:
     Properties:
-      IamInstanceProfile: !Ref InstanceProfile
       ImageId: !Ref InstanceImageId
       InstanceType: !Ref InstanceInstanceType
       KeyName: !Ref KeyPair08
@@ -710,11 +701,6 @@ Resources:
           curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
           sudo apt-get install ./minikube_latest_amd64.deb -y
     Type: AWS::EC2::Instance
-
-  InstanceProfile:
-    Properties:
-      Roles: [!Ref Role]
-    Type: AWS::IAM::InstanceProfile
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
@@ -862,22 +848,6 @@ Resources:
       TTL: 60
       Type: A
     Type: AWS::Route53::RecordSet
-
-  Role:
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          -
-            Action:
-              - sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service:
-                - ec2.amazonaws.com
-        Version: 2012-10-17
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-    Type: AWS::IAM::Role
 
   RoutePublic:
     DependsOn: [VPCGatewayAttachment]
