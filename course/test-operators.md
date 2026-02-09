@@ -5,23 +5,31 @@ oc patch OperatorHub cluster --type json -p '[{"op": "add", "path": "/spec/disab
 
 Install the OPM cli by downloading the binary:
 ```
-export BINARY_PATH=${HOME}/bin
+export OCP_RELEASE_NEW=4.9.59
 export OCP_RELEASE_OLD=4.8.37
-export PACKAGE_NAME=opm-linux.tar.gz
+```
+```
+export BINARIES="oc opm"
+export BINARY_PATH=${HOME}/bin
+export PACKAGES="openshift-client opm"
 ```
 ```
 unalias cp mv rm
+```
+```
 mkdir -p ${BINARY_PATH}
 grep -q ":${BINARY_PATH}:" ~/.bashrc || echo "export PATH=\"${BINARY_PATH}:\${PATH}\"" | tee -a ~/.bashrc
 source ~/.bashrc
-curl -O https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OCP_RELEASE_OLD}/${PACKAGE_NAME}
-tar fxvz ${PACKAGE_NAME}
-binaries='opm'
-for binary in ${binaries}
-  do
-    mv ${binary} ${BINARY_PATH}
-  done    
-opm version
+for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
+  for package in ${PACKAGES}; do
+    curl -O https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${release}/${package}-linux-${release}.tar.gz
+    tar fxvz ${package}-linux-${release}.tar.gz
+  done
+  for binary in ${BINARIES}; do
+    mv ${binary} ${BINARY_PATH}/${binary}-${release}
+    ${binary}-${release} version
+  done
+done
 ```
 
 ```
@@ -46,7 +54,7 @@ export MIRROR_HOST=mirror.hub.sebastian-colomar.com
 ```
 ```
 export LOCAL_REGISTRY=${MIRROR_HOST}:${MIRROR_PORT}
-export OLM_NAMESPACE=olm
+export OLM_REPOSITORY=olm
 ```
 ```
 export INDEX_IMAGE=${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}
@@ -56,7 +64,7 @@ export PRUNED_INDEX_IMAGE=localhost:5000/${RH_REPOSITORY}/${RH_INDEX}
 mkdir -p ${HOME}/.docker
 cp -fv ${LOCAL_SECRET_JSON} ${HOME}/.docker/config.json
 #podman login ${RH_REGISTRY}
-opm index prune -f ${INDEX_IMAGE} -p "${PKGS}" -t ${PRUNED_INDEX_IMAGE}
+opm-${OCP_RELEASE_OLD} index prune -f ${INDEX_IMAGE} -p "${PKGS}" -t ${PRUNED_INDEX_IMAGE}
 ```
 ```
 export MIRROR_PORT=5000
@@ -79,12 +87,12 @@ EOF
 sudo podman push ${PRUNED_INDEX_IMAGE}
 ```
 ```
-mkdir -p ${REMOVABLE_MEDIA_PATH}/${OLM_NAMESPACE}
-oc adm catalog mirror ${PRUNED_INDEX_IMAGE} file://${OLM_NAMESPACE} -a ${LOCAL_SECRET_JSON} --index-filter-by-os=linux/${ARCHITECTURE} --insecure --dir ${REMOVABLE_MEDIA_PATH}/${OLM_NAMESPACE}
+mkdir -p ${REMOVABLE_MEDIA_PATH}/${OLM_REPOSITORY}
+oc-${OCP_RELEASE_OLD} adm catalog mirror ${PRUNED_INDEX_IMAGE} file://${OLM_REPOSITORY} -a ${LOCAL_SECRET_JSON} --index-filter-by-os=linux/${ARCHITECTURE} --insecure --dir ${REMOVABLE_MEDIA_PATH}/${OLM_REPOSITORY}
 ```
 ```
 cd ${REMOVABLE_MEDIA_PATH}
-sudo tar cfv ${OLM_NAMESPACE}.tar ${OLM_NAMESPACE}
+sudo tar cfv ${OLM_REPOSITORY}.tar ${OLM_REPOSITORY}
 ```
 ```
 export SSH_KEY=${HOME}/key.txt
@@ -94,21 +102,21 @@ export MIRROR_HOST=mirror.sebastian-colomar.com
 ```
 ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo mkdir -p ${REMOVABLE_MEDIA_PATH}"
 ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo chown ${REMOTE_USER}. ${REMOVABLE_MEDIA_PATH}"
-scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOVABLE_MEDIA_PATH}/${OLM_NAMESPACE}.tar ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
+scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOVABLE_MEDIA_PATH}/${OLM_REPOSITORY}.tar ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
 ```
 ```
 ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo chown -R root. ${REMOVABLE_MEDIA_PATH}"
 ```
 ```
-scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${HOME}/${PACKAGE_NAME} ${REMOTE_USER}@${MIRROR_HOST}:
+scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${HOME}/${OPM_PACKAGE} ${REMOTE_USER}@${MIRROR_HOST}:
 ```
 ```
-ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo mv -fv ${PACKAGE_NAME} /root"
+ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo mv -fv ${OPM_PACKAGE} /root"
 ```
 The following needs to be executed in "99":
 ```
-oc adm catalog mirror file://${OLM_NAMESPACE}/${RH_REPOSITORY}/${RH_INDEX} ${LOCAL_REGISTRY}/${OLM_NAMESPACE} --insecure
-oc adm catalog mirror ${LOCAL_REGISTRY}/${OLM_NAMESPACE}/${RH_INDEX} ${LOCAL_REGISTRY}/{OLM_NAMESPACE} --insecure --manifests-only
+oc-${OCP_RELEASE_OLD} adm catalog mirror file://${OLM_REPOSITORY}/${RH_REPOSITORY}/${RH_INDEX} ${LOCAL_REGISTRY}/${OLM_REPOSITORY} --insecure
+oc-${OCP_RELEASE_OLD} adm catalog mirror ${LOCAL_REGISTRY}/${OLM_REPOSITORY}/${RH_INDEX} ${LOCAL_REGISTRY}/{OLM_REPOSITORY} --insecure --manifests-only
 ```
 ```
 oc apply -f manifests-*/imageContentSourcePolicy.yaml
