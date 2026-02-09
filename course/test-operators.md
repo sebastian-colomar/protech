@@ -105,6 +105,7 @@ scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${
 ```
 ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo mv -fv ${PACKAGE_NAME} /root"
 ```
+The following needs to be executed in "99":
 ```
 oc adm catalog mirror file://${OLM_NAMESPACE}/${RH_REPOSITORY}/${RH_INDEX} ${LOCAL_REGISTRY}/${OLM_NAMESPACE} --insecure
 oc adm catalog mirror ${LOCAL_REGISTRY}/${OLM_NAMESPACE}/${RH_INDEX} ${LOCAL_REGISTRY}/{OLM_NAMESPACE} --insecure --manifests-only
