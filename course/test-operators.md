@@ -33,7 +33,7 @@ export RH_REPOSITORY=redhat
 ```
 ```
 sudo podman run --authfile ${LOCAL_SECRET_JSON} -d --name index -p 50051:50051 --rm ${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}
-sudo podman run --rm --network host docker.io/fullstorydev/grpcurl:latest -plaintext 127.0.0.1:50051 api.Registry/ListPackages | grep '"name"' | cut -d '"' -f4 | sort -u | tee ${REMOVABLE_MEDIA_PATH}/index.txt
+sudo podman run --rm --network host docker.io/fullstorydev/grpcurl:latest -plaintext localhost:50051 api.Registry/ListPackages | grep '"name"' | cut -d '"' -f4 | sort -u | tee ${REMOVABLE_MEDIA_PATH}/index.txt
 sudo podman rm -f index
 ```
 ```
@@ -80,11 +80,34 @@ sudo podman push ${PRUNED_INDEX_IMAGE}
 ```
 ```
 mkdir -p ${REMOVABLE_MEDIA_PATH}/${OLM_NAMESPACE}
-oc adm catalog mirror ${PRUNED_INDEX_IMAGE} file://${REMOVABLE_MEDIA_PATH}/${OLM_NAMESPACE} -a ${LOCAL_SECRET_JSON} --index-filter-by-os=linux/${ARCHITECTURE} --insecure --dir ${REMOVABLE_MEDIA_PATH}/${OLM_NAMESPACE}
+oc adm catalog mirror ${PRUNED_INDEX_IMAGE} file://${OLM_NAMESPACE} -a ${LOCAL_SECRET_JSON} --index-filter-by-os=linux/${ARCHITECTURE} --insecure --dir ${REMOVABLE_MEDIA_PATH}/${OLM_NAMESPACE}
 ```
 ```
-oc adm catalog mirror file://${REMOVABLE_MEDIA_PATH}/${OLM_NAMESPACE}/index/redhat/${RH_INDEX} ${LOCAL_REGISTRY}/${OLM_NAMESPACE} -a ${REG_CREDS} --insecure
-oc adm catalog mirror ${LOCAL_REGISTRY}/${OLM_NAMESPACE}/${RH_INDEX} ${LOCAL_REGISTRY}/{OLM_NAMESPACE} -a ${REG_CREDS} --insecure --manifests-only
+cd ${REMOVABLE_MEDIA_PATH}
+sudo tar cfv ${LOCAL_REPOSITORY}.tar ${LOCAL_REPOSITORY}
+```
+```
+export SSH_KEY=${HOME}/key.txt
+export REMOTE_USER=ec2-user
+export MIRROR_HOST=mirror.sebastian-colomar.com
+```
+```
+ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo mkdir -p ${REMOVABLE_MEDIA_PATH}"
+ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo chown ${REMOTE_USER}. ${REMOVABLE_MEDIA_PATH}"
+scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOVABLE_MEDIA_PATH}/${LOCAL_REPOSITORY}.tar ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
+```
+```
+ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo chown -R root. ${REMOVABLE_MEDIA_PATH}"
+```
+```
+scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${HOME}/${PACKAGE_NAME} ${REMOTE_USER}@${MIRROR_HOST}:
+```
+```
+ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo mv -fv ${PACKAGE_NAME} /root"
+```
+```
+oc adm catalog mirror file://${OLM_NAMESPACE}/${RH_REPOSITORY}/${RH_INDEX} ${LOCAL_REGISTRY}/${OLM_NAMESPACE} --insecure
+oc adm catalog mirror ${LOCAL_REGISTRY}/${OLM_NAMESPACE}/${RH_INDEX} ${LOCAL_REGISTRY}/{OLM_NAMESPACE} --insecure --manifests-only
 ```
 ```
 oc apply -f manifests-*/imageContentSourcePolicy.yaml
