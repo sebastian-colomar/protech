@@ -84,7 +84,7 @@ oc adm catalog mirror ${PRUNED_INDEX_IMAGE} file://${OLM_NAMESPACE} -a ${LOCAL_S
 ```
 ```
 cd ${REMOVABLE_MEDIA_PATH}
-sudo tar cfv ${LOCAL_REPOSITORY}.tar ${LOCAL_REPOSITORY}
+sudo tar cfv ${OLM_NAMESPACE}.tar ${OLM_NAMESPACE}
 ```
 ```
 export SSH_KEY=${HOME}/key.txt
