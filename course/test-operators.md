@@ -79,7 +79,8 @@ EOF
 sudo podman push ${PRUNED_INDEX_IMAGE}
 ```
 ```
-oc adm catalog mirror ${PRUNED_INDEX_IMAGE} file://${REMOVABLE_MEDIA_PATH}/${OLM_NAMESPACE} -a ${LOCAL_SECRET_JSON} --index-filter-by-os=linux/${ARCHITECTURE} --insecure
+mkdir -p ${REMOVABLE_MEDIA_PATH}/${OLM_NAMESPACE}
+oc adm catalog mirror ${PRUNED_INDEX_IMAGE} file://${REMOVABLE_MEDIA_PATH}/${OLM_NAMESPACE} -a ${LOCAL_SECRET_JSON} --index-filter-by-os=linux/${ARCHITECTURE} --insecure --dir ${REMOVABLE_MEDIA_PATH}/${OLM_NAMESPACE}
 ```
 ```
 oc adm catalog mirror file://${REMOVABLE_MEDIA_PATH}/${OLM_NAMESPACE}/index/redhat/${RH_INDEX} ${LOCAL_REGISTRY}/${OLM_NAMESPACE} -a ${REG_CREDS} --insecure
