@@ -30,6 +30,9 @@ for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
     ${binary}-${release} version
   done
 done
+
+ln -s ${BINARY_PATH}/oc-${OCP_RELEASE_NEW} ${BINARY_PATH}/oc
+ln -s ${BINARY_PATH}/oc-${OCP_RELEASE_OLD} ${BINARY_PATH}/opm
 ```
 
 ```
