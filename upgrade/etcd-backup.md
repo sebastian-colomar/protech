@@ -85,8 +85,6 @@ In this example, two files are created in the /home/core/assets/backup/ director
 ---
 # 3. Alternative method for performing an etcd backup (not officially supported by Red Hat)
 
-3.1 Start an SSH session for a control plane node:
-
   ```  
   export SSH_KEY=${HOME}/key.txt
   export REMOTE_USER=core
@@ -100,8 +98,6 @@ In this example, two files are created in the /home/core/assets/backup/ director
   ```
   ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST}
   ```
-
-3.2 Run the `cluster-backup.sh` script and pass in the location to save the backup to:
 
   ```
   mkdir -p ${HOME}/${BACKUP_LOCATION}
