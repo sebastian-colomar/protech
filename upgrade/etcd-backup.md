@@ -42,23 +42,28 @@ This backup can be saved and used at a later time if you need to restore etcd.
 
 1.1. Start an SSH session for a control plane node:
 
-    ```
-    export SSH_KEY=${HOME}/key.txt
-    export REMOTE_USER=core
-    ```
-    ```
-    HOST=$(oc get no | grep master -m1 | awk '{print $1}')
-    ```
-    ```
-    ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST}
-    ```
+```  
+export SSH_KEY=${HOME}/key.txt
+export REMOTE_USER=core
+```
+
+```
+HOST=$(oc get no | grep master -m1 | awk '{print $1}')
+```
+
+```
+ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST}
+```
+
 1.2. Run the `cluster-backup.sh` script and pass in the location to save the backup to:
 
-    ```
-    mkdir -p /home/core/assets/backup
+```
+mkdir -p /home/core/assets/backup
+```
 
-    /usr/local/bin/cluster-backup.sh /home/core/assets/backup
-    ```
+```
+/usr/local/bin/cluster-backup.sh /home/core/assets/backup
+```
 
 ---
 
@@ -73,6 +78,6 @@ In this example, two files are created in the /home/core/assets/backup/ director
 
 2.1. Check the API Server Encryption Configuration
 
-    ```
-    oc get apiserver cluster -o jsonpath='{.status.conditions}' | grep Encrypted= || echo ENCRYPTION IS NOT ENABLED
-    ```
+```
+oc get apiserver cluster -o jsonpath='{.status.conditions}' | grep Encrypted= || echo ENCRYPTION IS NOT ENABLED
+```
