@@ -90,6 +90,7 @@ In this example, two files are created in the /home/core/assets/backup/ director
   ```  
   export SSH_KEY=${HOME}/key.txt
   export REMOTE_USER=core
+  export BACKUP_LOCATION=assets/backup
   ```
   
   ```
@@ -102,11 +103,18 @@ In this example, two files are created in the /home/core/assets/backup/ director
 
 3.2 Run the `cluster-backup.sh` script and pass in the location to save the backup to:
 
+  ```
+  mkdir -p ${HOME}/${BACKUP_LOCATION}
+  ```
 
   ```
-  mkdir -p /home/core/assets/backup
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} "mkdir -p ${BACKUP_LOCATION}"
   ```
   
   ```
-  /usr/local/bin/cluster-backup.sh /home/core/assets/backup
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} "sudo /usr/local/bin/cluster-backup.sh ${BACKUP_LOCATION}"
+  ```
+
+  ```
+  scp -i ${SSH_KEY} -r ${REMOTE_USER}@${HOST}:assets/backup ${HOME}/${BACKUP_LOCATION}
   ```
