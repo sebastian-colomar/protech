@@ -122,3 +122,7 @@ In this example, two files are created in the /home/core/assets/backup/ director
   ```
   scp -i ${SSH_KEY} -r ${REMOTE_USER}@${HOST}:assets/backup ${HOME}/${BACKUP_LOCATION}
   ```
+
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} "sudo chown -R root ${BACKUP_LOCATION}"
+  ```
