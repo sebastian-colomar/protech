@@ -9,8 +9,8 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 Red Hat references:
 - https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/html/backup_and_restore/control-plane-backup-and-restore
 
----
-## Control plane backup and restore
+# Control plane backup and restore
+
 # Backing up etcd
 
 etcd is the key-value store for OpenShift Container Platform, which persists the state of all resource objects.
@@ -25,9 +25,10 @@ For example, an OpenShift Container Platform 4.y.z cluster must use an etcd back
 
 
 After you have an etcd backup, you can restore to a previous cluster state.
+
 ---
 # 1. Backing up etcd data
----
+
 IMPORTANT:
 > Back up your cluster’s etcd data by performing a single invocation of the backup script on a control plane host (also known as the master host).
 >
