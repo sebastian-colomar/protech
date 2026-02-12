@@ -24,6 +24,9 @@ Red Hat references:
 ## Procedure
 
 ### 1.1. Select a control plane host to use as the recovery host. This is the host that you will run the restore operation on.
+  ```
+  oc get no -owide | grep master -m1
+  ```
 
 ### 1.2. Establish SSH connectivity to each of the control plane nodes, including the recovery host:
 
