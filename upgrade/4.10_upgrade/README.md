@@ -46,6 +46,6 @@ These are the steps described in the previous link as retrieved at the date of c
 ## Update Procedure
 
 Let us describe the procedure step by step:
-- [Upgrade the cluster from 4.8.37 to 4.9.59](4.9.59_upgrade.md)
-- [Upgrade the cluster from 4.9.59 to 4.10.64](4.10.64_upgrade.md)
+- [Upgrade the cluster from 4.8.37 to 4.9.59](4.9_procedure.md)
+- [Upgrade the cluster from 4.9.59 to 4.10.64](4.10_procedure.md)
   
