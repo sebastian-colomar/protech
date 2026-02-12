@@ -171,3 +171,46 @@ Red Hat references:
   ```
   ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3} "sudo oc get pods -n openshift-etcd --kubeconfig ${KUBECONFIG_HOST} | grep -v etcd-quorum-guard | grep etcd || echo etcd POD IS NOT RUNNING"
   ```
+
+### 1.10. Force etcd redeployment:
+  ```
+  oc patch etcd cluster -p='{"spec": {"forceRedeploymentReason": "recovery-'"$( date --rfc-3339=ns )"'"}}' --type=merge
+  ```
+
+### 1.11. Verify all nodes are updated to the latest revision:
+  ```
+  oc get etcd -o=jsonpath='{range .items[0].status.conditions[?(@.type=="NodeInstallerProgressing")]}{.reason}{"\n"}{.message}{"\n"}'
+  ```
+
+### 1.12. After etcd is redeployed, force new rollouts for the control plane:
+- #### 1.12.1. Force a new rollout for the Kubernetes API server:
+  ```
+  oc patch kubeapiserver cluster -p='{"spec": {"forceRedeploymentReason": "recovery-'"$( date --rfc-3339=ns )"'"}}' --type=merge
+  ```
+- #### 1.12.2. Verify all nodes are updated to the latest revision:
+  ```
+  oc get kubeapiserver -o=jsonpath='{range .items[0].status.conditions[?(@.type=="NodeInstallerProgressing")]}{.reason}{"\n"}{.message}{"\n"}'
+  ```
+- #### 1.12.3. AFTER the previous verification is SUCCESSFUL, force a new rollout of the Kubernetes controller manager:
+  ```
+  oc patch kubecontrollermanager cluster -p='{"spec": {"forceRedeploymentReason": "recovery-'"$( date --rfc-3339=ns )"'"}}' --type=merge
+  ```
+- #### 1.12.4. Verify all nodes are updated to the latest revision:
+  ```
+  oc get kubecontrollermanager -o=jsonpath='{range .items[0].status.conditions[?(@.type=="NodeInstallerProgressing")]}{.reason}{"\n"}{.message}{"\n"}'
+  ```
+- #### 1.12.5. AFTER the previous verification is SUCCESSFUL, force a new rollout of the Kubernetes scheduler:
+  ```
+  oc patch kubescheduler cluster -p='{"spec": {"forceRedeploymentReason": "recovery-'"$( date --rfc-3339=ns )"'"}}' --type=merge
+  ```
+- #### 1.12.6. Verify all nodes are updated to the latest revision:
+  ```
+  oc get kubescheduler -o=jsonpath='{range .items[0].status.conditions[?(@.type=="NodeInstallerProgressing")]}{.reason}{"\n"}{.message}{"\n"}'
+  ```
+
+### 1.13. Verify that all control plane hosts have started and joined the cluster:
+  ```
+  oc get pods -n openshift-etcd | grep -v etcd-quorum-guard | grep etcd || echo etcd POD IS NOT RUNNING
+  ```
+
+### 1.14. To ensure that all workloads return to normal operation following a recovery procedure, restart each pod that stores Kubernetes API information. This includes OpenShift Container Platform components such as routers, Operators, and third-party componen.
