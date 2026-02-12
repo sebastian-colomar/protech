@@ -149,28 +149,25 @@ Red Hat references:
     oc adm certificate approve "$csr"
   done
   ```
-- #### 1.8.1. Get the list of current CSRs:
-  ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "sudo oc get csr --kubeconfig ${KUBECONFIG}"
-  ```
-- #### 1.8.1. Get the list of current CSRs:
-  ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "sudo oc get csr --kubeconfig ${KUBECONFIG}"
-  ```
-  ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3} 'sudo mv /var/lib/etcd/ /tmp'  
-  ```
-  
-  ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "sudo systemctl restart kubelet.service"
-  ```
-  ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST2} "sudo systemctl restart kubelet.service"
-  ```
-  ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3} "sudo systemctl restart kubelet.service"
-  ```
 
-
-
-
+### 1.9. Verify that the single member control plane has started successfully:
+- #### 1.9.1. Verify that the etcd container is running:
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "sudo crictl ps | grep etcd | grep -v operator || echo etcd CONTAINER IS NOT RUNNING"
+  ```
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST2} "sudo crictl ps | grep etcd | grep -v operator || echo etcd CONTAINER IS NOT RUNNING"
+  ```
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3} "sudo crictl ps | grep etcd | grep -v operator || echo etcd CONTAINER IS NOT RUNNING"
+  ```
+- #### 1.9.2. Verify that the etcd pod is running:
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "oc get pods -n openshift-etcd | grep -v etcd-quorum-guard | grep etcd || echo etcd POD IS NOT RUNNING"
+  ```
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST2} "oc get pods -n openshift-etcd | grep -v etcd-quorum-guard | grep etcd || echo etcd POD IS NOT RUNNING"
+  ```
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3} "oc get pods -n openshift-etcd | grep -v etcd-quorum-guard | grep etcd || echo etcd POD IS NOT RUNNING"
+  ```
