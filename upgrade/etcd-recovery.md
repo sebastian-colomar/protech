@@ -79,10 +79,10 @@ Red Hat references:
   ```
 - #### 1.4.2. Verify that the etcd pods are stopped:
   ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST2} 'sudo crictl ps | grep etcd | grep -v operator'  
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST2} 'sudo crictl ps | grep etcd | grep -v operator || echo etcd POD HAS BEEN REMOVED'  
   ```
   ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3} 'sudo crictl ps | grep etcd | grep -v operator'  
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3} 'sudo crictl ps | grep etcd | grep -v operator || echo etcd POD HAS BEEN REMOVED'  
   ```
   > The output of this command should be empty. If it is not empty, wait a few minutes and check again.
 - #### 1.4.3. Move the existing Kubernetes API server pod file out of the kubelet manifest directory:
@@ -94,10 +94,10 @@ Red Hat references:
   ```
 - #### 1.4.4. Verify that the Kubernetes API server pods are stopped:
   ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST2} 'sudo crictl ps | grep kube-apiserver | grep -v operator'  
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST2} 'sudo crictl ps | grep kube-apiserver | grep -v operator || echo kube-apiserver POD HAS BEEN REMOVED'  
   ```
   ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3} 'sudo crictl ps | grep kube-apiserver | grep -v operator'  
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3} 'sudo crictl ps | grep kube-apiserver | grep -v operator || echo kube-apiserver POD HAS BEEN REMOVED'  
   ```
   > The output of this command should be empty. If it is not empty, wait a few minutes and check again.
 - #### 1.4.5. Move the etcd data directory to a different location:
