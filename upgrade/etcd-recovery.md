@@ -122,5 +122,21 @@ Red Hat references:
   ```
   ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "sudo oc get no --kubeconfig ${KUBECONFIG}"
   ```
+  IMPORTANT:
+  > If any nodes are in the NotReady state, log in to the nodes and remove all of the PEM files from the `/var/lib/kubelet/pki` directory on each node. You can SSH into the nodes for that purpose.
+
+### 1.6. Restart the kubelet service on all control plane hosts:
+
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "sudo systemctl restart kubelet.service"
+  ```
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST2} "sudo systemctl restart kubelet.service"
+  ```
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3} "sudo systemctl restart kubelet.service"
+  ```
+
+
 
 
