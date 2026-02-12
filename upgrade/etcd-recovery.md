@@ -213,4 +213,7 @@ Red Hat references:
   oc get pods -n openshift-etcd | grep -v etcd-quorum-guard | grep etcd || echo etcd POD IS NOT RUNNING
   ```
 
-### 1.14. To ensure that all workloads return to normal operation following a recovery procedure, restart each pod that stores Kubernetes API information. This includes OpenShift Container Platform components such as routers, Operators, and third-party componen.
+### IMPORTANT
+> To ensure that all workloads return to normal operation following a recovery procedure, restart each pod that stores Kubernetes API information.
+> 
+> This includes OpenShift Container Platform components such as routers, Operators, and third-party componen.
