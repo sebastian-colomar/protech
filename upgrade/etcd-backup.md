@@ -103,7 +103,7 @@ In this example, two files are created in the /home/core/assets/backup/ director
 
 ### 3.3.
   ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} ls
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} uptime
   ```
 ### 3.4.
   ```
