@@ -1,0 +1,682 @@
+# DISCLAIMER
+The following material is reproduced from the referenced guides and is provided exclusively for educational and training purposes.
+It is provided on an "as-is" basis, without any express or implied warranties, and no responsibility is assumed for its accuracy, completeness, or applicability to any particular use.
+
+---
+
+### Important:
+> You must upgrade to Cyclops 4.0 before upgrading Red Hat OpenShift Container Platform (OCP) and OpenShift Data Foundation (ODF) to version 4.10. For installation instructions, see the README file:
+> - https://download4.boulder.ibm.com/sar/CMA/WSA/0bnji/0/readme.txt
+
+--- 
+
+# Upgrade from version 4.8.37 to 4.9.59
+
+Red Hat references:
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/html/installing/installing-mirroring-installation-images
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/html/updating_clusters/updating-a-cluster-in-a-disconnected-environment
+
+---
+
+## Updating a cluster in a disconnected environment
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/html/updating_clusters/updating-a-cluster-in-a-disconnected-environment
+
+### Mirroring the OpenShift Container Platform image repository
+
+---
+
+# 1. Preparing your mirror host
+
+NOTE:
+> Run this whole procedure on a Linux machine with internet access and at least 1 TB of mounted storage.
+> 
+> YOU NEED TO BE THE ROOT USER (ID=0).
+
+When you populate your mirror registry with OpenShift Container Platform images, 
+if you do not have a host that can access both the internet and your mirror registry,
+you must mirror the images to a file system and then bring that host or removable media into your restricted environment.
+This process is referred to as disconnected mirroring.
+
+#### Procedure
+1.1. Set up your Red Hat account and link the Red Hat entitlement to your account. For help, see Accessing Red Hat entitlements from your IBM Cloud Pak:
+   - https://www.ibm.com/docs/en/cloud-paks/1.0?topic=iocpc-accessing-red-hat-entitlements-from-your-cloud-paks
+     
+1.2. Obtain the pull secret file with Red Hat credentials from Red Hat OpenShift cluster manager and save as pull-secret.json:
+   - https://console.redhat.com/openshift/install/pull-secret
+     
+1.3. Validate the external connectivity and Red Hat credentials by running:
+   ```
+   podman pull --authfile ${HOME}/pull-secret.json registry.redhat.io/openshift4/ose-local-storage-mustgather-rhel8
+   ```
+
+1.4. Set the required environment variables:
+   ```
+   export ARCH_RELEASE=x86_64
+   #export LOCAL_SECRET_JSON=${XDG_RUNTIME_DIR}/containers/auth.json
+   #export LOCAL_SECRET_JSON=${HOME}/.docker/config.json
+   export LOCAL_SECRET_JSON=${HOME}/pull-secret.json
+   export MIRROR_PORT=5000
+   export MIRROR_PROTOCOL=http
+   export MIRROR_HOST=mirror.hub.sebastian-colomar.com
+   export OCP_RELEASE_NEW=4.9.59
+   export OCP_RELEASE_OLD=4.8.37
+   export OCP_REPOSITORY=ocp
+   export PRODUCT_REPO=openshift-release-dev
+   export RELEASE_NAME=ocp-release
+   export REMOVABLE_MEDIA_PATH=/mnt/mirror
+   ```
+   ```
+   export LOCAL_REGISTRY=${MIRROR_HOST}:${MIRROR_PORT}
+   ```
+
+1.5. Install the OpenShift CLI by downloading the binary:
+   
+   IMPORTANT:
+   > If you are upgrading a cluster in a disconnected environment, install the oc version that you plan to upgrade to.
+
+   ```
+   export BINARIES="oc opm"
+   export BINARY_PATH=${HOME}/bin
+   export PACKAGES="openshift-client opm"
+   ```
+   ```
+   cd ${HOME}
+   mkdir -p ${BINARY_PATH}
+   grep -q ":${BINARY_PATH}:" ~/.bashrc || echo "export PATH=\"${BINARY_PATH}:\${PATH}\"" | tee -a ~/.bashrc
+   source ~/.bashrc
+   ```
+   ```
+   unalias cp mv rm
+   ```
+   ```
+   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
+      for package in ${PACKAGES}; do
+        curl -O https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${release}/${package}-linux-${release}.tar.gz
+        tar fxvz ${package}-linux-${release}.tar.gz
+      done
+      for binary in ${BINARIES}; do
+        mv ${binary} ${BINARY_PATH}/${binary}-${release}
+      done
+   done
+   ```
+   ```
+   rm -fv ${BINARY_PATH}/oc
+   rm -fv ${BINARY_PATH}/opm
+   ```
+
+1.6. Mirror the images and configuration manifests to a directory on the removable media:
+
+   ```
+   touch ${HOME}/pull-secret.json
+   ```
+   ```
+   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
+      sudo mkdir -p ${REMOVABLE_MEDIA_PATH}/${OCP_REPOSITORY}-${release}
+      sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}
+      oc-${release} adm release mirror -a ${LOCAL_SECRET_JSON} quay.io/${PRODUCT_REPO}/${RELEASE_NAME}:${release}-${ARCH_RELEASE} --to-dir=${REMOVABLE_MEDIA_PATH}/${OCP_REPOSITORY}-${release}
+   done
+   ```
+
+1.7. Retrieve the ImageContentSourcePolicy:
+
+   ```
+   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
+      oc-${release} adm release mirror -a ${LOCAL_SECRET_JSON} quay.io/${PRODUCT_REPO}/${RELEASE_NAME}:${release}-${ARCH_RELEASE} --to=${LOCAL_REGISTRY}/${OCP_REPOSITORY}-${release} --to-release-image=${LOCAL_REGISTRY}/${OCP_REPOSITORY}-${release}:${release}-${ARCH_RELEASE} --insecure --dry-run | tee ${REMOVABLE_MEDIA_PATH}/${OCP_REPOSITORY}-${release}/config/icsp.yaml
+      sed -i '0,/ImageContentSourcePolicy/d' ${REMOVABLE_MEDIA_PATH}/${OCP_REPOSITORY}-${release}/config/icsp.yaml
+   done
+   ```
+
+1.8. Create a tar archive containing the directory and its contents:
+
+   ```
+   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
+      cd ${REMOVABLE_MEDIA_PATH}
+      tar cfv ${OCP_REPOSITORY}-${release}.tar ${OCP_REPOSITORY}-${release}
+   done
+   ```
+
+1.9. Upload the generated tarball to the mirror host:
+   ```
+   export SSH_KEY=${HOME}/key.txt
+   export REMOTE_USER=ec2-user
+   export MIRROR_HOST=mirror.sebastian-colomar.com
+   ```
+   ```
+   ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo mkdir -p ${REMOVABLE_MEDIA_PATH}"
+   ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo chown ${REMOTE_USER}. ${REMOVABLE_MEDIA_PATH}"
+   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
+      scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOVABLE_MEDIA_PATH}/${OCP_REPOSITORY}-${release}.tar ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
+   done
+   ```
+
+1.10. Upload the openshift client tarball to the mirror host:
+   ```
+    for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
+      for package in ${PACKAGES}; do
+         scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${HOME}/${package}-linux-${release}.tar.gz ${REMOTE_USER}@${MIRROR_HOST}:
+      done
+    done
+   ```
+
+--- 
+
+# 2. Using Operator Lifecycle Manager on restricted networks 
+
+NOTE:
+> Run this whole procedure on a Linux machine with internet access and at least 1 TB of mounted storage.
+>
+> YOU NEED TO BE THE ROOT USER (ID=0).
+
+
+For OpenShift Container Platform clusters that are installed on restricted networks, also known as disconnected clusters, Operator Lifecycle Manager (OLM) by default cannot access the Red Hat-provided OperatorHub sources hosted on remote registries because those remote sources require full internet connectivity.
+
+However, as a cluster administrator you can still enable your cluster to use OLM in a restricted network if you have a workstation that has full internet access. The workstation, which requires full internet access to pull the remote OperatorHub content, is used to prepare local mirrors of the remote sources, and push the content to a mirror registry.
+
+The mirror registry can be located on a bastion host, which requires connectivity to both your workstation and the disconnected cluster, or a completely disconnected, or airgapped, host, which requires removable media to physically move the mirrored content to the disconnected environment.
+
+## Pruning an index image
+
+An index image, based on the Operator bundle format, is a containerized snapshot of an Operator catalog. You can prune an index of all but a specified list of packages, which creates a copy of the source index containing only the Operators that you want.
+
+### Procedure
+
+2.1. Set up environment variables:
+   ```
+   export LOCAL_SECRET_JSON=${HOME}/pull-secret.json
+   export REMOVABLE_MEDIA_PATH=/mnt/mirror
+   export RH_INDEX=redhat-operator-index
+   export RH_INDEX_VERSION_NEW=v4.9
+   export RH_INDEX_VERSION_OLD=v4.8
+   export RH_REGISTRY=registry.redhat.io
+   export RH_REPOSITORY=redhat
+   ```
+
+2.2. Run the source index image that you want to prune in a container:
+   ```
+   mkdir -p ${REMOVABLE_MEDIA_PATH}/containers
+   mkdir -p ${REMOVABLE_MEDIA_PATH}/containers/cache
+   mkdir -p ${REMOVABLE_MEDIA_PATH}/containers/containers
+   mkdir -p ${REMOVABLE_MEDIA_PATH}/containers/containers-run
+   ```
+   ```
+   tee ${REMOVABLE_MEDIA_PATH}/containers/storage.conf 0<<EOF
+   [storage]
+   driver = "overlay"
+   graphroot = "${REMOVABLE_MEDIA_PATH}/containers/containers"
+   runroot = "${REMOVABLE_MEDIA_PATH}/containers/containers-run"
+   EOF
+   ```
+   ```
+   export TMPDIR=${REMOVABLE_MEDIA_PATH}/containers/cache
+   export CONTAINERS_STORAGE_CONF=${REMOVABLE_MEDIA_PATH}/containers/storage.conf
+   ```
+   ```
+   semanage fcontext -a -t container_file_t "${REMOVABLE_MEDIA_PATH}/containers/containers(/.*)?"
+   semanage fcontext -a -t container_var_run_t "${REMOVABLE_MEDIA_PATH}/containers/containers-run(/.*)?"
+   restorecon -Rv ${REMOVABLE_MEDIA_PATH}/containers/containers ${REMOVABLE_MEDIA_PATH}/containers/containers-run
+   ```
+   ```
+   podman info | egrep 'graphRoot:|runRoot:|imageCopyTmpDir:'
+   ```
+   ```
+   for version in ${RH_INDEX_VERSION_NEW} ${RH_INDEX_VERSION_OLD}; do
+      podman run --authfile ${LOCAL_SECRET_JSON} -d --name index-${version} -p 50051 --rm ${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${version}
+   done
+   ```
+
+2.3. Use the grpcurl command to get a list of the packages provided by the index:
+   ```
+   for version in ${RH_INDEX_VERSION_NEW} ${RH_INDEX_VERSION_OLD}; do
+      node_port=$( podman port index-${version} | cut -d: -f2 )
+      podman run --rm --network host docker.io/fullstorydev/grpcurl:latest -plaintext localhost:${node_port} api.Registry/ListPackages | grep '"name"' | cut -d '"' -f4 | sort -u | tee ${REMOVABLE_MEDIA_PATH}/index-${version}.txt
+      #podman rm -f index-${version}
+   done
+   ```
+   
+2.4. Inspect the `index-${version}.txt` file and identify which package names from this list you want to keep in your pruned index.
+
+2.5. Alternatively, list your current subscriptions:
+   ```
+   export PKGS=$(oc-${OCP_RELEASE_OLD} get subscriptions -A -o jsonpath='{range .items[*]}{.spec.name}{"\n"}{end}' | sort -u | paste -sd, -)
+   ```
+
+2.6. Run the following command to prune the source index of all but the specified packages:
+   ```
+   export ARCH_CATALOG=amd64
+   export MIRROR_PORT=5000
+   export MIRROR_PROTOCOL=http
+   export MIRROR_HOST=mirror.hub.sebastian-colomar.com
+   export OLM_REPOSITORY=olm
+   ```
+   ```
+   export INDEX_IMAGE_NEW=${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${RH_INDEX_VERSION_NEW}
+   export INDEX_IMAGE_OLD=${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${RH_INDEX_VERSION_OLD}
+   export INDEX_IMAGE_PRUNED_NEW=localhost:${MIRROR_PORT}/${RH_REPOSITORY}/${RH_INDEX}:${RH_INDEX_VERSION_NEW}
+   export INDEX_IMAGE_PRUNED_OLD=localhost:${MIRROR_PORT}/${RH_REPOSITORY}/${RH_INDEX}:${RH_INDEX_VERSION_OLD}
+   ```
+   ```
+   export LOCAL_REGISTRY=${MIRROR_HOST}:${MIRROR_PORT}
+   ```
+   ```
+   podman info | egrep 'graphRoot:|runRoot:|imageCopyTmpDir:'
+   ```
+   ```
+   mkdir -p ${HOME}/.docker
+   cp -fv ${LOCAL_SECRET_JSON} ${HOME}/.docker/config.json
+   ```
+   ```
+   opm-${OCP_RELEASE_NEW} index prune -f ${INDEX_IMAGE_NEW} -p "${PKGS}" -t ${INDEX_IMAGE_PRUNED_NEW}
+   opm-${OCP_RELEASE_OLD} index prune -f ${INDEX_IMAGE_OLD} -p "${PKGS}" -t ${INDEX_IMAGE_PRUNED_OLD}
+   ```
+
+2.7. Deploy the local container registry using the Distribution container image with the HTTP protocol:
+   ```
+   export CONTAINER_IMAGE=docker.io/library/registry
+   export CONTAINER_IMAGE_TAG=2.7
+   export CONTAINER_NAME=registry
+   export CONTAINER_PORT=5000
+   export CONTAINER_VOLUME=/var/lib/registry
+   export MIRROR_PORT=5000
+   export MIRROR_PROTOCOL=http
+   ```
+   ```
+   mkdir -p ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}
+   ```
+   ```
+   podman run -d --name ${CONTAINER_NAME} --restart=always -p ${MIRROR_PORT}:${CONTAINER_PORT} -v ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}:${CONTAINER_VOLUME}:Z ${CONTAINER_IMAGE}:${CONTAINER_IMAGE_TAG}
+   ```
+
+2.8. Run the following command to push the new index image to your target registry:
+   ```
+   tee /etc/containers/registries.conf.d/99-localhost-insecure.conf >/dev/null <<EOF
+   [[registry]]
+   location = "localhost:${MIRROR_PORT}"
+   insecure = true
+   EOF
+   ```
+   ```
+   podman push ${INDEX_IMAGE_PRUNED_NEW} --remove-signatures
+   podman push ${INDEX_IMAGE_PRUNED_OLD} --remove-signatures
+   ```
+
+2.9. Run the following command on your workstation with unrestricted network access to mirror the content to local files:
+   ```
+   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
+      mkdir -p ${REMOVABLE_MEDIA_PATH}/${OLM_REPOSITORY}-${release}
+   done
+   ```
+   ```
+   cd ${REMOVABLE_MEDIA_PATH}/${OLM_REPOSITORY}-${OCP_RELEASE_NEW}
+   oc-${OCP_RELEASE_NEW} adm catalog mirror ${INDEX_IMAGE_PRUNED_NEW} file://${OLM_REPOSITORY}-${OCP_RELEASE_NEW} -a ${LOCAL_SECRET_JSON} --index-filter-by-os=linux/${ARCH_CATALOG} --insecure
+   ```
+   ```
+   cd ${REMOVABLE_MEDIA_PATH}/${OLM_REPOSITORY}-${OCP_RELEASE_OLD}
+   oc-${OCP_RELEASE_OLD} adm catalog mirror ${INDEX_IMAGE_PRUNED_OLD} file://${OLM_REPOSITORY}-${OCP_RELEASE_OLD} -a ${LOCAL_SECRET_JSON} --index-filter-by-os=linux/${ARCH_CATALOG} --insecure
+   ```
+
+2.10. Copy the directory that is generated in your current directory to removable media:
+   ```
+   cd ${REMOVABLE_MEDIA_PATH}
+   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
+      tar cfv ${OLM_REPOSITORY}-${release}.tar ${OLM_REPOSITORY}-${release}
+   done
+   ```
+
+2.11. Upload the generated tarball to the mirror host:
+   ```
+   export MIRROR_HOST=mirror.sebastian-colomar.com
+   export REMOTE_USER=ec2-user
+   export SSH_KEY=${HOME}/key.txt
+   ```
+   ```
+   ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo mkdir -p ${REMOVABLE_MEDIA_PATH}"
+   ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo chown ${REMOTE_USER}. ${REMOVABLE_MEDIA_PATH}"
+   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
+      scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOVABLE_MEDIA_PATH}/${OLM_REPOSITORY}-${release}.tar ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
+   done
+   ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}"
+   ```
+
+## Disabling the default OperatorHub sources 
+
+Operator catalogs that source content provided by Red Hat and community projects are configured for OperatorHub by default during an OpenShift Container Platform installation. In a restricted network environment, you must disable the default catalogs as a cluster administrator. You can then configure OperatorHub to use local catalog sources.
+
+### Procedure
+
+- Disable the sources for the default catalogs by adding `disableAllDefaultSources: true` to the OperatorHub object:
+   ```
+   oc-${OCP_RELEASE_OLD} patch OperatorHub cluster --type json -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
+   ```
+
+---
+
+# 3. Mirror registry for Red Hat OpenShift
+
+NOTE:
+> Execute this procedure on a Linux machine reachable by the OpenShift cluster and equipped with at least 1 TB of mounted storage.
+
+#### Procedure
+3.1. Set the required environment variables:
+   
+   ```
+   export ARCH_RELEASE=x86_64
+   export MIRROR_HOST=mirror.hub.sebastian-colomar.com
+   export MIRROR_PORT=5000
+   export MIRROR_PROTOCOL=http
+   export OCP_RELEASE_NEW=4.9.59
+   export OCP_RELEASE_OLD=4.8.37
+   export OCP_REPOSITORY=ocp
+   export OLM_REPOSITORY=olm
+   export PRODUCT_REPO=openshift-release-dev
+   export RELEASE_NAME=ocp-release
+   export REMOVABLE_MEDIA_PATH=/mnt/mirror
+   export RH_INDEX=redhat-operator-index
+   export RH_INDEX_VERSION_NEW=v4.9
+   export RH_INDEX_VERSION_OLD=v4.8
+   export RH_REGISTRY=registry.redhat.io
+   export RH_REPOSITORY=redhat
+   ```
+   ```
+   export LOCAL_REGISTRY=${MIRROR_HOST}:${MIRROR_PORT}
+   ```
+
+3.2. Deploy the local container registry using the Distribution container image with the HTTP protocol:
+   ```
+   export CONTAINER_IMAGE=docker.io/library/registry
+   export CONTAINER_IMAGE_TAG=2.7
+   export CONTAINER_NAME=registry
+   export CONTAINER_PORT=5000
+   export CONTAINER_VOLUME=/var/lib/registry
+   ```
+   ```
+   mkdir -p ${REMOVABLE_MEDIA_PATH}/containers
+   mkdir -p ${REMOVABLE_MEDIA_PATH}/containers/cache
+   mkdir -p ${REMOVABLE_MEDIA_PATH}/containers/containers
+   mkdir -p ${REMOVABLE_MEDIA_PATH}/containers/containers-run
+   ```
+   ```
+   tee ${REMOVABLE_MEDIA_PATH}/containers/storage.conf 0<<EOF
+   [storage]
+   driver = "overlay"
+   graphroot = "${REMOVABLE_MEDIA_PATH}/containers/containers"
+   runroot = "${REMOVABLE_MEDIA_PATH}/containers/containers-run"
+   EOF
+   ```
+   ```
+   export TMPDIR=${REMOVABLE_MEDIA_PATH}/containers/cache
+   export CONTAINERS_STORAGE_CONF=${REMOVABLE_MEDIA_PATH}/containers/storage.conf
+   ```
+   ```
+   podman info | egrep 'graphRoot:|runRoot:|imageCopyTmpDir:'
+   ```
+   ```
+   semanage fcontext -a -t container_file_t ${REMOVABLE_MEDIA_PATH}/containers/containers(/.*)?"
+   semanage fcontext -a -t container_var_run_t "${REMOVABLE_MEDIA_PATH}/containers/containers-run(/.*)?"
+   restorecon -Rv ${REMOVABLE_MEDIA_PATH}/containers/containers ${REMOVABLE_MEDIA_PATH}/containers/containers-run
+   ```
+   ```
+   mkdir -p ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}
+   ```
+   ```
+   podman run -d --name ${CONTAINER_NAME} --restart=always -p ${MIRROR_PORT}:${CONTAINER_PORT} -v ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}:${CONTAINER_VOLUME}:Z ${CONTAINER_IMAGE}:${CONTAINER_IMAGE_TAG}
+   ```
+
+3.3. Install the OpenShift CLI:
+   
+   IMPORTANT:
+   > If you are upgrading a cluster in a disconnected environment, install the oc version that you plan to upgrade to.
+
+   ```
+   export BINARIES="oc opm"
+   export BINARY_PATH=${HOME}/bin
+   export PACKAGES="openshift-client opm"
+   ```
+   ```
+   cd ${HOME}
+   mkdir -p ${BINARY_PATH}
+   grep -q ":${BINARY_PATH}:" ~/.bashrc || echo "export PATH=\"${BINARY_PATH}:\${PATH}\"" | tee -a ~/.bashrc
+   source ~/.bashrc
+   unalias cp mv rm
+   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
+     for package in ${PACKAGES}; do
+       tar fvxz ${package}-linux-${release}.tar.gz
+     done
+     for binary in ${BINARIES}; do
+       mv ${binary} ${BINARY_PATH}/${binary}-${release}
+     done
+   done
+   rm ${BINARY_PATH}/oc
+   rm ${BINARY_PATH}/opm
+   ```   
+
+3.4. Extract the tar archive containing the directory of the mirrored images and its contents:
+
+   ```
+   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
+      cd ${REMOVABLE_MEDIA_PATH}
+      tar fvx ${OCP_REPOSITORY}-${release}.tar
+   done
+   ```
+
+3.5. Extract the tar archive containing the directory of the mirrored catalogs and its contents:
+
+   ```
+   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
+      cd ${REMOVABLE_MEDIA_PATH}
+      tar fvx ${OLM_REPOSITORY}-${release}.tar
+   done
+   ```
+
+3.6. Upload the release images to the local container registry:
+
+   ```
+   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
+      sudo mkdir -p ${REMOVABLE_MEDIA_PATH}/${OCP_REPOSITORY}-${release}
+   done
+   sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}
+   ```
+   ```
+   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
+      oc-${release} image mirror "file://openshift/release:${release}-${ARCH_RELEASE}*" ${LOCAL_REGISTRY}/${OCP_REPOSITORY} --from-dir=${REMOVABLE_MEDIA_PATH}/${OCP_REPOSITORY} --insecure
+   done
+   ```
+
+3.7. Print the mirrored release image signature ConfigMap manifest to standard output:
+
+   ```
+   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
+      cat ${REMOVABLE_MEDIA_PATH}/${OCP_REPOSITORY}-${release}/config/signature-sha256-*.yaml
+   done
+   ```
+
+3.8. For both manifests, copy the output content and paste it as a new resource in the OpenShift cluster using the following URL:
+   - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-config-managed/import
+     
+     Alternatively, you can use any shell with network access to the OpenShift cluster and use the oc CLI commands:
+   ```
+   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
+      oc-${OCP_RELEASE_OLD} apply -f ${REMOVABLE_MEDIA_PATH}/${OCP_REPOSITORY}-${release}/config/signature-sha256-*.yaml
+   done   
+   ```
+
+3.9. Print the ImageContentSourcePolicy manifest to standard output:
+
+   ```
+   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
+      cat ${REMOVABLE_MEDIA_PATH}/${OCP_REPOSITORY}-${release}/config/icsp.yaml
+   done
+   ```
+
+3.10. Copy the output content and paste it as a new resource in the OpenShift cluster using the following URL:
+   - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/default/import
+
+     Alternatively, you can use any shell with network access to the OpenShift cluster and use the oc CLI commands:
+   ```
+   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
+      oc-${OCP_RELEASE_OLD} apply -f ${REMOVABLE_MEDIA_PATH}/${OCP_REPOSITORY}-${release}/config/icsp.yaml
+   done   
+   ```
+     
+3.11. Upload the catalog images to the local container registry:
+   ```
+   oc-${OCP_RELEASE_NEW} adm catalog mirror file://${OLM_REPOSITORY}-${OCP_RELEASE_NEW}/${RH_REPOSITORY}/${RH_INDEX}:${RH_INDEX_VERSION_NEW} ${LOCAL_REGISTRY}/${OLM_REPOSITORY}-${OCP_RELEASE_NEW} --insecure
+   oc-${OCP_RELEASE_OLD} adm catalog mirror file://${OLM_REPOSITORY}-${OCP_RELEASE_OLD}/${RH_REPOSITORY}/${RH_INDEX}:${RH_INDEX_VERSION_OLD} ${LOCAL_REGISTRY}/${OLM_REPOSITORY}-${OCP_RELEASE_OLD} --insecure
+   oc-${OCP_RELEASE_NEW} adm catalog mirror ${LOCAL_REGISTRY}/${OLM_REPOSITORY}-${OCP_RELEASE_NEW}/${RH_INDEX}:${RH_INDEX_VERSION_NEW} ${LOCAL_REGISTRY}/{OLM_REPOSITORY}-${OCP_RELEASE_NEW} --insecure --manifests-only
+   oc-${OCP_RELEASE_OLD} adm catalog mirror ${LOCAL_REGISTRY}/${OLM_REPOSITORY}-${OCP_RELEASE_OLD}/${RH_INDEX}:${RH_INDEX_VERSION_OLD} ${LOCAL_REGISTRY}/{OLM_REPOSITORY}-${OCP_RELEASE_OLD} --insecure --manifests-only
+   ```
+
+3.12. Create the ImageContentSourcePolicy (ICSP) object by running the following command to specify the imageContentSourcePolicy.yaml file in your manifests directory:
+   ```
+   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
+      oc-${OCP_RELEASE_OLD} apply -f ${REMOVABLE_MEDIA_PATH}/${OLM_REPOSITORY}-${release}/manifests-${RH_INDEX}-*/imageContentSourcePolicy.yaml
+   done
+   ```
+
+--- 
+
+# 4. Updating a cluster in a disconnected environment without the OpenShift Update Service
+
+## Prerequisites
+> You must have a recent etcd backup in case your update fails and you must restore your cluster to a previous state.
+>
+> You can refer to the link below for detailed instructions on how to create a backup of the cluster:
+>
+> - [Control plane backup and restore](../cluster-disaster-recovery/etcd-backup.md)
+
+### Before you begin
+- https://www.ibm.com/docs/en/cloud-paks/cloudpak-data-system/2.0.0?topic=ocp-ocs-upgrade-in-connected-environment-by-using-red-hat-openshift-console-ui
+  
+Make sure that:
+- The cluster is in healthy state by running the following command:
+  ```
+  oc-${OCP_RELEASE_OLD} get nodes
+  ```
+- The machine config pools (MCP) are up to date by running the following command:
+  ```
+  oc-${OCP_RELEASE_OLD} get mcp
+  ```
+- All cluster operators are in healthy state by running the following command:
+  ```
+  oc-${OCP_RELEASE_OLD} get co
+  ```
+- Configuring the Rook-Ceph Toolbox in OpenShift Data Foundation 4.8:
+  ```
+  oc-${OCP_RELEASE_OLD} patch OCSInitialization ocsinit -n openshift-storage --type json --patch  '[{ "op": "replace", "path": "/spec/enableCephTools", "value": true }]'
+  ```
+- OpenShift Container Storage (OCS) ceph status is HEALTH_OK by running the following command:
+  ```
+  oc-${OCP_RELEASE_OLD} -n openshift-storage rsh `oc-${OCP_RELEASE_OLD} get pods -n openshift-storage | grep ceph-tool | cut -d ' ' -f1` ceph status
+  ```
+
+NOTE:
+> All the commands that are mentioned here are to be run from e1n1 except where it mentions otherwise.
+
+### Upgrading the disconnected cluster
+
+#### Procedure
+
+4.1. Validate that the ImageContentSourcePolicy has been rendered into a MachineConfig and successfully rolled out to all nodes before proceeding:
+   ```
+   export MIRROR_HOST=mirror.hub.sebastian-colomar.com
+   
+   for n in $(oc-${OCP_RELEASE_OLD} get nodes -o name); do echo "== $n =="; oc-${OCP_RELEASE_OLD} debug "$n" -q -- chroot /host grep -R "${MIRROR_HOST}" /etc/containers || echo "Not found"; done
+   ```
+   
+4.2. Retrieve the sha256 sum value for the release from the image signature ConfigMap:
+
+   ```
+   export LOCAL_REGISTRY=${MIRROR_HOST}:${MIRROR_PORT}
+   export OCP_REPOSITORY=ocp
+   export OCP_RELEASE_NEW=4.9.59
+   export OCP_RELEASE_OLD=4.8.37
+   export RELEASE_NAME=ocp-release
+   export SHA256_SUM_VALUE=$( oc-${OCP_RELEASE_OLD} get cm -n openshift-config-managed -o name | grep sha256 | cut -d- -f2- )
+   ```
+
+4.3. To Select the stable-4.9 channel, run this patch command on the CLI:
+
+   ```
+   oc-${OCP_RELEASE_OLD} patch clusterversion version --type merge -p '{"spec": {"channel": "stable-4.9"}}'
+   ```
+
+4.4. Upgrading to an OCP version higher than 4.8 requires manual acknowledgment from the administrator. For more information, see Preparing to upgrade to OpenShift Container Platform 4.9:
+   - https://access.redhat.com/articles/6329921
+
+   ```
+   oc-${OCP_RELEASE_OLD} -n openshift-config patch cm admin-acks --patch '{"data":{"ack-4.8-kube-1.22-api-removals-in-4.9":"true"}}' --type=merge
+   ```
+  
+4.5. Allow HTTP connections to the mirror registry:
+
+   ```
+   oc-${OCP_RELEASE_OLD} patch image.config.openshift.io/cluster --type=merge -p '{"spec":{"registrySources":{"insecureRegistries":["'${LOCAL_REGISTRY}'"]}}}'
+   ```
+
+4.6. Update the cluster:
+
+   ```
+   oc-${OCP_RELEASE_OLD} adm upgrade --allow-explicit-upgrade --to-image ${LOCAL_REGISTRY}/${OCP_REPOSITORY}-${OCP_RELEASE_NEW}@sha256:${SHA256_SUM_VALUE}
+   ```
+
+4.7. Force an explicit upgrade with version set (ONLY IF NECESSARY):
+
+   ```
+   oc-${OCP_RELEASE_OLD} patch clusterversion version --type=merge -p '{"spec":{"desiredUpdate":{"image":"'${LOCAL_REGISTRY}-${OCP_RELEASE_NEW}/${OCP_REPOSITORY}@sha256:${SHA256_SUM_VALUE}'","version":"'${OCP_RELEASE_NEW}'","force":true}}}'
+   ```
+
+4.8. Monitor the upgrade:
+   - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/cluster/config.openshift.io~v1~ClusterVersion/version
+   ```
+   oc-${OCP_RELEASE_NEW} get clusterversion version -o jsonpath='{range .status.conditions[*]}{.type}{"\t"}{.status}{"\t"}{.reason}{"\t"}{.message}{"\n"}{end}'
+   ```
+
+4.9. Watch the CVO logs while it downloads/unpacks:
+   - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-cluster-version/pods
+   ```
+   oc-${OCP_RELEASE_NEW} -n openshift-cluster-version logs deploy/cluster-version-operator -f
+   ```
+
+4.10. Some troubleshooting hints:
+   ```
+   curl -s ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/
+   ```
+   ```
+   curl -s ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/_catalog
+   ```
+   ```
+   curl -s ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/${OCP_REPOSITORY}-${OCP_RELEASE_NEW}/tags/list | jq .
+   ```
+   ```
+   curl -s ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/${OCP_REPOSITORY}-${OCP_RELEASE_OLD}/tags/list | jq .
+   ```
+   ```
+   curl -s ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/${OCP_REPOSITORY}-${OCP_RELEASE_NEW}/tags/list | jq -r '.tags[]'
+   ```
+   ```
+   curl -s ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/${OCP_REPOSITORY}-${OCP_RELEASE_OLD}/tags/list | jq -r '.tags[]'
+   ```
+   ```
+   for tag in $( curl -s ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/${OCP_REPOSITORY}-${OCP_RELEASE_NEW}/tags/list | jq -r '.tags[]' );do
+      curl -sIH 'Accept: application/vnd.docker.distribution.manifest.v2+json' ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/${OCP_REPOSITORY}-${OCP_RELEASE_NEW}/manifests/${tag} | awk /Docker-Content-Digest/'{print "'${tag}'",$2}'
+   done
+   ```
+   ```
+   for tag in $( curl -s ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/${OCP_REPOSITORY}-${OCP_RELEASE_OLD}/tags/list | jq -r '.tags[]' );do
+      curl -sIH 'Accept: application/vnd.docker.distribution.manifest.v2+json' ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/${OCP_REPOSITORY}-${OCP_RELEASE_OLD}/manifests/${tag} | awk /Docker-Content-Digest/'{print "'${tag}'",$2}'
+   done
+   ```
+   ```
+   ls ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}/docker/registry/v2/repositories/${OCP_REPOSITORY}-${OCP_RELEASE_NEW}/_manifests/revisions/sha256/
+   ```
+   ```
+   ls ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}/docker/registry/v2/repositories/${OCP_REPOSITORY}-${OCP_RELEASE_OLD}/_manifests/revisions/sha256/
+   ```
+   ```
+   podman exec ${CONTAINER_NAME} ls ${CONTAINER_VOLUME}/docker/registry/v2/repositories/${OCP_REPOSITORY}-${OCP_RELEASE_NEW}/_manifests/revisions/sha256/
+   ```
+   ```
+   podman exec ${CONTAINER_NAME} ls ${CONTAINER_VOLUME}/docker/registry/v2/repositories/${OCP_REPOSITORY}-${OCP_RELEASE_OLD}/_manifests/revisions/sha256/
+   ```
+---
+
+# 5. Upgrade OCS to Red Hat OpenShift Data Foundation (ODF) 4.9
