@@ -117,10 +117,10 @@ Red Hat references:
 ### 1.6. Check the nodes to ensure they are in the Ready state:
 
   ```
-  export KUBECONFIG=/etc/kubernetes/static-pod-resources/kube-apiserver-certs/secrets/node-kubeconfigs/localhost.kubeconfig
+  export KUBECONFIG_HOST=/etc/kubernetes/static-pod-resources/kube-apiserver-certs/secrets/node-kubeconfigs/localhost.kubeconfig
   ```
   ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "sudo oc get no --kubeconfig ${KUBECONFIG}"
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "sudo oc get no --kubeconfig ${KUBECONFIG_HOST}"
   ```
   IMPORTANT:
   > If any nodes are in the NotReady state, log in to the nodes and remove all of the PEM files from the `/var/lib/kubelet/pki` directory on each node. You can SSH into the nodes for that purpose.
@@ -163,11 +163,11 @@ Red Hat references:
   ```
 - #### 1.9.2. Verify that the etcd pod is running:
   ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "oc get pods -n openshift-etcd | grep -v etcd-quorum-guard | grep etcd || echo etcd POD IS NOT RUNNING"
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "sudo oc get pods -n openshift-etcd --kubeconfig ${KUBECONFIG_HOST} | grep -v etcd-quorum-guard | grep etcd || echo etcd POD IS NOT RUNNING"
   ```
   ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST2} "oc get pods -n openshift-etcd | grep -v etcd-quorum-guard | grep etcd || echo etcd POD IS NOT RUNNING"
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST2} "sudo oc get pods -n openshift-etcd --kubeconfig ${KUBECONFIG_HOST} | grep -v etcd-quorum-guard | grep etcd || echo etcd POD IS NOT RUNNING"
   ```
   ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3} "oc get pods -n openshift-etcd | grep -v etcd-quorum-guard | grep etcd || echo etcd POD IS NOT RUNNING"
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3} "sudo oc get pods -n openshift-etcd --kubeconfig ${KUBECONFIG_HOST} | grep -v etcd-quorum-guard | grep etcd || echo etcd POD IS NOT RUNNING"
   ```
