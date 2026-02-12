@@ -138,13 +138,16 @@ Red Hat references:
   ```
 
 ### 1.8. Approve the pending CSRs:
+  At this point, the cluster should be recovered, and the API should be accessible using a standard `oc login`.
 - #### 1.8.1. Get the list of current CSRs:
   ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "sudo oc get csr --kubeconfig ${KUBECONFIG}"
+  oc get csr
   ```
 - #### 1.8.2. Approve the list of pending CSRs:
   ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "for csr in $(sudo oc get csr --no-headers --kubeconfig ${KUBECONFIG} | awk '$4=="Pending"{print $1}'); do sudo oc adm certificate approve "$csr" --kubeconfig ${KUBECONFIG}; done"
+  for csr in $(oc get csr --no-headers | awk '$4=="Pending"{print $1}'); do
+    oc adm certificate approve "$csr"
+  done
   ```
 - #### 1.8.1. Get the list of current CSRs:
   ```
