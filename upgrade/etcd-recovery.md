@@ -114,4 +114,13 @@ Red Hat references:
   ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "sudo /usr/local/bin/cluster-restore.sh ${BACKUP_LOCATION}"
   ```
 
+### 1.6. Check the nodes to ensure they are in the Ready state:
+
+  ```
+  export KUBECONFIG=/etc/kubernetes/static-pod-resources/kube-apiserver-certs/secrets/node-kubeconfigs/localhost.kubeconfig
+  ```
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "sudo oc get no --kubeconfig ${KUBECONFIG}"
+  ```
+
 
