@@ -74,10 +74,17 @@ Red Hat references:
   ```
   ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} 'sudo mv /etc/kubernetes/manifests/kube-apiserver-pod.yaml /tmp'  
   ```
-- #### 1.4.4. Move the existing Kubernetes API server pod file out of the kubelet manifest directory:
+- #### 1.4.4. Verify that the Kubernetes API server pods are stopped:
   ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} 'sudo mv /etc/kubernetes/manifests/kube-apiserver-pod.yaml /tmp'  
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} 'sudo crictl ps | grep kube-apiserver | grep -v operator'  
   ```
+  > The output of this command should be empty. If it is not empty, wait a few minutes and check again.
+- #### 1.4.5. Move the etcd data directory to a different location:
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} 'sudo mv /var/lib/etcd/ /tmp'  
+  ```
+- #### 1.4.6. REPEAT THESE STEPS ON EACH OF THE OTHER CONTROL PLANE HOSTS EXCEPT THE RECOVERY HOST.
+
 
 ---
 
