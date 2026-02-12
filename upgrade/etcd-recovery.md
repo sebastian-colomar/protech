@@ -4,65 +4,79 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 ---
 
-# ETCD backup for OCP version 4.8.37
+# ETCD Disaster Recovery for OCP version 4.8.37
 
 Red Hat references:
 - https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/html/backup_and_restore/control-plane-backup-and-restore
 
-# Control plane backup and restore
+# About restoring to a previous cluster state
 
-# Backing up etcd
-
-etcd is the key-value store for OpenShift Container Platform, which persists the state of all resource objects.
-
-Back up your cluster’s etcd data regularly and store in a secure location ideally outside the OpenShift Container Platform environment.
-
-It is also recommended to take etcd backups during non-peak usage hours because the etcd snapshot has a high I/O cost.
-
-Be sure to take an etcd backup after you upgrade your cluster. 
-This is important because when you restore your cluster, you must use an etcd backup that was taken from the same z-stream release. 
-For example, an OpenShift Container Platform 4.y.z cluster must use an etcd backup that was taken from 4.y.z.
-
-
-After you have an etcd backup, you can restore to a previous cluster state.
+## WARNING:
+> Restoring to a previous cluster state is a destructive and destablizing action to take on a running cluster.
+>
+> This should only be used as a last resort.
+>
+> If you are able to retrieve data using the Kubernetes API server, then etcd is available and you should not restore using an etcd backup.
 
 ---
-# 1. Backing up etcd data
-
-IMPORTANT:
-> Back up your cluster’s etcd data by performing a single invocation of the backup script on a control plane host (also known as the master host).
->
-> Do not take a backup for each control plane host.
-
-Follow these steps to back up etcd data by creating an etcd snapshot and backing up the resources for the static pods. 
-
-This backup can be saved and used at a later time if you need to restore etcd.
+# 1. Restoring to a previous cluster state
 
 ## Procedure
 
-### 1.1. Start an SSH session for a control plane node:
-  
+### 1.1. Select a control plane host to use as the recovery host. This is the host that you will run the restore operation on.
+
+### 1.2. Establish SSH connectivity to each of the control plane nodes, including the recovery host:
+
   ```  
   export SSH_KEY=${HOME}/key.txt
   export REMOTE_USER=core
   ```
-  
   ```
-  HOST=$(oc get no | grep master -m1 | awk '{print $1}')
+  oc get no | grep master
+  HOST1=$( oc get no | grep master -m1 | awk '{print $1}' )
+  HOST2=$( oc get no | grep master -m2 | tail -1 | awk '{print $1}' )
+  HOST3=$( oc get no | grep master -m3 | tail -1 | awk '{print $1}' )
   ```
-  
   ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST}
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1}
+  ```
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST2}
+  ```
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3}
   ```
 
-### 1.2. Run the `cluster-backup.sh` script and pass in the location to save the backup to:
+  #### WARNING
+  > ALL SSH SESSIONS MUST REMAIN OPEN UNTIL THE PROCEDURE HAS BEEN FULLY COMPLETED
+
+### 1.3. Copy the etcd backup directory to the recovery control plane host:
 
   ```
-  mkdir -p /home/core/assets/backup
+  export BACKUP_LOCATION=assets/backup
   ```
-  
   ```
-  /usr/local/bin/cluster-backup.sh /home/core/assets/backup
+  scp -i ${SSH_KEY} -r ${HOME}/${BACKUP_LOCATION} ${REMOTE_USER}@${HOST1}:
+  ```
+
+### 1.4. Stop the static pods on any other control plane nodes:
+
+- #### 1.4.1. Access a control plane host that is not the recovery host. Move the existing `etcd` pod file out of the kubelet manifest directory:
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} 'sudo mv /etc/kubernetes/manifests/etcd-pod.yaml /tmp'  
+  ```
+- #### 1.4.2. Verify that the etcd pods are stopped:
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} 'sudo crictl ps | grep etcd | grep -v operator'  
+  ```
+  > The output of this command should be empty. If it is not empty, wait a few minutes and check again.
+- #### 1.4.3. Move the existing Kubernetes API server pod file out of the kubelet manifest directory:
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} 'sudo mv /etc/kubernetes/manifests/kube-apiserver-pod.yaml /tmp'  
+  ```
+- #### 1.4.4. Move the existing Kubernetes API server pod file out of the kubelet manifest directory:
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} 'sudo mv /etc/kubernetes/manifests/kube-apiserver-pod.yaml /tmp'  
   ```
 
 ---
