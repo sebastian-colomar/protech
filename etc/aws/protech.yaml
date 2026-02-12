@@ -708,55 +708,91 @@ Resources:
   KeyPair00:
     Type: AWS::EC2::KeyPair
     Properties:
-      KeyName: !Ref UserName00
+      KeyName: !Sub
+        - "${UserName00}-${UUID}"
+        - UUID: !Select
+            - 2
+            - !Split [ "/", !Ref AWS::StackId ]
       PublicKeyMaterial: !Ref PublicKeyMaterial00
 
   KeyPair01:
     Type: AWS::EC2::KeyPair
     Properties:
-      KeyName: !Ref UserName01
+      KeyName: !Sub
+        - "${UserName01}-${UUID}"
+        - UUID: !Select
+            - 2
+            - !Split [ "/", !Ref AWS::StackId ]
       PublicKeyMaterial: !Ref PublicKeyMaterial01
 
   KeyPair02:
     Type: AWS::EC2::KeyPair
     Properties:
-      KeyName: !Ref UserName02
+      KeyName: !Sub
+        - "${UserName02}-${UUID}"
+        - UUID: !Select
+            - 2
+            - !Split [ "/", !Ref AWS::StackId ]
       PublicKeyMaterial: !Ref PublicKeyMaterial02
 
   KeyPair03:
     Type: AWS::EC2::KeyPair
     Properties:
-      KeyName: !Ref UserName03
+      KeyName: !Sub
+        - "${UserName03}-${UUID}"
+        - UUID: !Select
+            - 2
+            - !Split [ "/", !Ref AWS::StackId ]
       PublicKeyMaterial: !Ref PublicKeyMaterial03
 
   KeyPair04:
     Type: AWS::EC2::KeyPair
     Properties:
-      KeyName: !Ref UserName04
+      KeyName: !Sub
+        - "${UserName04}-${UUID}"
+        - UUID: !Select
+            - 2
+            - !Split [ "/", !Ref AWS::StackId ]
       PublicKeyMaterial: !Ref PublicKeyMaterial04
 
   KeyPair05:
     Type: AWS::EC2::KeyPair
     Properties:
-      KeyName: !Ref UserName05
+      KeyName: !Sub
+        - "${UserName05}-${UUID}"
+        - UUID: !Select
+            - 2
+            - !Split [ "/", !Ref AWS::StackId ]
       PublicKeyMaterial: !Ref PublicKeyMaterial05
 
   KeyPair06:
     Type: AWS::EC2::KeyPair
     Properties:
-      KeyName: !Ref UserName06
+      KeyName: !Sub
+        - "${UserName06}-${UUID}"
+        - UUID: !Select
+            - 2
+            - !Split [ "/", !Ref AWS::StackId ]
       PublicKeyMaterial: !Ref PublicKeyMaterial06
 
   KeyPair07:
     Type: AWS::EC2::KeyPair
     Properties:
-      KeyName: !Ref UserName07
+      KeyName: !Sub
+        - "${UserName07}-${UUID}"
+        - UUID: !Select
+            - 2
+            - !Split [ "/", !Ref AWS::StackId ]
       PublicKeyMaterial: !Ref PublicKeyMaterial07
 
   KeyPair08:
     Type: AWS::EC2::KeyPair
     Properties:
-      KeyName: !Ref UserName08
+      KeyName: !Sub
+        - "${UserName08}-${UUID}"
+        - UUID: !Select
+            - 2
+            - !Split [ "/", !Ref AWS::StackId ]
       PublicKeyMaterial: !Ref PublicKeyMaterial08
 
   RecordSet00:
