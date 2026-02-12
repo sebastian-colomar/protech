@@ -107,7 +107,6 @@ Red Hat references:
   ```
   ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3} 'sudo mv /var/lib/etcd/ /tmp'  
   ```
-- #### 1.4.6. REPEAT THESE STEPS ON EACH OF THE OTHER CONTROL PLANE HOSTS EXCEPT THE RECOVERY HOST.
 
 ### 1.5. Access the recovery control plane host. Run the restore script on the recovery control plane host and pass in the path to the etcd backup directory:
 
