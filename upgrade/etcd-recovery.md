@@ -125,8 +125,39 @@ Red Hat references:
   IMPORTANT:
   > If any nodes are in the NotReady state, log in to the nodes and remove all of the PEM files from the `/var/lib/kubelet/pki` directory on each node. You can SSH into the nodes for that purpose.
 
-### 1.6. Restart the kubelet service on all control plane hosts:
+### 1.7. Restart the kubelet service on all control plane hosts:
 
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "sudo systemctl restart kubelet.service"
+  ```
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST2} "sudo systemctl restart kubelet.service"
+  ```
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3} "sudo systemctl restart kubelet.service"
+  ```
+
+### 1.8. Approve the pending CSRs:
+- #### 1.8.1. Get the list of current CSRs:
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "sudo oc get csr --kubeconfig ${KUBECONFIG}"
+  ```
+- #### 1.8.2. Approve the list of pending CSRs:
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "for csr in $(oc get csr --no-headers --kubeconfig ${KUBECONFIG} | awk '$4=="Pending"{print $1}'); do oc adm certificate approve "$csr" --kubeconfig ${KUBECONFIG}; done"
+  ```
+- #### 1.8.1. Get the list of current CSRs:
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "sudo oc get csr --kubeconfig ${KUBECONFIG}"
+  ```
+- #### 1.8.1. Get the list of current CSRs:
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "sudo oc get csr --kubeconfig ${KUBECONFIG}"
+  ```
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3} 'sudo mv /var/lib/etcd/ /tmp'  
+  ```
+  
   ```
   ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "sudo systemctl restart kubelet.service"
   ```
