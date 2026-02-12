@@ -120,7 +120,7 @@ Parameters:
     Type: String
 
   InstanceInstanceType:
-    Default: t3a.medium
+    Default: c5n.large
     Description: >
       Select Amazon EC2 instance type.
     Type: String
