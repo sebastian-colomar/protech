@@ -59,7 +59,13 @@ Red Hat references:
   export BACKUP_LOCATION=assets/backup
   ```
   ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "ls -l ${HOME}/${BACKUP_LOCATION}"
+  ```
+  ```
   scp -i ${SSH_KEY} -r ${HOME}/${BACKUP_LOCATION} ${REMOTE_USER}@${HOST1}:
+  ```
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "ls -l ${HOME}/${BACKUP_LOCATION}"
   ```
 
 ### 1.4. Stop the static pods on any other control plane nodes:
