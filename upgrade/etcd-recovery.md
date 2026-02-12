@@ -63,90 +63,47 @@ Red Hat references:
 
 - #### 1.4.1. Access a control plane host that is not the recovery host. Move the existing `etcd` pod file out of the kubelet manifest directory:
   ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} 'sudo mv /etc/kubernetes/manifests/etcd-pod.yaml /tmp'  
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST2} 'sudo mv /etc/kubernetes/manifests/etcd-pod.yaml /tmp'  
+  ```
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3} 'sudo mv /etc/kubernetes/manifests/etcd-pod.yaml /tmp'  
   ```
 - #### 1.4.2. Verify that the etcd pods are stopped:
   ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} 'sudo crictl ps | grep etcd | grep -v operator'  
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST2} 'sudo crictl ps | grep etcd | grep -v operator'  
+  ```
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3} 'sudo crictl ps | grep etcd | grep -v operator'  
   ```
   > The output of this command should be empty. If it is not empty, wait a few minutes and check again.
 - #### 1.4.3. Move the existing Kubernetes API server pod file out of the kubelet manifest directory:
   ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} 'sudo mv /etc/kubernetes/manifests/kube-apiserver-pod.yaml /tmp'  
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST2} 'sudo mv /etc/kubernetes/manifests/kube-apiserver-pod.yaml /tmp'  
+  ```
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3} 'sudo mv /etc/kubernetes/manifests/kube-apiserver-pod.yaml /tmp'  
   ```
 - #### 1.4.4. Verify that the Kubernetes API server pods are stopped:
   ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} 'sudo crictl ps | grep kube-apiserver | grep -v operator'  
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST2} 'sudo crictl ps | grep kube-apiserver | grep -v operator'  
+  ```
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3} 'sudo crictl ps | grep kube-apiserver | grep -v operator'  
   ```
   > The output of this command should be empty. If it is not empty, wait a few minutes and check again.
 - #### 1.4.5. Move the etcd data directory to a different location:
   ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} 'sudo mv /var/lib/etcd/ /tmp'  
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST2} 'sudo mv /var/lib/etcd/ /tmp'  
+  ```
+  ```
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST3} 'sudo mv /var/lib/etcd/ /tmp'  
   ```
 - #### 1.4.6. REPEAT THESE STEPS ON EACH OF THE OTHER CONTROL PLANE HOSTS EXCEPT THE RECOVERY HOST.
 
-
----
-
-In this example, two files are created in the /home/core/assets/backup/ directory on the control plane host:
-- `snapshot_<datetimestamp>.db`: This file is the etcd snapshot. The `cluster-backup.sh` script confirms its validity.
-- `static_kuberesources_<datetimestamp>.tar.gz`: This file contains the resources for the static pods. If etcd encryption is enabled, it also contains the encryption keys for the etcd snapshot.
-
----
-# 2. Check if etcd encryption is enabled
-
-## Procedure
-
-### 2.1. Check the API Server Encryption Configuration
+### 1.5. Access the recovery control plane host. Run the restore script on the recovery control plane host and pass in the path to the etcd backup directory:
 
   ```
-  oc get apiserver cluster -o jsonpath='{.status.conditions}' | grep Encrypted= || echo ENCRYPTION IS NOT ENABLED
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "sudo /usr/local/bin/cluster-restore.sh ${BACKUP_LOCATION}"
   ```
 
----
-# 3. Alternative method for performing an etcd backup
 
-## WARNING: This alternative method is NOT officially supported by Red Hat
-
-## Procedure
-
-### 3.1.
-  ```  
-  export SSH_KEY=${HOME}/key.txt
-  export REMOTE_USER=core
-  export BACKUP_LOCATION=assets/backup
-  ```
-
-### 3.2.
-  ```
-  HOST=$(oc get no | grep master -m1 | awk '{print $1}')
-  ```
-
-### 3.3.
-  ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST}
-  ```
-### 3.4.
-  ```
-  mkdir -p ${HOME}/${BACKUP_LOCATION}
-  ```
-### 3.5.
-  ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} "mkdir -p ${BACKUP_LOCATION}"
-  ```
-### 3.6.
-  ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} "sudo /usr/local/bin/cluster-backup.sh ${BACKUP_LOCATION}"
-  ```
-### 3.7.
-  ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} "sudo chown -R ${REMOTE_USER} ${BACKUP_LOCATION}"
-  ```
-### 3.8.
-  ```
-  scp -i ${SSH_KEY} -r ${REMOTE_USER}@${HOST}:assets/backup ${HOME}/${BACKUP_LOCATION}
-  ```
-### 3.9.
-  ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} "sudo chown -R root ${BACKUP_LOCATION}"
-  ```
