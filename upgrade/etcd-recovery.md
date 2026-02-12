@@ -144,7 +144,7 @@ Red Hat references:
   ```
 - #### 1.8.2. Approve the list of pending CSRs:
   ```
-  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "for csr in $(oc get csr --no-headers --kubeconfig ${KUBECONFIG} | awk '$4=="Pending"{print $1}'); do oc adm certificate approve "$csr" --kubeconfig ${KUBECONFIG}; done"
+  ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST1} "for csr in $(sudo oc get csr --no-headers --kubeconfig ${KUBECONFIG} | awk '$4=="Pending"{print $1}'); do sudo oc adm certificate approve "$csr" --kubeconfig ${KUBECONFIG}; done"
   ```
 - #### 1.8.1. Get the list of current CSRs:
   ```
