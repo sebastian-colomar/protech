@@ -25,7 +25,7 @@ Check in the above link the table that presents which Cloud Pak for Data System 
 > You must upgrade to Cyclops 4.0 before upgrading Red Hat OpenShift Container Platform (OCP) and OpenShift Data Foundation (ODF) to version 4.10. For installation instructions, see the README file:
 > - https://download4.boulder.ibm.com/sar/CMA/WSA/0bnji/0/readme.txt
 
-- [Upgrade from v4.8 to v4.10](4.10_upgrade.md)
+- [Upgrade from v4.8 to v4.10](4.10_upgrade/4.10_upgrade.md)
 
 ## 4.12 upgrade
 
