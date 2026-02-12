@@ -40,7 +40,7 @@ This backup can be saved and used at a later time if you need to restore etcd.
 
 ## Procedure
 
-1.1. Start an SSH session for a control plane node:
+### 1.1. Start an SSH session for a control plane node:
   
   ```  
   export SSH_KEY=${HOME}/key.txt
@@ -55,7 +55,7 @@ This backup can be saved and used at a later time if you need to restore etcd.
   ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST}
   ```
 
-1.2. Run the `cluster-backup.sh` script and pass in the location to save the backup to:
+### 1.2. Run the `cluster-backup.sh` script and pass in the location to save the backup to:
 
   ```
   mkdir -p /home/core/assets/backup
@@ -76,49 +76,56 @@ In this example, two files are created in the /home/core/assets/backup/ director
 
 ## Procedure
 
-2.1. Check the API Server Encryption Configuration
+### 2.1. Check the API Server Encryption Configuration
 
   ```
   oc get apiserver cluster -o jsonpath='{.status.conditions}' | grep Encrypted= || echo ENCRYPTION IS NOT ENABLED
   ```
 
 ---
-# 3. Alternative method for performing an etcd backup (not officially supported by Red Hat)
+# 3. Alternative method for performing an etcd backup
 
+## WARNING: This alternative method is NOT officially supported by Red Hat
+
+## Procedure
+
+### 3.1.
   ```  
   export SSH_KEY=${HOME}/key.txt
   export REMOTE_USER=core
   export BACKUP_LOCATION=assets/backup
   ```
-  
+
+### 3.2.
   ```
   HOST=$(oc get no | grep master -m1 | awk '{print $1}')
   ```
-  
+
+### 3.3.
   ```
   ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST}
   ```
-
+### 3.4.
   ```
   mkdir -p ${HOME}/${BACKUP_LOCATION}
   ```
-
+### 3.5.
   ```
   ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} "mkdir -p ${BACKUP_LOCATION}"
   ```
-  
+### 3.6.
   ```
   ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} "sudo /usr/local/bin/cluster-backup.sh ${BACKUP_LOCATION}"
   ```
-  
+### 3.7.
   ```
   ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} "sudo chown -R ${REMOTE_USER} ${BACKUP_LOCATION}"
   ```
-
+### 3.8.
   ```
   scp -i ${SSH_KEY} -r ${REMOTE_USER}@${HOST}:assets/backup ${HOME}/${BACKUP_LOCATION}
   ```
-
+### 3.9.
   ```
   ssh -i ${SSH_KEY} ${REMOTE_USER}@${HOST} "sudo chown -R root ${BACKUP_LOCATION}"
   ```
