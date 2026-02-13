@@ -5,7 +5,7 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 --- 
 
-# 5. Some troubleshooting hints:
+# Some troubleshooting hints:
    ```
    curl -s ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/
    ```
