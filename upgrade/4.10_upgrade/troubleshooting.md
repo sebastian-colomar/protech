@@ -50,3 +50,5 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-marketplace/operators.coreos.com~v1alpha1~CatalogSource
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/cluster/operator.openshift.io~v1alpha1~ImageContentSourcePolicy/instances
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/all-namespaces/operators.coreos.com~v1alpha1~ClusterServiceVersion
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/settings/cluster/clusteroperators
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/cluster/config.openshift.io~v1~ClusterVersion/version
