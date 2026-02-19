@@ -1,4 +1,4 @@
-   # 2.0. (IF NOT ALREADY PRESENT) Deploy the local container registry using the Distribution container image with the HTTP protocol:
+   # 2.1. (IF NOT ALREADY PRESENT) Deploy the local container registry using the Distribution container image with the HTTP protocol:
 
    mkdir -p ${REMOVABLE_MEDIA_PATH}/containers
    mkdir -p ${REMOVABLE_MEDIA_PATH}/containers/cache
