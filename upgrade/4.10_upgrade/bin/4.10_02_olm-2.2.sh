@@ -13,7 +13,7 @@ sudo sed -i '/"registry.redhat.io": \[/i\
 # 2.3. Run the source index image that you want to prune in a container:
 
 for RH_INDEX in ${RH_INDEX_LIST}; do
-  podman run --authfile ${LOCAL_SECRET_JSON} -d --name ${RH_INDEX}-${RH_INDEX_VERSION_NEW} -p 50051 --rm ${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${RH_INDEX_VERSION_NEW}
+  podman run --authfile ${LOCAL_SECRET_JSON} -d --name ${RH_INDEX}-${RH_INDEX_VERSION_NEW} -p 50051 --replace --rm ${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${RH_INDEX_VERSION_NEW}
 done
 
 
@@ -21,7 +21,7 @@ done
 
 for RH_INDEX in ${RH_INDEX_LIST}; do
    node_port=$( podman port ${RH_INDEX}-${RH_INDEX_VERSION_NEW} | cut -d: -f2 )
-   podman run --rm --network host docker.io/fullstorydev/grpcurl:latest -plaintext localhost:${node_port} api.Registry/ListPackages | grep '"name"' | cut -d '"' -f4 | sort -u | tee ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${RH_INDEX_VERSION_NEW}.txt
+   podman run --network host docker.io/fullstorydev/grpcurl:latest -plaintext localhost:${node_port} --replace --rm api.Registry/ListPackages | grep '"name"' | cut -d '"' -f4 | sort -u | tee ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${RH_INDEX_VERSION_NEW}.txt
 done
 
 
