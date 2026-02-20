@@ -23,9 +23,9 @@ cp -fv ${LOCAL_SECRET_JSON} ${HOME}/.docker/config.json
 
 mkdir -p ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}
 
-podman run -d --name ${CONTAINER_NAME} --restart=always -p ${MIRROR_PORT}:${CONTAINER_PORT} -v ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}:${CONTAINER_VOLUME}:Z ${CONTAINER_IMAGE}:${CONTAINER_IMAGE_TAG}
+podman load -i ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar
 
-podman save > ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar ${CONTAINER_IMAGE}:${CONTAINER_IMAGE_TAG}
+podman run -d --name ${CONTAINER_NAME} --replace --restart=always -p ${MIRROR_PORT}:${CONTAINER_PORT} -v ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}:${CONTAINER_VOLUME}:Z ${CONTAINER_IMAGE}:${CONTAINER_IMAGE_TAG}
 
 tee /etc/containers/registries.conf.d/99-localhost-insecure.conf >/dev/null <<EOF
 [[registry]]
