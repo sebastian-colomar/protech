@@ -23,7 +23,7 @@ export MIRROR_PROTOCOL=http
 export OCP_RELEASE_NEW=4.10.64
 export OCP_RELEASE_OLD=4.9.59
 
-export OCP_REPOSITORY=ocp-release
+export OCP_REPOSITORY=ocp
 export PACKAGES="openshift-client opm"
 
 # PKGS_CERTIFIED contains the operators from the certified-operator-index
