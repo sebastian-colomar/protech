@@ -1,4 +1,3 @@
-  
   # 3.3. Install the OpenShift CLI:
 
 cd ${HOME}
