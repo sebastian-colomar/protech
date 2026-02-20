@@ -45,6 +45,7 @@ index_image_prune() {
    opm-${RH_INDEX_VERSION_NEW} index prune -f ${INDEX_IMAGE} -p "${pkg}" -t ${INDEX_IMAGE_PRUNED}  
    podman push ${INDEX_IMAGE_PRUNED} --remove-signatures
    podman run -d --name ${INDEX_CONTAINER_NAME} -p 50051 --replace --rm ${INDEX_IMAGE_PRUNED}
+   sleep 10
    export node_port=$( podman port ${INDEX_CONTAINER_NAME} | cut -d: -f2 )
    podman run --network host --rm docker.io/fullstorydev/grpcurl:latest -plaintext localhost:${node_port} api.Registry/ListPackages | grep '"name"' | cut -d '"' -f4 | sort -u | tee ${REMOVABLE_MEDIA_PATH}/${INDEX_CONTAINER_NAME}.txt
 }
