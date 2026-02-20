@@ -25,9 +25,9 @@ Red Hat references:
 
 ---
 
-# 1. [Preparing your mirror host](4.10_01_ocp.md)
-# 2. [Using Operator Lifecycle Manager on restricted networks](4.10_02_olm.md)
-# 3. [Mirror registry for Red Hat OpenShift](4.10_03_mirror.md)
-# 4. [Updating a cluster in a disconnected environment](4.10_04_upgrade.md)
-# 5. [Upgrade OCS to Red Hat OpenShift Data Foundation (ODF)](4.10_05_odf.md)
-# 6. [Upgrade Elastic Search and Cluster Logging](4.10_06_logging.md)
+# 1. [Preparing your mirror host](01-ocp.md)
+# 2. [Using Operator Lifecycle Manager on restricted networks](02-olm.md)
+# 3. [Mirror registry for Red Hat OpenShift](03-mirror.md)
+# 4. [Updating a cluster in a disconnected environment](04-upgrade.md)
+# 5. [Upgrade OCS to Red Hat OpenShift Data Foundation (ODF)](05-odf.md)
+# 6. [Upgrade Elastic Search and Cluster Logging](06-logging.md)
