@@ -7,7 +7,7 @@ date
 index_image_upload() {
   export MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${RH_INDEX_VERSION_NEW}
   export repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
-  tar fvx ${MIRROR_INDEX_REPOSITORY}.tar -C ${repo_path} --strip-components=1
+  tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
   cd ${repo_path}
   oc-${RH_INDEX_VERSION_NEW} adm catalog mirror file://${MIRROR_INDEX_REPOSITORY}/${RH_REPOSITORY}/${RH_INDEX}:${RH_INDEX_VERSION_NEW} ${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY} --insecure
   sed -i 's|name: .*$|name: '${MIRROR_INDEX_REPOSITORY//./-}'|' ${repo_path}/manifests-${RH_INDEX}-*/catalogSource.yaml
