@@ -10,10 +10,11 @@
 
 ```
 export GITHUB_BRANCH=main
-export GITHUB_REPO=protech
 export GITHUB_USER=sebastian-colomar
 
-export UPGRADE_BIN=upgrade/bin/jumphost
+export GITHUB_REPO=protech
+export UPGRADE_BIN=upgrade/bin
+export UPGRADE_HOST=jumphost
 export UPGRADE_SCRIPT=upgrade.sh
 export UPGRADE_VARS=00-export_vars.sh
 
@@ -21,18 +22,19 @@ export UPGRADE_VARS=00-export_vars.sh
 
 ```
 export GITHUB_PATH=${GITHUB_REPO}-$( date +%s )
+export UPGRADE_FULL_PATH=${HOME}/${GITHUB_PATH}/${UPGRADE_BIN}/${UPGRADE_HOST}
 
 git clone --branch ${GITHUB_BRANCH} --single-branch -- https://github.com/${GITHUB_USER}/${GITHUB_REPO} ${GITHUB_PATH}
 
 ```
 ### 1.2. If necessary, modify the environment variables:
 ```
-vi ${GITHUB_PATH}/${UPGRADE_BIN}/${UPGRADE_VARS}
+vi ${UPGRADE_FULL_PATH}/${UPGRADE_VARS}
 
 ```
 ### 1.3. Now you can execute the upgrade script:
 ```
-source ${GITHUB_PATH}/${UPGRADE_BIN}/${UPGRADE_SCRIPT}
+source ${UPGRADE_FULL_PATH}/${UPGRADE_SCRIPT}
 
 ```
 ### 1.4. Once finished, you can transfer the upgrade repository to the mirror host:
@@ -62,8 +64,8 @@ ssh -i ${SSH_KEY} ${REMOTE_USER}@{MIRROR_HOST}
 
 ```
 export GITHUB_REPO=protech
-
-export UPGRADE_BIN=upgrade/bin/mirror
+export UPGRADE_BIN=upgrade/bin
+export UPGRADE_HOST=mirror
 export UPGRADE_SCRIPT=upgrade.sh
 export UPGRADE_VARS=00-export_vars.sh
 
@@ -71,7 +73,10 @@ export UPGRADE_VARS=00-export_vars.sh
 
 ```
 export GITHUB_PATH=${GITHUB_REPO}-$( date +%s )
+export UPGRADE_FULL_PATH=${HOME}/${GITHUB_PATH}/${UPGRADE_BIN}/${UPGRADE_HOST}
 
+```
+```
 mkdir -p ${GITHUB_PATH}
 
 tar fvxz ${GITHUB_REPO}.tgz -C ${GITHUB_PATH} --strip-components=1
@@ -79,11 +84,11 @@ tar fvxz ${GITHUB_REPO}.tgz -C ${GITHUB_PATH} --strip-components=1
 ```
 ### 2.2 If necessary, modify the environment variables:
 ```
-vi ${GITHUB_PATH}/${UPGRADE_BIN}/${UPGRADE_VARS}
+vi ${UPGRADE_FULL_PATH}/${UPGRADE_VARS}
 
 ```
 ### 2.3. Now you can execute the upgrade script:
 ```
-source ${GITHUB_PATH}/${UPGRADE_BIN}/${UPGRADE_SCRIPT}
+source ${UPGRADE_FULL_PATH}/${UPGRADE_SCRIPT}
 
 ```
