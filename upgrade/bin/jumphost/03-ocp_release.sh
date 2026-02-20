@@ -1,3 +1,4 @@
+date
 
    # 1.6. Mirror the images and configuration manifests to a directory on the removable media:
 
@@ -31,3 +32,5 @@ scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${
 for package in ${PACKAGES}; do
    scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${HOME}/${package}-linux-${OCP_RELEASE_NEW}.tar.gz ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
 done
+
+date
