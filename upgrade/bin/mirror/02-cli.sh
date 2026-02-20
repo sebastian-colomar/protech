@@ -1,4 +1,5 @@
-  # 3.3. Install the OpenShift CLI:
+date
+# 3.3. Install the OpenShift CLI:
 
 cd ${HOME}
 mkdir -p ${BINARY_PATH}
@@ -18,3 +19,4 @@ rm -fv ${BINARY_PATH}/opm
 ln -sfnT ${BINARY_PATH}/oc-${OCP_RELEASE_NEW} ${BINARY_PATH}/oc-${RH_INDEX_VERSION_NEW}
 ln -sfnT ${BINARY_PATH}/opm-${OCP_RELEASE_NEW} ${BINARY_PATH}/opm-${RH_INDEX_VERSION_NEW}
 
+date
