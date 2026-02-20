@@ -1,10 +1,8 @@
 # How to use the upgrade scripts
 
-The first script should run on a jumphost with internet access. It will download the mirror images and send them to the mirror host using SSH.
-
-The second script should run on the mirror host. This host does not have internet access, but it can connect to the OpenShift cluster.
-
-Both the jumphost and the mirror host must be able to use `oc` commands to connect to the OpenShift API.
+- The first script should run on a jumphost with internet access. It will download the mirror images and send them to the mirror host using SSH.
+- The second script should run on the mirror host. This host does not have internet access, but it can connect to the OpenShift cluster.
+- Both the jumphost and the mirror host must be able to use `oc` commands to connect to the OpenShift API.
 
 ## JUMPHOST script
 
