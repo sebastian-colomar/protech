@@ -18,7 +18,7 @@ export OCP_REPOSITORY=ocp
 export PACKAGES="openshift-client opm"
 export PKGS='ako-operator,cluster-logging,elasticsearch-operator,local-storage-operator,ocs-operator,odf-operator'
 export PKGS_CERTIFIED='ako-operator'
-export PKGS_REDHAT='cluster-logging,elasticsearch-operator,local-storage-operator,ocs-operator,odf-operator'
+export PKGS_REDHAT='cluster-logging elasticsearch-operator local-storage-operator ocs-operator odf-operator'
 
 export PRODUCT_REPO=openshift-release-dev
 export RELEASE_NAME=ocp-release
