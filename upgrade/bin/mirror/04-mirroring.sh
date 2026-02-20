@@ -1,3 +1,4 @@
+date
 
 #3.6. Allow HTTP connections to the mirror registry:
 
@@ -59,4 +60,4 @@ for pkg in ${PKGS_REDHAT}; do
    oc-${OCP_RELEASE_OLD} apply -f ${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}/manifests-${RH_REPOSITORY}-${RH_INDEX}-*/imageContentSourcePolicy.yaml
 done
 
-
+date
