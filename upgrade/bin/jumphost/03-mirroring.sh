@@ -21,7 +21,7 @@ done
 
 for RH_INDEX in ${RH_INDEX_LIST}; do
    node_port=$( podman port ${RH_INDEX}-${RH_INDEX_VERSION_NEW} | cut -d: -f2 )
-   podman run --network host --replace --rm docker.io/fullstorydev/grpcurl:latest -plaintext localhost:${node_port} api.Registry/ListPackages | grep '"name"' | cut -d '"' -f4 | sort -u | tee ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${RH_INDEX_VERSION_NEW}.txt
+   podman run --network host --rm docker.io/fullstorydev/grpcurl:latest -plaintext localhost:${node_port} api.Registry/ListPackages | grep '"name"' | cut -d '"' -f4 | sort -u | tee ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${RH_INDEX_VERSION_NEW}.txt
 done
 
 
