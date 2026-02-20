@@ -30,7 +30,7 @@ export PACKAGES="openshift-client opm"
 # "ako-operator" is just an example for testing purposes, simulating an external operator such as IBM operators
 export PKGS_CERTIFIED='ako-operator'
 # PKGS_REDHAT contains the operators from the redhat-operator-index
-export PKGS_REDHAT='cluster-logging elasticsearch-operator local-storage-operator ocs-operator odf-csi-addons-operator odf-operator'
+export PKGS_REDHAT='cluster-logging elasticsearch-operator local-storage-operator mcg-operator ocs-operator odf-csi-addons-operator odf-operator'
 
 export PRODUCT_REPO=openshift-release-dev
 export RELEASE_NAME=ocp-release
