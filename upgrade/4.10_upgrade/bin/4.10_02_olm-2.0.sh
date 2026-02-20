@@ -18,9 +18,9 @@ export OCP_RELEASE_OLD=4.9.59
 export OCP_REPOSITORY=ocp
 # "ako-operator" is just an example for testing purposes, simulating an external operator such as IBM operators
 # "cluster-logging,elasticsearch-operator,local-storage-operator,mcg-operator,ocs-operator,odf-operator" are the currently existing Red Hat operators in version 4.9
-export PKGS='ako-operator,cluster-logging,elasticsearch-operator,local-storage-operator,ocs-operator,odf-operator'
+export PKGS='ako-operator cluster-logging elasticsearch-operator local-storage-operator ocs-operator odf-operator'
 export PKGS_CERTIFIED='ako-operator'
-export PKGS_REDHAT='cluster-logging,elasticsearch-operator,local-storage-operator,ocs-operator,odf-operator'
+export PKGS_REDHAT='cluster-logging elasticsearch-operator local-storage-operator ocs-operator odf-operator'
 export PRODUCT_REPO=openshift-release-dev
 export RELEASE_NAME=ocp-release
 export REMOTE_USER=ec2-user
