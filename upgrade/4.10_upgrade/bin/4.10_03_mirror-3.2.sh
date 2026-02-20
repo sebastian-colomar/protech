@@ -32,5 +32,3 @@ tee /etc/containers/registries.conf.d/99-localhost-insecure.conf >/dev/null <<EO
 location = "localhost:${MIRROR_PORT}"
 insecure = true
 EOF
-
-```
