@@ -18,12 +18,11 @@ export UPGRADE_HOST=jumphost
 export UPGRADE_SCRIPT=upgrade.sh
 export UPGRADE_VARS=00-export_vars.sh
 
-```
-
-```
 export GITHUB_PATH=${GITHUB_REPO}-$( date +%s )
 export UPGRADE_FULL_PATH=${HOME}/${GITHUB_PATH}/${UPGRADE_BIN}/${UPGRADE_HOST}
 
+```
+```
 git clone --branch ${GITHUB_BRANCH} --single-branch -- https://github.com/${GITHUB_USER}/${GITHUB_REPO} ${GITHUB_PATH}
 
 ```
@@ -44,7 +43,6 @@ export REMOTE_USER=ec2-user
 export SSH_KEY=${HOME}/key.txt
 
 ```
-
 ```
 tar cfvz ${GITHUB_REPO}.tgz ${GITHUB_PATH}
 
@@ -69,9 +67,6 @@ export UPGRADE_HOST=mirror
 export UPGRADE_SCRIPT=upgrade.sh
 export UPGRADE_VARS=00-export_vars.sh
 
-```
-
-```
 export GITHUB_PATH=${GITHUB_REPO}-$( date +%s )
 export UPGRADE_FULL_PATH=${HOME}/${GITHUB_PATH}/${UPGRADE_BIN}/${UPGRADE_HOST}
 
