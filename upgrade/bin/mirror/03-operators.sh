@@ -1,4 +1,4 @@
-
+date
 
 
 # 3.4. Extract the tar archives containing the directory of the mirrored images and catalogs and its contents:
@@ -21,3 +21,4 @@ for pkg in ${PKGS_REDHAT}; do
 done
 
 
+date
