@@ -8,7 +8,7 @@ grep -q ":${BINARY_PATH}:" ~/.bashrc || echo "export PATH=\"${BINARY_PATH}:\${PA
 source ~/.bashrc
 unalias cp mv rm 2>/dev/null || true
 for package in ${PACKAGES}; do
-  curl -O https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${release}/${package}-linux-${OCP_RELEASE_NEW}.tar.gz
+  curl -O https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OCP_RELEASE_NEW}/${package}-linux-${OCP_RELEASE_NEW}.tar.gz
   tar fxvz ${package}-linux-${OCP_RELEASE_NEW}.tar.gz
 done
 for binary in ${BINARIES}; do
