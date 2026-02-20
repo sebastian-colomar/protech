@@ -25,6 +25,7 @@ mkdir -p ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}
 
 podman run -d --name ${CONTAINER_NAME} --replace --restart=always -p ${MIRROR_PORT}:${CONTAINER_PORT} -v ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}:${CONTAINER_VOLUME}:Z ${CONTAINER_IMAGE}:${CONTAINER_IMAGE_TAG}
 
+rm -fv ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar
 podman save -o ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar ${CONTAINER_IMAGE}:${CONTAINER_IMAGE_TAG}
 
 tee /etc/containers/registries.conf.d/99-localhost-insecure.conf >/dev/null <<EOF
