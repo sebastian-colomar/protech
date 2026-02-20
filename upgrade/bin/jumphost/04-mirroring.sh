@@ -20,7 +20,7 @@ rm -f "$tmp"
 for RH_INDEX in ${RH_INDEX_LIST}; do
   podman run --authfile ${LOCAL_SECRET_JSON} -d --name ${RH_INDEX}-${RH_INDEX_VERSION_NEW} -p 50051 --replace --rm ${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${RH_INDEX_VERSION_NEW}
 done
-
+sleep 10
 
 # 2.4. Use the grpcurl command to get a list of the packages provided by the index:
 
