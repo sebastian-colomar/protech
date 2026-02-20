@@ -50,5 +50,5 @@ export SSH_KEY=${HOME}/key.txt
 # These variables are derived from the previous ones:
 export CONTAINERS_STORAGE_CONF=${REMOVABLE_MEDIA_PATH}/containers/storage.conf
 export LOCAL_REGISTRY=${MIRROR_HOST}:${MIRROR_PORT}
-export MIRROR_OCP_REPOSITORY=mirror-${OCP_REPOSITORY}
+export MIRROR_OCP_REPOSITORY=mirror-${OCP_REPOSITORY}-${OCP_RELEASE_NEW}
 export TMPDIR=${REMOVABLE_MEDIA_PATH}/containers/cache
