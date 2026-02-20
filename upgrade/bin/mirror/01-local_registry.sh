@@ -1,9 +1,11 @@
-unalias cp mv rm || true
+date
 
 #3.2. (IF NOT ALREADY PRESENT) Deploy the local container registry using the Distribution container image with the HTTP protocol:   mkdir -p ${REMOVABLE_MEDIA_PATH}/containers
 mkdir -p ${REMOVABLE_MEDIA_PATH}/containers/cache
 mkdir -p ${REMOVABLE_MEDIA_PATH}/containers/containers
 mkdir -p ${REMOVABLE_MEDIA_PATH}/containers/containers-run
+
+unalias cp mv rm || true
 
 tee ${REMOVABLE_MEDIA_PATH}/containers/storage.conf 0<<EOF
 [storage]
@@ -32,3 +34,5 @@ tee /etc/containers/registries.conf.d/99-localhost-insecure.conf >/dev/null <<EO
 location = "localhost:${MIRROR_PORT}"
 insecure = true
 EOF
+
+date
