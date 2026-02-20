@@ -13,9 +13,9 @@ export GITHUB_BRANCH=main
 export GITHUB_REPO=protech
 export GITHUB_USER=sebastian-colomar
 
-export UPGRADE_BIN=upgrade/bin
-export UPGRADE_JUMPHOST_SCRIPT=jumphost.sh
-export UPGRADE_JUMPHOST_VARS=jumphost/00-export_vars.sh
+export UPGRADE_BIN=upgrade/bin/jumphost
+export UPGRADE_SCRIPT=upgrade.sh
+export UPGRADE_VARS=00-export_vars.sh
 
 ```
 
@@ -27,12 +27,12 @@ git clone --branch ${GITHUB_BRANCH} --single-branch -- https://github.com/${GITH
 ```
 ### 1.2. If necessary, modify the environment variables:
 ```
-vi ${GITHUB_PATH}/${UPGRADE_BIN}/${UPGRADE_JUMPHOST_VARS}
+vi ${GITHUB_PATH}/${UPGRADE_BIN}/${UPGRADE_VARS}
 
 ```
 ### 1.3. Now you can execute the upgrade script:
 ```
-source ${GITHUB_PATH}/${UPGRADE_BIN}/${UPGRADE_JUMPHOST_SCRIPT}
+source ${GITHUB_PATH}/${UPGRADE_BIN}/${UPGRADE_SCRIPT}
 
 ```
 ### 1.4. Once finished, you can transfer the upgrade repository to the mirror host:
@@ -63,9 +63,9 @@ ssh -i ${SSH_KEY} ${REMOTE_USER}@{MIRROR_HOST}
 ```
 export GITHUB_REPO=protech
 
-export UPGRADE_BIN=upgrade/bin
-export UPGRADE_MIRRORHOST_SCRIPT=mirror.sh
-export UPGRADE_MIRRORHOST_VARS=mirror/00-export_vars.sh
+export UPGRADE_BIN=upgrade/bin/mirror
+export UPGRADE_SCRIPT=upgrade.sh
+export UPGRADE_VARS=00-export_vars.sh
 
 ```
 
@@ -79,11 +79,11 @@ tar fvxz ${GITHUB_REPO}.tgz -C ${GITHUB_PATH} --strip-components=1
 ```
 ### 2.2 If necessary, modify the environment variables:
 ```
-vi ${GITHUB_PATH}/${UPGRADE_BIN}/${UPGRADE_MIRRORHOST_VARS}
+vi ${GITHUB_PATH}/${UPGRADE_BIN}/${UPGRADE_VARS}
 
 ```
 ### 2.3. Now you can execute the upgrade script:
 ```
-source ${GITHUB_PATH}/${UPGRADE_BIN}/${UPGRADE_MIRRORHOST_SCRIPT}
+source ${GITHUB_PATH}/${UPGRADE_BIN}/${UPGRADE_SCRIPT}
 
 ```
