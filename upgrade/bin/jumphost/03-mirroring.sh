@@ -2,13 +2,18 @@
 
 # 2.2. Allow unsigned registries for the Certified Operator Index:
 
-sudo sed -i '/"registry.redhat.io": \[/i\
-            "registry.redhat.io/redhat/certified-operator-index": [\
-                {\
-                    "type": "insecureAcceptAnything"\
-                }\
-            ],' /etc/containers/policy.json
+sudo sh -c '
+set -euo pipefail
+f=/etc/containers/policy.json
+tmp=$(mktemp)
 
+jq --arg k "registry.redhat.io/redhat/certified-operator-index" \
+   '"'"'.transports.docker[$k] = [{"type":"insecureAcceptAnything"}]'"'"' \
+   "$f" > "$tmp"
+
+install -m 0644 "$tmp" "$f"
+rm -f "$tmp"
+'
 
 # 2.3. Run the source index image that you want to prune in a container:
 
