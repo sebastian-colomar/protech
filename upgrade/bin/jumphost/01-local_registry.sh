@@ -1,4 +1,5 @@
 # 2.1. (IF NOT ALREADY PRESENT) Deploy the local container registry using the Distribution container image with the HTTP protocol:
+unalias cp mv rm || true
 
 mkdir -p ${REMOVABLE_MEDIA_PATH}/containers
 mkdir -p ${REMOVABLE_MEDIA_PATH}/containers/cache
