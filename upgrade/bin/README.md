@@ -12,6 +12,7 @@ From the `jumphost` execute the following commands:
 export GITHUB_BRANCH=main
 export GITHUB_REPO=protech
 export GITHUB_USER=sebastian-colomar
+
 export UPGRADE_BIN=upgrade/bin
 export UPGRADE_JUMPHOST_SCRIPT=jumphost.sh
 export UPGRADE_JUMPHOST_VARS=jumphost/00-export_vars.sh
@@ -61,6 +62,7 @@ From the `mirror host` execute the following commands:
 
 ```
 export GITHUB_REPO=protech
+
 export UPGRADE_BIN=upgrade/bin
 export UPGRADE_MIRRORHOST_SCRIPT=mirror.sh
 export UPGRADE_MIRRORHOST_VARS=mirror/00-export_vars.sh
