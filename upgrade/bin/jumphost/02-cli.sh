@@ -1,4 +1,6 @@
-   # 1.4. Install the OpenShift CLI by downloading the binary:
+date
+
+# 1.4. Install the OpenShift CLI by downloading the binary:
 
 cd ${HOME}
 mkdir -p ${BINARY_PATH}
@@ -15,3 +17,4 @@ done
 rm -fv ${BINARY_PATH}/oc
 rm -fv ${BINARY_PATH}/opm
 
+date
