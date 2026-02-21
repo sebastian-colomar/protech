@@ -62,6 +62,8 @@ ssh -i ${SSH_KEY} ${REMOTE_USER}@${MIRROR_HOST}
 
 ```
 export GITHUB_REPO=protech
+export REMOTE_USER=ec2-user
+
 export UPGRADE_BIN=upgrade/v4.10/bin
 export UPGRADE_HOST=mirror
 export UPGRADE_SCRIPT=mirror.sh
@@ -73,6 +75,8 @@ export UPGRADE_FULL_PATH=${HOME}/${GITHUB_PATH}/${UPGRADE_BIN}/${UPGRADE_HOST}
 ```
 ```
 mkdir -p ${GITHUB_PATH}
+
+sudo mv -fv /home/$[REMOTE_USER}/${GITHUB_REPO}.tgz ${HOME}
 
 tar fvxz ${GITHUB_REPO}.tgz -C ${GITHUB_PATH} --strip-components=1
 
