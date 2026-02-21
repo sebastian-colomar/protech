@@ -10,7 +10,7 @@ oc-${OCP_RELEASE_OLD} patch image.config.openshift.io/cluster --type=merge -p '{
 
 export repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
 
-tar fvx ${MIRROR_OCP_REPOSITORY}.tar -C ${repo_path} --strip-components=1
+tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
 
 sudo mkdir -p ${repo_path}
 
