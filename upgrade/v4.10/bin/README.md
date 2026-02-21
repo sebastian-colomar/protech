@@ -76,7 +76,7 @@ export UPGRADE_FULL_PATH=${HOME}/${GITHUB_PATH}/${UPGRADE_BIN}/${UPGRADE_HOST}
 ```
 mkdir -p ${GITHUB_PATH}
 
-sudo mv -fv /home/$[REMOTE_USER}/${GITHUB_REPO}.tgz ${HOME}
+sudo mv -fv /home/${REMOTE_USER}/${GITHUB_REPO}.tgz ${HOME}
 
 tar fvxz ${GITHUB_REPO}.tgz -C ${GITHUB_PATH} --strip-components=1
 
