@@ -10,11 +10,11 @@ oc-${OCP_RELEASE_OLD} patch image.config.openshift.io/cluster --type=merge -p '{
 
 export repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
 
-tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
-
-sudo mkdir -p ${repo_path}
-
 sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}
+
+mkdir -p ${repo_path}
+
+tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
 
 oc-${OCP_RELEASE_NEW} image mirror "file://openshift/release:${OCP_RELEASE_NEW}-${ARCH_RELEASE}*" ${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY} --from-dir=${repo_path} --insecure
 
