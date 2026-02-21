@@ -5,6 +5,7 @@ date
 #3.12. Create the ImageContentSourcePolicy (ICSP) object by running the following command to specify the imageContentSourcePolicy.yaml file in your manifests directory:
 
 index_image_upload() {
+  export INDEX_CONTAINER_NAME=${RH_INDEX}-${RH_INDEX_VERSION_NEW}-${pkg}  
   export MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${RH_INDEX_VERSION_NEW}
   export repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
   mkdir -p ${repo_path}
@@ -13,11 +14,15 @@ index_image_upload() {
   oc-${RH_INDEX_VERSION_NEW} adm catalog mirror file://${MIRROR_INDEX_REPOSITORY}/${RH_REPOSITORY}/${RH_INDEX}:${RH_INDEX_VERSION_NEW} ${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY} --insecure
   sed -i 's|name: .*$|name: '${MIRROR_INDEX_REPOSITORY//./-}'|' ${repo_path}/manifests-${RH_INDEX}-*/catalogSource.yaml
   export target=$( ls ${repo_path}/manifests-${RH_INDEX}-*/catalogSource.yaml | tail -1 )
-  oc-${OCP_RELEASE_OLD} apply -f ${target}
+  if oc-${OCP_RELEASE_OLD} apply --dry-run=client -f "${target}" >/dev/null 2>&1; then
+    oc-${OCP_RELEASE_OLD} apply -f "${target}"
+  fi
   oc-${RH_INDEX_VERSION_NEW} adm catalog mirror ${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY}/${RH_REPOSITORY}-${RH_INDEX}:${RH_INDEX_VERSION_NEW} ${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY} --insecure --manifests-only
   sed -i 's|name: .*$|name: '${MIRROR_INDEX_REPOSITORY//./-}'|' ${repo_path}/manifests-${RH_REPOSITORY}-${RH_INDEX}-*/imageContentSourcePolicy.yaml
   export target=$( ls ${repo_path}/manifests-${RH_REPOSITORY}-${RH_INDEX}-*/imageContentSourcePolicy.yaml | tail -1 )
-  oc-${OCP_RELEASE_OLD} apply -f ${target}
+  if oc-${OCP_RELEASE_OLD} apply --dry-run=client -f "${target}" >/dev/null 2>&1; then
+    oc-${OCP_RELEASE_OLD} apply -f "${target}"
+  fi
 }
 
 # CERTIFIED OPERATOR INDEX
