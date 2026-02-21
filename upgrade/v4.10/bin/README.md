@@ -13,9 +13,9 @@ export GITHUB_BRANCH=main
 export GITHUB_USER=sebastian-colomar
 
 export GITHUB_REPO=protech
-export UPGRADE_BIN=upgrade/bin
+export UPGRADE_BIN=upgrade/v4.10/bin
 export UPGRADE_HOST=jumphost
-export UPGRADE_SCRIPT=upgrade.sh
+export UPGRADE_SCRIPT=mirror.sh
 export UPGRADE_VARS=00-export_vars.sh
 
 export GITHUB_PATH=${GITHUB_REPO}-$( date +%s )
@@ -33,7 +33,7 @@ vi ${UPGRADE_FULL_PATH}/${UPGRADE_VARS}
 ```
 ### 1.3. Now you can execute the upgrade script:
 ```
-source ${UPGRADE_FULL_PATH}/${UPGRADE_SCRIPT}
+source ${UPGRADE_BIN}/${UPGRADE_SCRIPT}
 
 ```
 ### 1.4. Once finished, you can transfer the upgrade repository to the mirror host:
@@ -62,9 +62,9 @@ ssh -i ${SSH_KEY} ${REMOTE_USER}@{MIRROR_HOST}
 
 ```
 export GITHUB_REPO=protech
-export UPGRADE_BIN=upgrade/bin
+export UPGRADE_BIN=upgrade/v4.10/bin
 export UPGRADE_HOST=mirror
-export UPGRADE_SCRIPT=upgrade.sh
+export UPGRADE_SCRIPT=mirror.sh
 export UPGRADE_VARS=00-export_vars.sh
 
 export GITHUB_PATH=${GITHUB_REPO}-$( date +%s )
@@ -84,6 +84,6 @@ vi ${UPGRADE_FULL_PATH}/${UPGRADE_VARS}
 ```
 ### 2.3. Now you can execute the upgrade script:
 ```
-source ${UPGRADE_FULL_PATH}/${UPGRADE_SCRIPT}
+source ${UPGRADE_BIN}/${UPGRADE_SCRIPT}
 
 ```
