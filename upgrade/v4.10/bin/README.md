@@ -15,7 +15,7 @@ export GITHUB_USER=sebastian-colomar
 export GITHUB_REPO=protech
 export UPGRADE_HOST=jumphost
 export UPGRADE_SCRIPT=mirror.sh
-export UPGRADE_VARS=00-export_vars.sh
+export UPGRADE_VARS=values.sh
 
 export GITHUB_PATH=${GITHUB_REPO}-$( date +%s )
 export UPGRADE_BIN=${HOME}/${GITHUB_PATH}/upgrade/v4.10/bin
