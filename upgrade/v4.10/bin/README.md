@@ -66,7 +66,7 @@ export REMOTE_USER=ec2-user
 
 export UPGRADE_HOST=mirror
 export UPGRADE_SCRIPT=mirror.sh
-export UPGRADE_VARS=00-export_vars.sh
+export UPGRADE_VARS=values.sh
 
 export GITHUB_PATH=${GITHUB_REPO}-$( date +%s )
 export UPGRADE_BIN=${HOME}/${GITHUB_PATH}/upgrade/v4.10/bin
@@ -83,11 +83,12 @@ tar fvxz ${GITHUB_REPO}.tgz -C ${GITHUB_PATH} --strip-components=1
 ```
 ### 2.2 If necessary, modify the environment variables:
 ```
-vi ${UPGRADE_FULL_PATH}/${UPGRADE_VARS}
+vi ${UPGRADE_BIN}/${UPGRADE_VARS}
 
 ```
 ### 2.3. Now you can execute the upgrade script:
 ```
+source ${UPGRADE_BIN}/${UPGRADE_VARS}
 source ${UPGRADE_BIN}/${UPGRADE_SCRIPT}
 
 ```
