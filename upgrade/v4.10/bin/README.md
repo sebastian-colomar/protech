@@ -13,13 +13,13 @@ export GITHUB_BRANCH=main
 export GITHUB_USER=sebastian-colomar
 
 export GITHUB_REPO=protech
-export UPGRADE_BIN=upgrade/v4.10/bin
 export UPGRADE_HOST=jumphost
 export UPGRADE_SCRIPT=mirror.sh
 export UPGRADE_VARS=00-export_vars.sh
 
 export GITHUB_PATH=${GITHUB_REPO}-$( date +%s )
-export UPGRADE_FULL_PATH=${HOME}/${GITHUB_PATH}/${UPGRADE_BIN}/${UPGRADE_HOST}
+export UPGRADE_BIN=${HOME}/${GITHUB_PATH}/upgrade/v4.10/bin
+export UPGRADE_FULL_PATH=${UPGRADE_BIN}/${UPGRADE_HOST}
 
 ```
 ```
