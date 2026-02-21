@@ -88,6 +88,6 @@ vi ${UPGRADE_FULL_PATH}/${UPGRADE_VARS}
 ```
 ### 2.3. Now you can execute the upgrade script:
 ```
-source ${UPGRADE_BIN}/${UPGRADE_SCRIPT}
+source ${UPGRADE_FULL_PATH}/${UPGRADE_SCRIPT}
 
 ```
