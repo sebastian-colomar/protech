@@ -27,7 +27,7 @@ mkdir -p ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}
 
 podman load -i ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar
 
-podman run -d --name ${CONTAINER_NAME} --replace --restart=always -p ${MIRROR_PORT}:${CONTAINER_PORT} -v ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}:${CONTAINER_VOLUME}:Z ${CONTAINER_IMAGE}:${CONTAINER_IMAGE_TAG}
+podman run -d -e REGISTRY_STORAGE_DELETE_ENABLED=true --name ${CONTAINER_NAME} --replace --restart=always -p ${MIRROR_PORT}:${CONTAINER_PORT} -v ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}:${CONTAINER_VOLUME}:Z ${CONTAINER_IMAGE}:${CONTAINER_IMAGE_TAG}
 
 tee /etc/containers/registries.conf.d/99-localhost-insecure.conf >/dev/null <<EOF
 [[registry]]
