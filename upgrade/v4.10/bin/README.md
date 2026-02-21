@@ -70,7 +70,7 @@ export UPGRADE_SCRIPT=mirror.sh
 export UPGRADE_VARS=00-export_vars.sh
 
 export GITHUB_PATH=${GITHUB_REPO}-$( date +%s )
-export UPGRADE_FULL_PATH=${HOME}/${GITHUB_PATH}/${UPGRADE_BIN}/${UPGRADE_HOST}
+export UPGRADE_FULL_PATH=${HOME}/${GITHUB_PATH}/${UPGRADE_BIN}
 
 ```
 ```
@@ -83,7 +83,7 @@ tar fvxz ${GITHUB_REPO}.tgz -C ${GITHUB_PATH} --strip-components=1
 ```
 ### 2.2 If necessary, modify the environment variables:
 ```
-vi ${UPGRADE_FULL_PATH}/${UPGRADE_VARS}
+vi ${UPGRADE_FULL_PATH}/${UPGRADE_HOST}/${UPGRADE_VARS}
 
 ```
 ### 2.3. Now you can execute the upgrade script:
