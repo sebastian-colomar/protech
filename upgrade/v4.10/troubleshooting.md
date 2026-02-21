@@ -46,12 +46,12 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
    ```
    podman exec ${CONTAINER_NAME} ls ${CONTAINER_VOLUME}/docker/registry/v2/repositories/${OCP_REPOSITORY}-${OCP_RELEASE_OLD}/_manifests/revisions/sha256/
    ```
-- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/cluster/config.openshift.io~v1~OperatorHub/cluster/sources
-- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-marketplace/operators.coreos.com~v1alpha1~CatalogSource
-- https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/cluster/operator.openshift.io~v1alpha1~ImageContentSourcePolicy/instances
-- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/all-namespaces/operators.coreos.com~v1alpha1~ClusterServiceVersion
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/settings/cluster/clusteroperators
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/all-namespaces/operators.coreos.com~v1alpha1~CatalogSource
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/all-namespaces/operators.coreos.com~v1alpha1~ClusterServiceVersion
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/all-namespaces/operators.coreos.com~v1alpha1~Subscription
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/cluster/config.openshift.io~v1~ClusterVersion/version
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/cluster/config.openshift.io~v1~OperatorHub/cluster/sources
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/cluster/operator.openshift.io~v1alpha1~ImageContentSourcePolicy/instances
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/packages.operators.coreos.com~v1~PackageManifest/instances
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1alpha1~InstallPlan/instances
-- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/all-namespaces/operators.coreos.com~v1alpha1~Subscription
