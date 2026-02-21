@@ -33,6 +33,7 @@ vi ${UPGRADE_BIN}/${UPGRADE_VARS}
 ```
 ### 1.3. Now you can execute the upgrade script:
 ```
+source ${UPGRADE_BIN}/${UPGRADE_VARS}
 source ${UPGRADE_BIN}/${UPGRADE_SCRIPT}
 
 ```
