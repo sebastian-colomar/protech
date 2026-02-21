@@ -46,12 +46,12 @@ export SSH_KEY=${HOME}/key.txt
 ```
 tar cfvz ${GITHUB_REPO}.tgz ${GITHUB_PATH}
 
-scp -i ${SSH_KEY} ${GITHUB_REPO}.tgz ${REMOTE_USER}@{MIRROR_HOST}:
+scp -i ${SSH_KEY} ${GITHUB_REPO}.tgz ${REMOTE_USER}@${MIRROR_HOST}:
 
 ```
 ### 1.5 Now you can log in into the mirror host and continue there the upgrade process:
 ```
-ssh -i ${SSH_KEY} ${REMOTE_USER}@{MIRROR_HOST}
+ssh -i ${SSH_KEY} ${REMOTE_USER}@${MIRROR_HOST}
 
 ```
 
