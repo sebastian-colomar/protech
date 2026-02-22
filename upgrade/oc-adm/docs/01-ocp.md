@@ -23,29 +23,59 @@ This process is referred to as disconnected mirroring.
 1.2. Obtain the pull secret file with Red Hat credentials from Red Hat OpenShift cluster manager and save as pull-secret.json:
    - https://console.redhat.com/openshift/install/pull-secret
      
-1.3. Set the required environment variables:
-   ```
+1.3. Set the required environment variables (the `RELEASE` variable for the version you want to mirror should already be exported):
+   ```  
+   export ARCH_CATALOG=amd64
    export ARCH_RELEASE=x86_64
+   
    export BINARIES="oc opm"
    export BINARY_PATH=${HOME}/bin
+   
+   export CONTAINER_IMAGE=docker.io/library/registry
+   export CONTAINER_IMAGE_TAG=2.7
+   export CONTAINER_NAME=registry
+   export CONTAINER_PORT=5000
+   export CONTAINER_VOLUME=/var/lib/registry
+   
    #export LOCAL_SECRET_JSON=${XDG_RUNTIME_DIR}/containers/auth.json
    #export LOCAL_SECRET_JSON=${HOME}/.docker/config.json
-   export LOCAL_SECRET_JSON=${HOME}/pull-secret.json
+   export LOCAL_SECRET_JSON=${HOME}/auth/pull-secret.json
+   
+   export MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
+   export MINOR=$( echo ${RELEASE} | cut -d. -f2 )
+   export PATCH=$( echo ${RELEASE} | cut -d. -f3 )
+   
    export MIRROR_HOST=mirror.hub.sebastian-colomar.com
    export MIRROR_PORT=5000
    export MIRROR_PROTOCOL=http
-   export OCP_RELEASE_NEW=4.9.59
-   export OCP_RELEASE_OLD=4.8.37
+   
    export OCP_REPOSITORY=ocp
    export PACKAGES="openshift-client opm"
+   
+   # PKGS_CERTIFIED contains the operators from the certified-operator-index
+   # "ako-operator" is just an example for testing purposes, simulating an external operator such as IBM operators
+   export PKGS_CERTIFIED='ako-operator'
+   # PKGS_REDHAT contains the operators from the redhat-operator-index
+   export PKGS_REDHAT='cluster-logging elasticsearch-operator local-storage-operator mcg-operator ocs-operator odf-csi-addons-operator odf-operator'
+   
    export PRODUCT_REPO=openshift-release-dev
    export RELEASE_NAME=ocp-release
    export REMOTE_USER=ec2-user
    export REMOVABLE_MEDIA_PATH=/mnt/mirror
-   export SSH_KEY=${HOME}/key.txt
-
+   
+   export RH_INDEX_LIST='certified-operator-index redhat-operator-index'
+   
+   export RH_REGISTRY=registry.redhat.io
+   export RH_REPOSITORY=redhat
+   
+   export SSH_KEY=${HOME}/auth/key.txt
+   
+   # These variables are derived from the previous ones:
+   export CONTAINERS_STORAGE_CONF=${REMOVABLE_MEDIA_PATH}/containers/storage.conf
    export LOCAL_REGISTRY=${MIRROR_HOST}:${MIRROR_PORT}
-   export MIRROR_OCP_REPOSITORY=mirror-${OCP_REPOSITORY}
+   export MIRROR_OCP_REPOSITORY=mirror-${OCP_REPOSITORY}-${RELEASE}
+   export TMPDIR=${REMOVABLE_MEDIA_PATH}/containers/cache
+   export VERSION=v${MAJOR}.${MINOR}
 
    ```
 
@@ -54,93 +84,80 @@ This process is referred to as disconnected mirroring.
    IMPORTANT:
    > If you are upgrading a cluster in a disconnected environment, install the oc version that you plan to upgrade to.
 
-   ```
+   ```   
    cd ${HOME}
    mkdir -p ${BINARY_PATH}
    grep -q ":${BINARY_PATH}:" ~/.bashrc || echo "export PATH=\"${BINARY_PATH}:\${PATH}\"" | tee -a ~/.bashrc
-   source ~/.bashrc
-
-   unalias cp mv rm
-
-   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
-      for package in ${PACKAGES}; do
-        curl -O https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${release}/${package}-linux-${release}.tar.gz
-        tar fxvz ${package}-linux-${release}.tar.gz
-      done
-      for binary in ${BINARIES}; do
-        mv ${binary} ${BINARY_PATH}/${binary}-${release}
-      done
+   #source ~/.bashrc
+   unalias cp mv rm 2>/dev/null || true
+   for package in ${PACKAGES}; do
+     curl -O https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${RELEASE}/${package}-linux-${RELEASE}.tar.gz
+     tar fxvz ${package}-linux-${RELEASE}.tar.gz
    done
-
+   for binary in ${BINARIES}; do
+     mv -fv ${binary} ${BINARY_PATH}/${binary}-${RELEASE} 
+   done
+   
+   rm -fv kubectl
+   rm -fv README.md
+   
    rm -fv ${BINARY_PATH}/oc
    rm -fv ${BINARY_PATH}/opm
-
+   
+   ln -sfnT ${BINARY_PATH}/oc-${RELEASE} ${BINARY_PATH}/oc-${VERSION}
+   ln -sfnT ${BINARY_PATH}/opm-${RELEASE} ${BINARY_PATH}/opm-${VERSION}
+   
+   ln -sfnT ${BINARY_PATH}/oc-${RELEASE} ${BINARY_PATH}/oc
+   ln -sfnT ${BINARY_PATH}/opm-${RELEASE} ${BINARY_PATH}/opm
+   
    ```
 
 1.5. Check that the Image Pull Secret is in the right location:
 
    ```
-   ls -l ${HOME}/pull-secret.json
+   ls -l ${HOME}/auth/pull-secret.json
 
-   cat ${HOME}/pull-secret.json
+   cat ${HOME}/auth/pull-secret.json
 
    ```
 
 1.6. Mirror the images and configuration manifests to a directory on the removable media:
 
    ```
-   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
-      sudo mkdir -p ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}-${release}
-      sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}
-      oc-${release} adm release mirror -a ${LOCAL_SECRET_JSON} quay.io/${PRODUCT_REPO}/${RELEASE_NAME}:${release}-${ARCH_RELEASE} --to-dir=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}-${release}
-   done
+   sudo mkdir -p ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
+   sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}
+   oc-${RELEASE} adm release mirror -a ${LOCAL_SECRET_JSON} quay.io/${PRODUCT_REPO}/${RELEASE_NAME}:${RELEASE}-${ARCH_RELEASE} --to-dir=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
 
    ```
 
 1.7. Retrieve the ImageContentSourcePolicy:
 
    ```
-   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
-      oc-${release} adm release mirror -a ${LOCAL_SECRET_JSON} quay.io/${PRODUCT_REPO}/${RELEASE_NAME}:${release}-${ARCH_RELEASE} --to=${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY}-${release} --to-release-image=${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY}-${release}:${release}-${ARCH_RELEASE} --insecure --dry-run | tee ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}-${release}/config/icsp.yaml
-      sed -i '0,/ImageContentSourcePolicy/d' ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}-${release}/config/icsp.yaml
-      sed -i 's/name: .*$/name: '${MIRROR_OCP_REPOSITORY}-${release}'/' ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}-${release}/config/icsp.yaml
-   done
+   oc-${RELEASE} adm release mirror -a ${LOCAL_SECRET_JSON} quay.io/${PRODUCT_REPO}/${RELEASE_NAME}:${RELEASE}-${ARCH_RELEASE} --to=${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY} --to-release-image=${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY}:${RELEASE}-${ARCH_RELEASE} --insecure --dry-run | tee ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}/config/icsp.yaml
+   sed -i '0,/ImageContentSourcePolicy/d' ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}/config/icsp.yaml
+   sed -i 's/name: .*$/name: '${MIRROR_OCP_REPOSITORY}'/' ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}/config/icsp.yaml
 
    ```
 
 1.8. Create a tar archive containing the directory and its contents:
 
    ```
-   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
-      cd ${REMOVABLE_MEDIA_PATH}
-      tar cfv ${MIRROR_OCP_REPOSITORY}-${release}.tar ${MIRROR_OCP_REPOSITORY}-${release}
-   done
+   cd ${REMOVABLE_MEDIA_PATH}
+   tar cfv ${MIRROR_OCP_REPOSITORY}.tar ${MIRROR_OCP_REPOSITORY}
 
    ```
 
 1.9. Upload the release and the openshift client tarball to the mirror host:
    ```
    export MIRROR_HOST=mirror.sebastian-colomar.com
-
    mirror_remote_exec() {
       ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "$@"
    }
-
-   ```
-   ```
    mirror_remote_exec "sudo mkdir -p ${REMOVABLE_MEDIA_PATH}"
-
-   ```
-   ```
-   mirror_remote_exec "sudo chown ${REMOTE_USER}. ${REMOVABLE_MEDIA_PATH}"
-
-   ```
-   ```
-   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
-      scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}-${release}.tar ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
-      for package in ${PACKAGES}; do
-         scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${HOME}/${package}-linux-${release}.tar.gz ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
-      done
+   mirror_remote_exec "sudo chown -R ${REMOTE_USER}. ${REMOVABLE_MEDIA_PATH}"
+   scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}.tar ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
+   for package in ${PACKAGES}; do
+      scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${HOME}/${package}-linux-${RELEASE}.tar.gz ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
    done
 
    ```
