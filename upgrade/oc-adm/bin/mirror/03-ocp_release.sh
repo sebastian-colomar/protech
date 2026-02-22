@@ -8,7 +8,7 @@ oc-${RELEASE} patch image.config.openshift.io/cluster --type=merge -p '{"spec":{
 
 #3.7. Upload the release images to the local container registry:
 
-export repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
+repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
 
 sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}
 
