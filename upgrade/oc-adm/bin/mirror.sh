@@ -8,4 +8,6 @@ BIN=$(cd "$(dirname "$0")" && pwd)
 BIN_HOST=${BIN}/${HOST}
 
 source ${BIN}/values.sh
-source ${BIN_HOST}/*.sh
+for script in ${BIN_HOST}/*.sh; do
+  source ${script}
+done
