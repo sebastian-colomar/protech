@@ -169,7 +169,7 @@ NOTE:
 
 2.12. Update the current custom catalog source of the `local-storage-operator` to use the custom mirror catalog:
 
-   ## WARNING
+   ### WARNING
   
    > Make sure that the **RELEASE** value is still the same as the cluster’s **original release**.
    >
@@ -232,7 +232,7 @@ NOTE:
 
 2.16. Update the current custom catalog source of the `elasticsearch-operator` to use the custom mirror catalog:
 
-   ## WARNING
+   ### WARNING
   
    > Make sure that the **RELEASE** value is still the same as the cluster’s **original release**.
    >
@@ -321,7 +321,7 @@ NOTE:
 
 2.25. Update the current custom catalog source of the `cluster-logging` to use the custom mirror catalog:
 
-   ## WARNING
+   ### WARNING
   
    > Make sure that the **RELEASE** value is still the same as the cluster’s **original release**.
    >
@@ -364,27 +364,27 @@ NOTE:
 
 ---
 
-### Openshift Cluster Logging operator
+### AKO operator provided by VMware (as an example of external provider operator)
 
-2.24. Ensure that all OpenShift Cluster Logging Pods, including the operator pods, are in Ready state in the `openshift-logging` namespace:
+2.27. Ensure that all AKO Pods, including the operator pods, are in Ready state in the `avi-system` namespace:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-logging/pods
 
     ```
-    oc -n openshift-logging get po
+    oc -n avi-system get po
 
     ```
 
-2.25. Update the current custom catalog source of the `cluster-logging` to use the custom mirror catalog:
+2.28. Update the current custom catalog source of the `ako-operator` to use the custom mirror catalog:
 
-   ## WARNING
+   ### WARNING
   
    > Make sure that the **RELEASE** value is still the same as the cluster’s **original release**.
    >
    > **No upgrade must happen at this stage.**
 
    ```
-   NAMESPACE=openshift-logging
-   pkg=cluster-logging
+   NAMESPACE=avi-system
+   pkg=ako-operator
 
    ```
    ```
@@ -409,11 +409,11 @@ NOTE:
 
    ```
   
-2.26. Ensure that all OpenShift Cluster Logging Pods, including the operator pods, are in Ready state in the `openshift-logging` namespace:
+2.29. Ensure that all AKO Pods, including the operator pods, are in Ready state in the `avi-system` namespace:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-logging/pods
 
     ```
-    oc -n openshift-logging get po
+    oc -n avi-system get po
 
     ```
 
