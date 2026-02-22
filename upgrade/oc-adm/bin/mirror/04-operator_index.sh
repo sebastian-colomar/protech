@@ -6,8 +6,8 @@ date
 
 index_image_upload() {
   if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
-    export MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
-    export repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
+    MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
+    repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
     mkdir -p ${repo_path}
     tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
     cd ${repo_path}
