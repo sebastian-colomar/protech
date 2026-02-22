@@ -1,4 +1,4 @@
-# How to use the upgrade scripts
+# How to use the mirroring scripts
 
 - The first script should run on a jumphost with internet access. It will download the mirror images and send them to the mirror host using SSH.
 - The second script should run on the mirror host. This host does not have internet access, but it can connect to the OpenShift cluster.
@@ -13,13 +13,13 @@ export GITHUB_BRANCH=main
 export GITHUB_USER=sebastian-colomar
 
 export GITHUB_REPO=protech
-export UPGRADE_HOST=jumphost
-export UPGRADE_SCRIPT=mirror.sh
-export UPGRADE_VARS=values.sh
+export SCRIPT=mirror.sh
+export VARS=values.sh
+export HOST=jumphost
 
 export GITHUB_PATH=${GITHUB_REPO}-$( date +%s )
-export UPGRADE_BIN=${HOME}/${GITHUB_PATH}/upgrade/v4.10/bin
-export UPGRADE_FULL_PATH=${UPGRADE_BIN}/${UPGRADE_HOST}
+export BIN=${HOME}/${GITHUB_PATH}/upgrade/v4.10/bin
+export FULL_PATH=${BIN}/${HOST}
 
 ```
 ```
@@ -28,13 +28,13 @@ git clone --branch ${GITHUB_BRANCH} --single-branch -- https://github.com/${GITH
 ```
 ### 1.2. If necessary, modify the environment variables:
 ```
-vi ${UPGRADE_BIN}/${UPGRADE_VARS}
+vi ${BIN}/${VARS}
 
 ```
-### 1.3. Now you can execute the upgrade script:
+### 1.3. Now you can execute the mirroring script:
 ```
-source ${UPGRADE_BIN}/${UPGRADE_VARS}
-source ${UPGRADE_BIN}/${UPGRADE_SCRIPT}
+source ${BIN}/${VARS}
+source ${BIN}/${SCRIPT}
 
 ```
 ### 1.4. Once finished, you can transfer the upgrade repository to the mirror host:
@@ -50,7 +50,7 @@ tar cfvz ${GITHUB_REPO}.tgz ${GITHUB_PATH}
 scp -i ${SSH_KEY} ${GITHUB_REPO}.tgz ${REMOTE_USER}@${MIRROR_HOST}:
 
 ```
-### 1.5 Now you can log in into the mirror host and continue there the upgrade process:
+### 1.5 Now you can log in into the mirror host and continue there the mirroring process:
 ```
 ssh -i ${SSH_KEY} ${REMOTE_USER}@${MIRROR_HOST}
 
@@ -65,13 +65,13 @@ ssh -i ${SSH_KEY} ${REMOTE_USER}@${MIRROR_HOST}
 export GITHUB_REPO=protech
 export REMOTE_USER=ec2-user
 
-export UPGRADE_HOST=mirror
-export UPGRADE_SCRIPT=mirror.sh
-export UPGRADE_VARS=values.sh
+export SCRIPT=mirror.sh
+export VARS=values.sh
+export HOST=mirror
 
 export GITHUB_PATH=${GITHUB_REPO}-$( date +%s )
-export UPGRADE_BIN=${HOME}/${GITHUB_PATH}/upgrade/v4.10/bin
-export UPGRADE_FULL_PATH=${UPGRADE_BIN}/${UPGRADE_HOST}
+export BIN=${HOME}/${GITHUB_PATH}/upgrade/v4.10/bin
+export FULL_PATH=${BIN}/${HOST}
 
 ```
 ```
@@ -84,12 +84,12 @@ tar fvxz ${GITHUB_REPO}.tgz -C ${GITHUB_PATH} --strip-components=1
 ```
 ### 2.2 If necessary, modify the environment variables:
 ```
-vi ${UPGRADE_BIN}/${UPGRADE_VARS}
+vi ${BIN}/${VARS}
 
 ```
-### 2.3. Now you can execute the upgrade script:
+### 2.3. Now you can execute the mirroring script:
 ```
-source ${UPGRADE_BIN}/${UPGRADE_VARS}
-source ${UPGRADE_BIN}/${UPGRADE_SCRIPT}
+source ${BIN}/${VARS}
+source ${BIN}/${SCRIPT}
 
 ```
