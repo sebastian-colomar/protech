@@ -79,10 +79,10 @@ SCRIPT=upgrade/oc-adm/bin/mirroring.sh
 nohup bash ${GITHUB_REPO}/${SCRIPT} 1> ${HOST}.log 2> ${HOST}-errors.log &
 
 ```
-## 3. Validate the mirroring process
+## 3. Verify the mirroring process
 
-Now you should have a valid disconnected mirror of the chosen `RELEASE`.
-You can validate the results checking the following resources:
+You should now have a valid disconnected mirror of the selected `RELEASE`.
+To make sure everything worked correctly, check the following resources:
 - `CatalogSources`:
   - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1alpha1~CatalogSource/instances
   ```
@@ -95,7 +95,7 @@ You can validate the results checking the following resources:
   oc get imagecontentsourcepolicy | grep v$( echo ${RELEASE} | cut -d. -f1 )-$( echo ${RELEASE} | cut -d. -f2 )
   
   ```
-It can also be useful to have a look at the following related resources:
+You may also find it helpful to review the following related resources:
 - `Subscriptions`:
   - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1alpha1~Subscription/instances
   ```
