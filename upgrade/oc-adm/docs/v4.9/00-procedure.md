@@ -25,8 +25,16 @@ Red Hat references:
 
 ---
 
-# 1. [Fully disconnected (air-gapped) mirror registry](../01-mirroring.md)
-# 2. [Updating a cluster in a disconnected environment](../03-upgrade.md)
-# 3. [Upgrade OCS to Red Hat OpenShift Data Foundation (ODF)](04-ocs2odf.md)
-# 4. [Upgrade Elastic Search and Cluster Logging](../06-logging.md)
-# 5. [Upgrade AKO operator (as an example of external operators)](../07-ako.md)
+## 1. Fully disconnected (air-gapped) mirror registry:
+
+  Before continuing, set the `RELEASE` environment variable to match the CURRENT cluster version, which is `4.8.37`.
+  ```
+  export RELEASE=4.8.37
+  ```
+  You can now continue with the following steps:
+  - [Fully disconnected (air-gapped) mirror registry](../01-mirroring.md)
+
+## 2. [Updating a cluster in a disconnected environment](../03-upgrade.md)
+## 3. [Upgrade OCS to Red Hat OpenShift Data Foundation (ODF)](04-ocs2odf.md)
+## 4. [Upgrade Elastic Search and Cluster Logging](../06-logging.md)
+## 5. [Upgrade AKO operator (as an example of external operators)](../07-ako.md)
