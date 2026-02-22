@@ -13,16 +13,13 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 ## Procedure
 
-4.1.1. Update the current custom catalog source of the ocs-operator and local-storage-operator to use the custom mirror catalog as shown:
-
-    alias oc=oc-4.9.59
-
-    export CATALOG_SOURCE=mirror-redhat-operator-index-v4-8
+4.1.1. Check that the current custom catalog source of the ocs-operator and local-storage-operator are using the custom mirror catalog as shown:
+   
+    oc get sub local-storage-operator -n openshift-local-storage -o jsonpath='{.spec.source}{" / "}{.spec.sourceNamespace}{" / "}{.spec.channel}{"\n"}'
     
-    oc patch subscription local-storage-operator -n openshift-local-storage --type json --patch '[{"op": "replace", "path": "/spec/source", "value": "'${CATALOG_SOURCE}'" }]'
-    
-    oc patch subscription ocs-operator -n openshift-storage --type json --patch '[{"op": "replace", "path": "/spec/source", "value": "'${CATALOG_SOURCE}'" }]'
+    oc get sub ocs-operator -n openshift-storage -o jsonpath='{.spec.source}{" / "}{.spec.sourceNamespace}{" / "}{.spec.channel}{"\n"}'
 
+    
 4.1.2. Ensure that the OpenShift Container Platform cluster has been successfully updated to version 4.9.59.
 
     oc get clusterversion
@@ -90,7 +87,7 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 # 4.2. Upgrade the local-storage component to 4.9
 
 WARNING:
-> You must upgrade the local-storage component to 4.9 after the completing ODF 4.9 installation.
+> You must upgrade the local-storage component to 4.9 after completing the ODF 4.9 installation.
 
 ## Procedure
 
@@ -106,4 +103,6 @@ WARNING:
     oc -n openshift-local-storage get sub
 
     oc -n openshift-local-storage get csv
+
+    oc -n openshift-local-storage get po
 
