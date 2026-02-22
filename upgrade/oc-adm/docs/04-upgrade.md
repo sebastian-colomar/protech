@@ -97,7 +97,7 @@ NOTE:
 
    ```
   
- 4.6. UPDATE THE CLUSTER:
+ 4.5. UPDATE THE CLUSTER:
 
    WARNING:
    > THIS WILL UPDATE THE CLUSTER
@@ -107,21 +107,21 @@ NOTE:
 
    ```
 
-4.7. (ONLY IF NECESSARY) Force an explicit upgrade with version set:
+4.6. (ONLY IF NECESSARY) Force an explicit upgrade with version set:
 
    ```
    oc patch clusterversion version --type=merge -p '{"spec":{"desiredUpdate":{"image":"'${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY}@sha256:${SHA256_SUM_VALUE}'","version":"'${OCP_RELEASE_NEW}'","force":true}}}'
 
    ```
 
-4.8. Monitor the upgrade:
+4.7. Monitor the upgrade:
    - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/cluster/config.openshift.io~v1~ClusterVersion/version
    ```
    oc get clusterversion version -o jsonpath='{range .status.conditions[*]}{.type}{"\t"}{.status}{"\t"}{.reason}{"\t"}{.message}{"\n"}{end}'
 
    ```
 
-4.9. Watch the CVO logs while it downloads/unpacks:
+4.8. Watch the CVO logs while it downloads/unpacks:
    - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-cluster-version/pods
    ```
    oc -n openshift-cluster-version logs deploy/cluster-version-operator -f
