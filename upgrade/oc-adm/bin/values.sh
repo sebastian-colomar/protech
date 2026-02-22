@@ -14,7 +14,7 @@ export CONTAINER_VOLUME=/var/lib/registry
 
 #export LOCAL_SECRET_JSON=${XDG_RUNTIME_DIR}/containers/auth.json
 #export LOCAL_SECRET_JSON=${HOME}/.docker/config.json
-export LOCAL_SECRET_JSON=${HOME}/pull-secret.json
+export LOCAL_SECRET_JSON=${HOME}/auth/pull-secret.json
 
 export MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
 export MINOR=$( echo ${RELEASE} | cut -d. -f2 )
@@ -43,7 +43,7 @@ export RH_INDEX_LIST='certified-operator-index redhat-operator-index'
 export RH_REGISTRY=registry.redhat.io
 export RH_REPOSITORY=redhat
 
-export SSH_KEY=${HOME}/key.txt
+export SSH_KEY=${HOME}/auth/key.txt
 
 # These variables are derived from the previous ones:
 export CONTAINERS_STORAGE_CONF=${REMOVABLE_MEDIA_PATH}/containers/storage.conf

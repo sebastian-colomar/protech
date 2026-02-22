@@ -36,7 +36,7 @@ nohup bash ${GITHUB_REPO}/${SCRIPT} 1> ${HOST}-$( date +%s ).log 2>& 1 &
 ```
 MIRROR_HOST=mirror.sebastian-colomar.com
 REMOTE_USER=ec2-user
-SSH_KEY=${HOME}/key.txt
+SSH_KEY=${HOME}/auth/key.txt
 
 ```
 ```
