@@ -19,7 +19,7 @@ rm -rf ${GITHUB_REPO}
 git clone --branch ${GITHUB_BRANCH} --single-branch -- https://github.com/${GITHUB_USER}/${GITHUB_REPO}
 
 ```
-### 1.2. Now you can execute the mirroring script:
+### 1.2. You can now run the mirroring script:
 ```
 export HOST=jumphost
 export RELEASE=4.8.37
@@ -32,7 +32,7 @@ SCRIPT=upgrade/oc-adm/bin/mirroring.sh
 nohup bash ${GITHUB_REPO}/${SCRIPT} 1> ${HOST}.log 2> ${HOST}-errors.log &
 
 ```
-### 1.3. Once finished, you can transfer the upgrade repository to the mirror host:
+### 1.3. After it finishes, you can copy the upgrade repository to the mirror host:
 ```
 MIRROR_HOST=mirror.sebastian-colomar.com
 REMOTE_USER=ec2-user
@@ -44,7 +44,7 @@ tar cfvz ${GITHUB_REPO}.tgz ${GITHUB_REPO}
 scp -i ${SSH_KEY} ${GITHUB_REPO}.tgz ${REMOTE_USER}@${MIRROR_HOST}:
 
 ```
-### 1.4. Now you can log in into the mirror host and continue there the mirroring process:
+### 1.4. You can now log in to the mirror host and continue the mirroring process there:
 ```
 ssh -i ${SSH_KEY} ${REMOTE_USER}@${MIRROR_HOST}
 
@@ -53,8 +53,7 @@ ssh -i ${SSH_KEY} ${REMOTE_USER}@${MIRROR_HOST}
 
 ## 2. MIRROR HOST script
 
-### 2.1. From the `mirror host` execute the following commands:
-
+### 2.1. On the `mirror host`, run the following commands:
 ```
 GITHUB_REPO=protech
 REMOTE_USER=ec2-user
@@ -66,7 +65,7 @@ sudo mv -fv /home/${REMOTE_USER}/${GITHUB_REPO}.tgz ${HOME}
 tar fvxz ${GITHUB_REPO}.tgz -C ${GITHUB_REPO} --strip-components=1
 
 ```
-### 2.2. Now you can execute the mirroring script:
+### 2.2. You can now run the mirroring script:
 ```
 export HOST=mirror
 export RELEASE=4.8.37
