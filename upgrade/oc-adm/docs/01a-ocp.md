@@ -4,7 +4,7 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 ---
 
-# 1. Getting your Jumphost ready
+# 1A. Getting your Jumphost ready
 
 NOTE:
 > Run this whole procedure on a Linux machine with internet access and at least 1 TB of mounted storage (the Jumphost)
@@ -17,13 +17,13 @@ you must mirror the images to a file system and then bring that host or removabl
 This process is referred to as disconnected mirroring.
 
 #### Procedure
-1.1. Set up your Red Hat account and link the Red Hat entitlement to your account. For help, see Accessing Red Hat entitlements from your IBM Cloud Pak:
+1A.1. Set up your Red Hat account and link the Red Hat entitlement to your account. For help, see Accessing Red Hat entitlements from your IBM Cloud Pak:
    - https://www.ibm.com/docs/en/cloud-paks/1.0?topic=iocpc-accessing-red-hat-entitlements-from-your-cloud-paks
      
-1.2. Obtain the pull secret file with Red Hat credentials from Red Hat OpenShift cluster manager and save as pull-secret.json:
+1A.2. Obtain the pull secret file with Red Hat credentials from Red Hat OpenShift cluster manager and save as pull-secret.json:
    - https://console.redhat.com/openshift/install/pull-secret
      
-1.3. Set the required environment variables:
+1A.3. Set the required environment variables:
    
    WARNING
    > The `RELEASE` variable for the version you want to mirror should already be exported)
@@ -83,7 +83,7 @@ This process is referred to as disconnected mirroring.
 
    ```
 
-1.4. Install the OpenShift CLI by downloading the binary:
+1A.4. Install the OpenShift CLI by downloading the binary:
    
    IMPORTANT:
    > If you are upgrading a cluster in a disconnected environment, install the oc version that you plan to upgrade to.
@@ -116,7 +116,7 @@ This process is referred to as disconnected mirroring.
    
    ```
 
-1.5. Check that the Image Pull Secret is in the right location:
+1A.5. Check that the Image Pull Secret is in the right location:
 
    ```
    ls -l ${HOME}/auth/pull-secret.json
@@ -125,7 +125,7 @@ This process is referred to as disconnected mirroring.
 
    ```
 
-1.6. Mirror the images and configuration manifests to a directory on the removable media:
+1A.6. Mirror the images and configuration manifests to a directory on the removable media:
 
    ```
    sudo mkdir -p ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
@@ -134,7 +134,7 @@ This process is referred to as disconnected mirroring.
 
    ```
 
-1.7. Retrieve the ImageContentSourcePolicy:
+1A.7. Retrieve the ImageContentSourcePolicy:
 
    ```
    oc-${RELEASE} adm release mirror -a ${LOCAL_SECRET_JSON} quay.io/${PRODUCT_REPO}/${RELEASE_NAME}:${RELEASE}-${ARCH_RELEASE} --to=${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY} --to-release-image=${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY}:${RELEASE}-${ARCH_RELEASE} --insecure --dry-run | tee ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}/config/icsp.yaml
@@ -143,7 +143,7 @@ This process is referred to as disconnected mirroring.
 
    ```
 
-1.8. Create a tar archive containing the directory and its contents:
+1A.8. Create a tar archive containing the directory and its contents:
 
    ```
    cd ${REMOVABLE_MEDIA_PATH}
@@ -151,7 +151,7 @@ This process is referred to as disconnected mirroring.
 
    ```
 
-1.9. Upload the release and the openshift client tarball to the mirror host:
+1A.9. Upload the release and the openshift client tarball to the mirror host:
    ```
    export MIRROR_HOST=mirror.sebastian-colomar.com
    mirror_remote_exec() {
