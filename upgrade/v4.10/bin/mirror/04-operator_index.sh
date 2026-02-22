@@ -5,25 +5,28 @@ date
 #3.12. Create the ImageContentSourcePolicy (ICSP) object by running the following command to specify the imageContentSourcePolicy.yaml file in your manifests directory:
 
 index_image_upload() {
-  export INDEX_CONTAINER_NAME=${RH_INDEX}-${RH_INDEX_VERSION_NEW}-${pkg}  
-  export MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${RH_INDEX_VERSION_NEW}
-  export repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
-  mkdir -p ${repo_path}
-  tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
-  cd ${repo_path}
-  oc-${RH_INDEX_VERSION_NEW} adm catalog mirror file://${MIRROR_INDEX_REPOSITORY}/${RH_REPOSITORY}/${RH_INDEX}:${RH_INDEX_VERSION_NEW} ${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY} --insecure
-  shopt -s nullglob
-  name="${MIRROR_INDEX_REPOSITORY//./-}"
-  for target in "${repo_path}"/manifests-"${RH_INDEX}"-*/catalogSource.yaml; do
-    sed -i "s|^name: .*$|name: ${name}|" "$target"
-    oc-"${OCP_RELEASE_OLD}" apply --dry-run=client -f "$target" >/dev/null 2>&1 && oc-"${OCP_RELEASE_OLD}" apply -f "$target"
-  done
-  oc-"${RH_INDEX_VERSION_NEW}" adm catalog mirror "${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY}/${RH_REPOSITORY}-${RH_INDEX}:${RH_INDEX_VERSION_NEW}" "${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY}" --insecure --manifests-only
-  for target in "${repo_path}"/manifests-"${RH_REPOSITORY}"-"${RH_INDEX}"-*/imageContentSourcePolicy.yaml; do
-    sed -i "s|^name: .*$|name: ${name}|" "$target"
-    oc-"${OCP_RELEASE_OLD}" apply --dry-run=client -f "$target" >/dev/null 2>&1 && oc-"${OCP_RELEASE_OLD}" apply -f "$target"
-  done
-  shopt -u nullglob
+  if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${RH_INDEX_VERSION_NEW}.txt; then
+    export MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${RH_INDEX_VERSION_NEW}
+    export repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
+    mkdir -p ${repo_path}
+    tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
+    cd ${repo_path}
+    oc-${RH_INDEX_VERSION_NEW} adm catalog mirror file://${MIRROR_INDEX_REPOSITORY}/${RH_REPOSITORY}/${RH_INDEX}:${RH_INDEX_VERSION_NEW} ${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY} --insecure
+    shopt -s nullglob
+    name=${MIRROR_INDEX_REPOSITORY//./-}
+    for target in ${repo_path}/manifests-${RH_INDEX}-*/catalogSource.yaml; do
+      sed -i "s|^name: .*$|name: ${name}|" $target
+      oc-${OCP_RELEASE_OLD} apply --dry-run=client -f $target >/dev/null 2>&1 && oc-${OCP_RELEASE_OLD} apply -f $target
+    done
+    oc-${RH_INDEX_VERSION_NEW} adm catalog mirror ${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY}/${RH_REPOSITORY}-${RH_INDEX}:${RH_INDEX_VERSION_NEW} ${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY} --insecure --manifests-only
+    for target in ${repo_path}/manifests-${RH_REPOSITORY}-${RH_INDEX}-*/imageContentSourcePolicy.yaml; do
+      sed -i "s|^name: .*$|name: ${name}|" $target
+      oc-${OCP_RELEASE_OLD} apply --dry-run=client -f $target >/dev/null 2>&1 && oc-${OCP_RELEASE_OLD} apply -f $target
+    done
+    shopt -u nullglob
+  else
+    echo Skipping $pkg: not in ${RH_INDEX}-${RH_INDEX_VERSION_NEW}
+  fi
 }
 
 # CERTIFIED OPERATOR INDEX
@@ -37,5 +40,6 @@ export RH_INDEX=redhat-operator-index
 for pkg in ${PKGS_REDHAT}; do
   index_image_upload
 done
+
 
 date
