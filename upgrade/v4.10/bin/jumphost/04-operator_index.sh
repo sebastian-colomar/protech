@@ -27,6 +27,7 @@ sleep 10
 for RH_INDEX in ${RH_INDEX_LIST}; do
    node_port=$( podman port ${RH_INDEX}-${RH_INDEX_VERSION_NEW} | cut -d: -f2 )
    podman run --network host --rm docker.io/fullstorydev/grpcurl:latest -plaintext localhost:${node_port} api.Registry/ListPackages | grep '"name"' | cut -d '"' -f4 | sort -u | tee ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${RH_INDEX_VERSION_NEW}.txt
+   scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${RH_INDEX_VERSION_NEW}.txt ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}   
 done
 
 
@@ -39,9 +40,9 @@ ln -sfnT ${BINARY_PATH}/oc-${OCP_RELEASE_NEW} ${BINARY_PATH}/oc-${RH_INDEX_VERSI
 ln -sfnT ${BINARY_PATH}/opm-${OCP_RELEASE_NEW} ${BINARY_PATH}/opm-${RH_INDEX_VERSION_NEW}
 
 index_image_prune() {
+   export INDEX_CONTAINER_NAME=${RH_INDEX}-${RH_INDEX_VERSION_NEW}-${pkg}
    export INDEX_IMAGE=${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${RH_INDEX_VERSION_NEW}   
    export INDEX_IMAGE_PRUNED=localhost:${MIRROR_PORT}/${RH_REPOSITORY}/${RH_INDEX}:${RH_INDEX_VERSION_NEW}
-   export INDEX_CONTAINER_NAME=${RH_INDEX}-${RH_INDEX_VERSION_NEW}-${pkg}
    opm-${RH_INDEX_VERSION_NEW} index prune -f ${INDEX_IMAGE} -p ${pkg} -t ${INDEX_IMAGE_PRUNED}  
    podman push ${INDEX_IMAGE_PRUNED} --remove-signatures
    podman run -d --name ${INDEX_CONTAINER_NAME} -p 50051 --replace --rm ${INDEX_IMAGE_PRUNED}
@@ -75,24 +76,29 @@ index_image_transfer() {
    ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}"
 }
 
+index_image_process() {
+   if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${RH_INDEX_VERSION_NEW}.txt; then
+      index_image_prune
+      index_image_download
+      index_image_tar
+      index_image_transfer
+   else
+      echo Skipping $pkg: not in ${RH_INDEX}-${RH_INDEX_VERSION_NEW}
+   fi
+}
+
 date
 
 # CERTIFIED OPERATOR INDEX
 export RH_INDEX=certified-operator-index
 for pkg in ${PKGS_CERTIFIED}; do
-   index_image_prune
-   index_image_download
-   index_image_tar
-   index_image_transfer
+   index_image_process
 done
 
 # REDHAT OPERATOR INDEX
 export RH_INDEX=redhat-operator-index
 for pkg in ${PKGS_REDHAT}; do
-   index_image_prune
-   index_image_download
-   index_image_tar
-   index_image_transfer
+   index_image_process
 done
 
 date
