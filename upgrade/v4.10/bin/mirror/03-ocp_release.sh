@@ -24,17 +24,17 @@ oc-${OCP_RELEASE_NEW} image mirror "file://openshift/release:${OCP_RELEASE_NEW}-
 targets="${repo_path}/config/signature-sha256-*.yaml"
 shopt -s nullglob
 for target in ${targets}; do
-  oc-${OCP_RELEASE_OLD} apply --dry-run=client -f "${target}" >/dev/null 2>&1 && oc-${OCP_RELEASE_OLD} apply -f "${target}"
+  oc-${OCP_RELEASE_OLD} apply --dry-run=client -f ${target} >/dev/null 2>&1 && oc-${OCP_RELEASE_OLD} apply -f ${target}
 done
 shopt -u nullglob
 
 
 #3.9. Create the ImageContentSourcePolicy manifest:
 
-target="${repo_path}/config/icsp.yaml"
+target=${repo_path}/config/icsp.yaml
 shopt -s nullglob
 for target in ${targets}; do
-  oc-${OCP_RELEASE_OLD} apply --dry-run=client -f "${target}" >/dev/null 2>&1 && oc-${OCP_RELEASE_OLD} apply -f "${target}"
+  oc-${OCP_RELEASE_OLD} apply --dry-run=client -f ${target} >/dev/null 2>&1 && oc-${OCP_RELEASE_OLD} apply -f ${target}
 done
 shopt -u nullglob
 
