@@ -4,10 +4,10 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 ---
 
-# 1. Preparing your mirror host
+# 1. Getting your Jumphost ready
 
 NOTE:
-> Run this whole procedure on a Linux machine with internet access and at least 1 TB of mounted storage.
+> Run this whole procedure on a Linux machine with internet access and at least 1 TB of mounted storage (the Jumphost)
 > 
 > YOU NEED TO BE THE ROOT USER (ID=0).
 
