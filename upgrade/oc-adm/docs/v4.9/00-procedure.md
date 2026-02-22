@@ -25,8 +25,8 @@ Red Hat references:
 
 ---
 
-# 1. [Fully disconnected (air-gapped) mirror registry](../00-mirroring.md)
-# 2. [Updating a cluster in a disconnected environment](../04-upgrade.md)
-# 3. [Upgrade OCS to Red Hat OpenShift Data Foundation (ODF)](../05-odf.md)
+# 1. [Fully disconnected (air-gapped) mirror registry](../01-mirroring.md)
+# 2. [Updating a cluster in a disconnected environment](../03-upgrade.md)
+# 3. [Upgrade OCS to Red Hat OpenShift Data Foundation (ODF)](04-ocs2odf.md)
 # 4. [Upgrade Elastic Search and Cluster Logging](../06-logging.md)
 # 5. [Upgrade AKO operator (as an example of external operators)](../07-ako.md)
