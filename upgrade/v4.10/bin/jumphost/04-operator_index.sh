@@ -18,16 +18,16 @@ rm -f $tmp
 # 2.3. Run the source index image that you want to prune in a container:
 
 for RH_INDEX in ${RH_INDEX_LIST}; do
-   podman run --authfile ${LOCAL_SECRET_JSON} -d --name ${RH_INDEX}-${RH_INDEX_VERSION_NEW} -p 50051 --replace --rm ${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${RH_INDEX_VERSION_NEW}
+   podman run --authfile ${LOCAL_SECRET_JSON} -d --name ${RH_INDEX}-${VERSION} -p 50051 --replace --rm ${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}
 done
 sleep 10
 
 # 2.4. Use the grpcurl command to get a list of the packages provided by the index:
 
 for RH_INDEX in ${RH_INDEX_LIST}; do
-   node_port=$( podman port ${RH_INDEX}-${RH_INDEX_VERSION_NEW} | cut -d: -f2 )
-   podman run --network host --rm docker.io/fullstorydev/grpcurl:latest -plaintext localhost:${node_port} api.Registry/ListPackages | grep '"name"' | cut -d '"' -f4 | sort -u | tee ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${RH_INDEX_VERSION_NEW}.txt
-   scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${RH_INDEX_VERSION_NEW}.txt ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}   
+   node_port=$( podman port ${RH_INDEX}-${VERSION} | cut -d: -f2 )
+   podman run --network host --rm docker.io/fullstorydev/grpcurl:latest -plaintext localhost:${node_port} api.Registry/ListPackages | grep '"name"' | cut -d '"' -f4 | sort -u | tee ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt
+   scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}   
 done
 
 
@@ -36,14 +36,14 @@ done
 # 2.10. Copy the directory that is generated in your current directory to removable media:
 # 2.11. Transfer the generated tarball to the mirror host:
 
-ln -sfnT ${BINARY_PATH}/oc-${OCP_RELEASE_NEW} ${BINARY_PATH}/oc-${RH_INDEX_VERSION_NEW}
-ln -sfnT ${BINARY_PATH}/opm-${OCP_RELEASE_NEW} ${BINARY_PATH}/opm-${RH_INDEX_VERSION_NEW}
+ln -sfnT ${BINARY_PATH}/oc-${RELEASE} ${BINARY_PATH}/oc-${VERSION}
+ln -sfnT ${BINARY_PATH}/opm-${RELEASE} ${BINARY_PATH}/opm-${VERSION}
 
 index_image_prune() {
-   export INDEX_CONTAINER_NAME=${RH_INDEX}-${RH_INDEX_VERSION_NEW}-${pkg}
-   export INDEX_IMAGE=${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${RH_INDEX_VERSION_NEW}   
-   export INDEX_IMAGE_PRUNED=localhost:${MIRROR_PORT}/${RH_REPOSITORY}/${RH_INDEX}:${RH_INDEX_VERSION_NEW}
-   opm-${RH_INDEX_VERSION_NEW} index prune -f ${INDEX_IMAGE} -p ${pkg} -t ${INDEX_IMAGE_PRUNED}  
+   export INDEX_CONTAINER_NAME=${RH_INDEX}-${VERSION}-${pkg}
+   export INDEX_IMAGE=${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}   
+   export INDEX_IMAGE_PRUNED=localhost:${MIRROR_PORT}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}
+   opm-${VERSION} index prune -f ${INDEX_IMAGE} -p ${pkg} -t ${INDEX_IMAGE_PRUNED}  
    podman push ${INDEX_IMAGE_PRUNED} --remove-signatures
    podman run -d --name ${INDEX_CONTAINER_NAME} -p 50051 --replace --rm ${INDEX_IMAGE_PRUNED}
    sleep 10
@@ -53,10 +53,10 @@ index_image_prune() {
 
 index_image_download() {
    export MIRROR_OLM_REPOSITORY=mirror-${pkg}
-   export MIRROR_INDEX_REPOSITORY=${MIRROR_OLM_REPOSITORY}-${RH_INDEX_VERSION_NEW}
-   mkdir -p ${REMOVABLE_MEDIA_PATH}/${MIRROR_OLM_REPOSITORY}-${RH_INDEX_VERSION_NEW}
+   export MIRROR_INDEX_REPOSITORY=${MIRROR_OLM_REPOSITORY}-${VERSION}
+   mkdir -p ${REMOVABLE_MEDIA_PATH}/${MIRROR_OLM_REPOSITORY}-${VERSION}
    cd ${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
-   oc-${RH_INDEX_VERSION_NEW} adm catalog mirror ${INDEX_IMAGE_PRUNED} file://${MIRROR_INDEX_REPOSITORY} -a ${LOCAL_SECRET_JSON} --index-filter-by-os=linux/${ARCH_CATALOG} --insecure
+   oc-${VERSION} adm catalog mirror ${INDEX_IMAGE_PRUNED} file://${MIRROR_INDEX_REPOSITORY} -a ${LOCAL_SECRET_JSON} --index-filter-by-os=linux/${ARCH_CATALOG} --insecure
 }
 
 index_image_tar() {
@@ -77,13 +77,13 @@ index_image_transfer() {
 }
 
 index_image_process() {
-   if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${RH_INDEX_VERSION_NEW}.txt; then
+   if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
       index_image_prune
       index_image_download
       index_image_tar
       index_image_transfer
    else
-      echo Skipping $pkg: not in ${RH_INDEX}-${RH_INDEX_VERSION_NEW}
+      echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
    fi
 }
 
