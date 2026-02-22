@@ -25,8 +25,8 @@ This process is referred to as disconnected mirroring.
      
 1.3. Set the required environment variables:
    
-   WARNING
-   > The `RELEASE` variable for the version you want to mirror should already be exported)
+    WARNING
+    > The `RELEASE` variable for the version you want to mirror should already be exported)
 
    ```  
    export ARCH_CATALOG=amd64
