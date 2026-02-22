@@ -7,12 +7,12 @@ set -euo pipefail
 f=/etc/containers/policy.json
 tmp=$(mktemp)
 
-jq --arg k "registry.redhat.io/redhat/certified-operator-index" \
+jq --arg k registry.redhat.io/redhat/certified-operator-index \
    '"'"'.transports.docker[$k] = [{"type":"insecureAcceptAnything"}]'"'"' \
-   "$f" > "$tmp"
+   $f > $tmp
 
-install -m 0644 "$tmp" "$f"
-rm -f "$tmp"
+install -m 0644 $tmp $f
+rm -f $tmp
 '
 
 # 2.3. Run the source index image that you want to prune in a container:
@@ -42,7 +42,7 @@ index_image_prune() {
    export INDEX_IMAGE=${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${RH_INDEX_VERSION_NEW}   
    export INDEX_IMAGE_PRUNED=localhost:${MIRROR_PORT}/${RH_REPOSITORY}/${RH_INDEX}:${RH_INDEX_VERSION_NEW}
    export INDEX_CONTAINER_NAME=${RH_INDEX}-${RH_INDEX_VERSION_NEW}-${pkg}
-   opm-${RH_INDEX_VERSION_NEW} index prune -f ${INDEX_IMAGE} -p "${pkg}" -t ${INDEX_IMAGE_PRUNED}  
+   opm-${RH_INDEX_VERSION_NEW} index prune -f ${INDEX_IMAGE} -p ${pkg} -t ${INDEX_IMAGE_PRUNED}  
    podman push ${INDEX_IMAGE_PRUNED} --remove-signatures
    podman run -d --name ${INDEX_CONTAINER_NAME} -p 50051 --replace --rm ${INDEX_IMAGE_PRUNED}
    sleep 10
