@@ -28,93 +28,75 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 
 ### Procedure
 
-2.1. Set up environment variables:
-   ```
-   export ARCH_CATALOG=amd64
-   export ARCH_RELEASE=x86_64
-   export CONTAINER_IMAGE=docker.io/library/registry
-   export CONTAINER_IMAGE_TAG=2.7
-   export CONTAINER_NAME=registry
-   export CONTAINER_PORT=5000
-   export CONTAINER_VOLUME=/var/lib/registry
-   #export LOCAL_SECRET_JSON=${XDG_RUNTIME_DIR}/containers/auth.json
-   #export LOCAL_SECRET_JSON=${HOME}/.docker/config.json
-   export LOCAL_SECRET_JSON=${HOME}/pull-secret.json
-   export MIRROR_HOST=mirror.hub.sebastian-colomar.com
-   export MIRROR_PORT=5000
-   export MIRROR_PROTOCOL=http
-   export OCP_RELEASE_NEW=4.9.59
-   export OCP_RELEASE_OLD=4.8.37
-   export OCP_REPOSITORY=ocp
-   # "ako-operator" is just an example for testing purposes, simulating an external operator such as IBM operators
-   # "cluster-logging,elasticsearch-operator,local-storage-operator,ocs-operator" are the currently existing Red Hat operators in version 4.8
-   # "mcg-operator,odf-operator" are necessary for the cluster upgrade to version 4.9
-   export PKGS='ako-operator,cluster-logging,elasticsearch-operator,local-storage-operator,mcg-operator,ocs-operator,odf-operator'
-   export PRODUCT_REPO=openshift-release-dev
-   export RELEASE_NAME=ocp-release
-   export REMOTE_USER=ec2-user
-   export REMOVABLE_MEDIA_PATH=/mnt/mirror
-   export RH_INDEX_LIST='certified-operator-index redhat-operator-index'
-   export RH_INDEX_VERSION_NEW=v4.9
-   export RH_INDEX_VERSION_OLD=v4.8
-   export RH_REGISTRY=registry.redhat.io
-   export RH_REPOSITORY=redhat
-   export SSH_KEY=${HOME}/key.txt
+2.1. The environment variables should already be set from the previous step.
 
-   export CONTAINERS_STORAGE_CONF=${REMOVABLE_MEDIA_PATH}/containers/storage.conf
-   export LOCAL_REGISTRY=${MIRROR_HOST}:${MIRROR_PORT}
-   export MIRROR_OCP_REPOSITORY=mirror-${OCP_REPOSITORY}
-   export TMPDIR=${REMOVABLE_MEDIA_PATH}/containers/cache
+   - If you start a new session, you must set them again as described in step `1.3` of the document below:
+      - [Getting your Jumphost ready](01-ocp.md)
 
-   ```
 
 2.2. Allow unsigned registries for the Certified Operator Index:
 
    ```
-   sudo sed -i '/"registry.redhat.io": \[/i\
-               "registry.redhat.io/redhat/certified-operator-index": [\
-                   {\
-                       "type": "insecureAcceptAnything"\
-                   }\
-               ],' /etc/containers/policy.json
-
+   sudo sh -c '
+   set -euo pipefail
+   f=/etc/containers/policy.json
+   tmp=$(mktemp)
+   
+   jq --arg k registry.redhat.io/redhat/certified-operator-index \
+      '"'"'.transports.docker[$k] = [{"type":"insecureAcceptAnything"}]'"'"' \
+      $f > $tmp
+   
+   install -m 0644 $tmp $f
+   rm -f $tmp
+   '
    ```
 
 2.3. Run the source index image that you want to prune in a container:
    ```
+   unalias cp mv rm || true
+   
    mkdir -p ${REMOVABLE_MEDIA_PATH}/containers
    mkdir -p ${REMOVABLE_MEDIA_PATH}/containers/cache
    mkdir -p ${REMOVABLE_MEDIA_PATH}/containers/containers
    mkdir -p ${REMOVABLE_MEDIA_PATH}/containers/containers-run
-
+   
    tee ${REMOVABLE_MEDIA_PATH}/containers/storage.conf 0<<EOF
    [storage]
    driver = "overlay"
    graphroot = "${REMOVABLE_MEDIA_PATH}/containers/containers"
    runroot = "${REMOVABLE_MEDIA_PATH}/containers/containers-run"
    EOF
-
+   
    semanage fcontext -a -t container_file_t "${REMOVABLE_MEDIA_PATH}/containers/containers(/.*)?"
    semanage fcontext -a -t container_var_run_t "${REMOVABLE_MEDIA_PATH}/containers/containers-run(/.*)?"
    restorecon -Rv ${REMOVABLE_MEDIA_PATH}/containers/containers ${REMOVABLE_MEDIA_PATH}/containers/containers-run
-
+   
    podman info | egrep 'graphRoot:|runRoot:|imageCopyTmpDir:'
-
+   
+   mkdir -p ${HOME}/.docker
+   cp -fv ${LOCAL_SECRET_JSON} ${HOME}/.docker/config.json
+   
    for RH_INDEX in ${RH_INDEX_LIST}; do
-      for version in ${RH_INDEX_VERSION_NEW} ${RH_INDEX_VERSION_OLD}; do
-         podman run --authfile ${LOCAL_SECRET_JSON} -d --name ${RH_INDEX}-${version} -p 50051 --rm ${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${version}
-      done
+      podman run --authfile ${LOCAL_SECRET_JSON} -d --name ${RH_INDEX}-${VERSION} -p 50051 --replace --rm ${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}
    done
+   sleep 10
 
    ```
 
 2.4. Use the grpcurl command to get a list of the packages provided by the index:
    ```
+   remote_transfer() {
+      MIRROR_HOST=mirror.sebastian-colomar.com
+      ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo mkdir -p ${REMOVABLE_MEDIA_PATH}"
+      ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo chown -R ${REMOTE_USER}. ${REMOVABLE_MEDIA_PATH}"
+      scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$@" ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
+      ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}"
+   }
+   
    for RH_INDEX in ${RH_INDEX_LIST}; do
-      for version in ${RH_INDEX_VERSION_NEW} ${RH_INDEX_VERSION_OLD}; do
-         node_port=$( podman port ${RH_INDEX}-${version} | cut -d: -f2 )
-         podman run --rm --network host docker.io/fullstorydev/grpcurl:latest -plaintext localhost:${node_port} api.Registry/ListPackages | grep '"name"' | cut -d '"' -f4 | sort -u | tee ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${version}.txt
-      done
+      node_port=$( podman port ${RH_INDEX}-${VERSION} | cut -d: -f2 )
+      podman run --network host --rm docker.io/fullstorydev/grpcurl:latest -plaintext localhost:${node_port} api.Registry/ListPackages | grep '"name"' | cut -d '"' -f4 | sort -u | tee ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt
+      remote_transfer ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt
    done
 
    ```
@@ -130,13 +112,12 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 2.6. Deploy the local container registry using the Distribution container image with the HTTP protocol:
    ```
    mkdir -p ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}
-
-   podman run -d --name ${CONTAINER_NAME} --restart=always -p ${MIRROR_PORT}:${CONTAINER_PORT} -v ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}:${CONTAINER_VOLUME}:Z ${CONTAINER_IMAGE}:${CONTAINER_IMAGE_TAG}
-
-   podman save > ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar ${CONTAINER_IMAGE}:${CONTAINER_IMAGE_TAG}
-
-   ```
-   ```
+     
+   podman run -d -e REGISTRY_STORAGE_DELETE_ENABLED=true --name ${CONTAINER_NAME} --replace --restart=always -p ${MIRROR_PORT}:${CONTAINER_PORT} -v ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}:${CONTAINER_VOLUME}:Z ${CONTAINER_IMAGE}:${CONTAINER_IMAGE_TAG}
+   
+   rm -fv ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar
+   podman save -o ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar ${CONTAINER_IMAGE}:${CONTAINER_IMAGE_TAG}
+   
    tee /etc/containers/registries.conf.d/99-localhost-insecure.conf >/dev/null <<EOF
    [[registry]]
    location = "localhost:${MIRROR_PORT}"
@@ -147,27 +128,39 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 
 2.7. Run the following command to prune the source index of all but the specified packages and push the new index image to your target registry:
    ```
-   podman info | egrep 'graphRoot:|runRoot:|imageCopyTmpDir:'
-
-   mkdir -p ${HOME}/.docker
-   cp -fv ${LOCAL_SECRET_JSON} ${HOME}/.docker/config.json
-
-   ln -s ${BINARY_PATH}/oc-${OCP_RELEASE_NEW} ${BINARY_PATH}/oc-${RH_INDEX_VERSION_NEW}
-   ln -s ${BINARY_PATH}/oc-${OCP_RELEASE_OLD} ${BINARY_PATH}/oc-${RH_INDEX_VERSION_OLD}
-
-   ln -s ${BINARY_PATH}/opm-${OCP_RELEASE_NEW} ${BINARY_PATH}/opm-${RH_INDEX_VERSION_NEW}
-   ln -s ${BINARY_PATH}/opm-${OCP_RELEASE_OLD} ${BINARY_PATH}/opm-${RH_INDEX_VERSION_OLD}
-
-   for RH_INDEX in ${RH_INDEX_LIST}; do
-      for version in ${RH_INDEX_VERSION_NEW} ${RH_INDEX_VERSION_OLD}; do
-         export INDEX_IMAGE=${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${version}   
-         export INDEX_IMAGE_PRUNED=localhost:${MIRROR_PORT}/${RH_REPOSITORY}/${RH_INDEX}:${version}
-         opm-${version} index prune -f ${INDEX_IMAGE} -p "${PKGS}" -t ${INDEX_IMAGE_PRUNED}  
-         podman push ${INDEX_IMAGE_PRUNED} --remove-signatures
-         podman run -d --name ${RH_INDEX}-${version}-pruned -p 50051 --rm ${INDEX_IMAGE_PRUNED}
-         export node_port=$( podman port ${RH_INDEX}-${version}-pruned | cut -d: -f2 )
-         podman run --rm --network host docker.io/fullstorydev/grpcurl:latest -plaintext localhost:${node_port} api.Registry/ListPackages | grep '"name"' | cut -d '"' -f4 | sort -u | tee ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${version}-pruned.txt
-      done
+   ln -sfnT ${BINARY_PATH}/oc-${RELEASE} ${BINARY_PATH}/oc-${VERSION}
+   ln -sfnT ${BINARY_PATH}/opm-${RELEASE} ${BINARY_PATH}/opm-${VERSION}
+   
+   index_image_prune() {
+      export INDEX_CONTAINER_NAME=${RH_INDEX}-${VERSION}-${pkg}
+      export INDEX_IMAGE=${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}   
+      export INDEX_IMAGE_PRUNED=localhost:${MIRROR_PORT}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}
+      opm-${VERSION} index prune -f ${INDEX_IMAGE} -p ${pkg} -t ${INDEX_IMAGE_PRUNED}  
+      podman push ${INDEX_IMAGE_PRUNED} --remove-signatures
+      podman run -d --name ${INDEX_CONTAINER_NAME} -p 50051 --replace --rm ${INDEX_IMAGE_PRUNED}
+      sleep 10
+      export node_port=$( podman port ${INDEX_CONTAINER_NAME} | cut -d: -f2 )
+      podman run --network host --rm docker.io/fullstorydev/grpcurl:latest -plaintext localhost:${node_port} api.Registry/ListPackages | grep '"name"' | cut -d '"' -f4 | sort -u | tee ${REMOVABLE_MEDIA_PATH}/${INDEX_CONTAINER_NAME}.txt
+   }
+   
+   # CERTIFIED OPERATOR INDEX
+   export RH_INDEX=certified-operator-index
+   for pkg in ${PKGS_CERTIFIED}; do
+      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
+         index_image_prune
+      else
+         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
+      fi
+   done
+   
+   # REDHAT OPERATOR INDEX
+   export RH_INDEX=redhat-operator-index
+   for pkg in ${PKGS_REDHAT}; do
+      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
+         index_image_prune
+      else
+         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
+      fi
    done
 
    ```
@@ -176,59 +169,94 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 
 2.9. Run the following command on your workstation with unrestricted network access to mirror the content to local files:
    ```
-   for RH_INDEX in ${RH_INDEX_LIST}; do
-      export MIRROR_OLM_REPOSITORY=mirror-${RH_INDEX}   
-      for version in ${RH_INDEX_VERSION_NEW} ${RH_INDEX_VERSION_OLD}; do
-         export INDEX_IMAGE_PRUNED=localhost:${MIRROR_PORT}/${RH_REPOSITORY}/${RH_INDEX}:${version}
-         mkdir -p ${REMOVABLE_MEDIA_PATH}/${MIRROR_OLM_REPOSITORY}-${version}
-         cd ${REMOVABLE_MEDIA_PATH}/${MIRROR_OLM_REPOSITORY}-${version}
-         oc-${version} adm catalog mirror ${INDEX_IMAGE_PRUNED} file://${MIRROR_OLM_REPOSITORY}-${version} -a ${LOCAL_SECRET_JSON} --index-filter-by-os=linux/${ARCH_CATALOG} --insecure
-      done
+   index_image_download() {
+      export MIRROR_OLM_REPOSITORY=mirror-${pkg}
+      export MIRROR_INDEX_REPOSITORY=${MIRROR_OLM_REPOSITORY}-${VERSION}
+      mkdir -p ${REMOVABLE_MEDIA_PATH}/${MIRROR_OLM_REPOSITORY}-${VERSION}
+      cd ${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
+      oc-${VERSION} adm catalog mirror ${INDEX_IMAGE_PRUNED} file://${MIRROR_INDEX_REPOSITORY} -a ${LOCAL_SECRET_JSON} --index-filter-by-os=linux/${ARCH_CATALOG} --insecure
+   }
+   
+   # CERTIFIED OPERATOR INDEX
+   export RH_INDEX=certified-operator-index
+   for pkg in ${PKGS_CERTIFIED}; do
+      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
+         index_image_download
+      else
+         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
+      fi
    done
-
+   
+   # REDHAT OPERATOR INDEX
+   export RH_INDEX=redhat-operator-index
+   for pkg in ${PKGS_REDHAT}; do
+      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
+         index_image_download
+      else
+         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
+      fi
+   done
+   
    ```
 
 2.10. Copy the directory that is generated in your current directory to removable media:
    ```
-   cd ${REMOVABLE_MEDIA_PATH}
-
-   for RH_INDEX in ${RH_INDEX_LIST}; do
-      export MIRROR_OLM_REPOSITORY=mirror-${RH_INDEX}
-      for version in ${RH_INDEX_VERSION_NEW} ${RH_INDEX_VERSION_OLD}; do
-         tar cfv ${MIRROR_OLM_REPOSITORY}-${version}.tar ${MIRROR_OLM_REPOSITORY}-${version}
-      done
+   index_image_tar() {
+      cd ${REMOVABLE_MEDIA_PATH}
+      tar cfv ${MIRROR_INDEX_REPOSITORY}.tar ${MIRROR_INDEX_REPOSITORY}     
+   }
+   
+   # CERTIFIED OPERATOR INDEX
+   export RH_INDEX=certified-operator-index
+   for pkg in ${PKGS_CERTIFIED}; do
+      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
+         index_image_tar
+      else
+         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
+      fi
+   done
+   
+   # REDHAT OPERATOR INDEX
+   export RH_INDEX=redhat-operator-index
+   for pkg in ${PKGS_REDHAT}; do
+      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
+         index_image_tar
+      else
+         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
+      fi
    done
 
    ```
 
 2.11. Upload the generated tarball to the mirror host:
    ```
-   export MIRROR_HOST=mirror.sebastian-colomar.com
-
-   ```
-   ```
-   ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo mkdir -p ${REMOVABLE_MEDIA_PATH}"
-
-   ```
-   ```
-   ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo chown -R ${REMOTE_USER}. ${REMOVABLE_MEDIA_PATH}"
-
-   ```
-   ```
-   for RH_INDEX in ${RH_INDEX_LIST}; do
-      export MIRROR_OLM_REPOSITORY=mirror-${RH_INDEX}
-      for version in ${RH_INDEX_VERSION_NEW} ${RH_INDEX_VERSION_OLD}; do
-         scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOVABLE_MEDIA_PATH}/${MIRROR_OLM_REPOSITORY}-${version}.tar ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
-      done
+   index_image_transfer() {
+      remote_transfer ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar ${REMOVABLE_MEDIA_PATH}/${INDEX_CONTAINER_NAME}.txt ${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}.tar   
+   }
+   
+   # CERTIFIED OPERATOR INDEX
+   export RH_INDEX=certified-operator-index
+   for pkg in ${PKGS_CERTIFIED}; do
+      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
+         index_image_transfer
+      else
+         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
+      fi
+   done
+   
+   # REDHAT OPERATOR INDEX
+   export RH_INDEX=redhat-operator-index
+   for pkg in ${PKGS_REDHAT}; do
+      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
+         index_image_transfer
+      else
+         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
+      fi
    done
 
-   scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
-
-   ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}"
-
    ```
 
-## (ONLY IF NECESSARY9 Disabling the default OperatorHub sources 
+## (ONLY IF NECESSARY) Disabling the default OperatorHub sources 
 
 Operator catalogs that source content provided by Red Hat and community projects are configured for OperatorHub by default during an OpenShift Container Platform installation. In a restricted network environment, you must disable the default catalogs as a cluster administrator. You can then configure OperatorHub to use local catalog sources.
 
@@ -236,7 +264,7 @@ Operator catalogs that source content provided by Red Hat and community projects
 
 - (ONLY IF NECESSARY) Disable the sources for the default catalogs by adding `disableAllDefaultSources: true` to the OperatorHub object:
    ```
-   oc-${OCP_RELEASE_OLD} patch OperatorHub cluster --type json -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
+   oc-${RELEASE} patch OperatorHub cluster --type json -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
    
    ```
 
