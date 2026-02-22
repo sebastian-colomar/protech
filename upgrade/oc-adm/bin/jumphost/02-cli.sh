@@ -14,7 +14,17 @@ done
 for binary in ${BINARIES}; do
   mv -fv ${binary} ${BINARY_PATH}/${binary}-${RELEASE} 
 done
+
+rm -fv kubectl
+rm -fv README.md
+
 rm -fv ${BINARY_PATH}/oc
 rm -fv ${BINARY_PATH}/opm
+
+ln -sfnT ${BINARY_PATH}/oc-${RELEASE} ${BINARY_PATH}/oc-${VERSION}
+ln -sfnT ${BINARY_PATH}/opm-${RELEASE} ${BINARY_PATH}/opm-${VERSION}
+
+ln -sfnT ${BINARY_PATH}/oc-${RELEASE} ${BINARY_PATH}/oc
+ln -sfnT ${BINARY_PATH}/opm-${RELEASE} ${BINARY_PATH}/opm
 
 date
