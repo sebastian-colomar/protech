@@ -4,7 +4,7 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 ---
 
-# 1. Upgrade OCS to Red Hat OpenShift Data Foundation (ODF)
+# 1. Upgrade OpenShift Data Foundation (ODF)
 
 ## REFERENCES:
 - https://www.ibm.com/docs/en/cloud-paks/cloudpak-data-system/2.0.0?topic=ocp-ocs-upgrade-in-connected-environment-by-using-red-hat-openshift-console-ui
@@ -13,17 +13,51 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 ## Procedure
 
-1.1. Update the current custom catalog source of the ocs-operator and local-storage-operator to use the custom mirror catalog as shown:
+1.1. Update the current custom catalog source of the ocs-operator and local-storage-operator to use the new custom mirror catalog as shown:
 
-    alias oc=oc-4.9.59
+   ```
+   if [ -z "${RELEASE}" ]; then
+     echo "ERROR: RELEASE is not set or empty"
+     exit 1
+   fi
 
-    export CATALOG_SOURCE=mirror-redhat-operator-index-v4-8
-    
-    oc patch subscription local-storage-operator -n openshift-local-storage --type json --patch '[{"op": "replace", "path": "/spec/source", "value": "'${CATALOG_SOURCE}'" }]'
-    
-    oc patch subscription ocs-operator -n openshift-storage --type json --patch '[{"op": "replace", "path": "/spec/source", "value": "'${CATALOG_SOURCE}'" }]'
+   MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
+   MINOR=$( echo ${RELEASE} | cut -d. -f2 )
+   PATCH=$( echo ${RELEASE} | cut -d. -f3 )
+   VERSION=v${MAJOR}.${MINOR}
 
-1.2. Ensure that the OpenShift Container Platform cluster has been successfully updated to version 4.9.59.
+   ```
+   ```
+   NAMESPACE=openshift-storage
+   pkg=ocs-operator
+
+   ```
+   ```
+   MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
+   CATALOG_SOURCE=${MIRROR_INDEX_REPOSITORY//./-}
+
+   ```
+   ```  
+   oc patch sub ${pkg} -n ${NAMESPACE} --type json --patch '[{"op": "replace", "path": "/spec/source", "value": "'${CATALOG_SOURCE}'" }]'
+
+   ```
+    Now the same for the `local-storage-operator`
+   ```
+   NAMESPACE=openshift-local-storage
+   pkg=local-storage-operator
+
+   ```
+   ```
+   MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
+   CATALOG_SOURCE=${MIRROR_INDEX_REPOSITORY//./-}
+
+   ```
+   ```  
+   oc patch sub ${pkg} -n ${NAMESPACE} --type json --patch '[{"op": "replace", "path": "/spec/source", "value": "'${CATALOG_SOURCE}'" }]'
+
+   ```
+
+1.2. Ensure that the OpenShift Container Platform cluster has been successfully updated to the new release:
 
     oc get clusterversion
 
@@ -44,53 +78,31 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 1.6. Ensure that you have sufficient time to complete the OpenShift Data Foundation update process, as the update time varies depending on the number of OSDs that run in the cluster.
 
-1.7. On the OpenShift Web Console, navigate to OperatorHub:
-- https://console-openshift-console.apps.hub.sebastian-colomar.com/operatorhub/ns/openshift-storage
-
-1.8. Search for OpenShift Data Foundation using the Filter by keyword box and click on the OpenShift Data Foundation tile:
-- https://console-openshift-console.apps.hub.sebastian-colomar.com/operatorhub/ns/openshift-storage?keyword=openshift+data+foundation
-
-1.9. Click Install:
-- https://console-openshift-console.apps.hub.sebastian-colomar.com/operatorhub/subscribe?pkg=odf-operator&catalog=mirror-redhat-operator-index-v4-9&catalogNamespace=openshift-marketplace&targetNamespace=openshift-storage
-
-1.10. On the install Operator page, click Install. Wait for the Operator installation to complete.
-
-### Note
-> We recommend using all default settings. Changing it may result in unexpected behavior. Alter only if you are aware of its result.
-
 ## Verification steps
 
-1.11. Verify that the page displays Succeeded message along with the option to Create StorageSystem.
-
-### WARNING
-> For the upgraded clusters, since the storage system is automatically created, do NOT create it again.
-
-1.12. On the notification popup, click Refresh web console link to reflect the OpenShift Data Foundation changes in the OpenShift console.
-- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-storage/operators.coreos.com~v1alpha1~ClusterServiceVersion/odf-operator.v4.9.15
-
-1.13. Verify the state of the pods on the OpenShift Web Console. Wait for all the pods in the openshift-storage namespace to restart and reach Running state:
+1.7. Verify the state of the pods on the OpenShift Web Console. Wait for all the pods in the openshift-storage namespace to restart and reach Running state:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-storage/pods
 
-1.14. Enable the ODF console plugin:
+1.8. (IF NECESSARY) Enable the ODF console plugin:
 
     oc patch console.operator cluster -n openshift-storage --type json -p '[{"op": "add", "path": "/spec/plugins", "value": ["odf-console"]}]'
 
-1.15. Verify that the OpenShift Data Foundation cluster is healthy and data is resilient:
+1.9. Verify that the OpenShift Data Foundation cluster is healthy and data is resilient:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/odf/cluster
 
-1.16. Navigate to Storage OpenShift Data foundation Storage Systems tab and then click on the storage system name:
+1.10. Navigate to Storage OpenShift Data foundation Storage Systems tab and then click on the storage system name:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/odf/cluster/systems
 
-1.17. Check both Block and File and Object tabs for the green tick on the status card. Green tick indicates that the storage cluster, object service and data resiliency are all healthy:
+1.11. Check both Block and File and Object tabs for the green tick on the status card. Green tick indicates that the storage cluster, object service and data resiliency are all healthy:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/odf/system/ocs.openshift.io~v1~storagecluster/ocs-storagecluster/overview/block-file
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/odf/system/ocs.openshift.io~v1~storagecluster/ocs-storagecluster/overview/object
 
 
 
-# 2. Upgrade the local-storage component to 4.9
+# 2. Upgrade the local-storage component
 
 WARNING:
-> You must upgrade the local-storage component to 4.9 after the completing ODF 4.9 installation.
+> You must upgrade the local-storage component after completing the ODF upgrade.
 
 ## Procedure
 
