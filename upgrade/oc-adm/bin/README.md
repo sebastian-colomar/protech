@@ -79,3 +79,63 @@ SCRIPT=upgrade/oc-adm/bin/mirror.sh
 nohup bash ${GITHUB_REPO}/${SCRIPT} 1> ${HOST}.log 2> ${HOST}-errors.log &
 
 ```
+## 3. Validate the mirroring process
+
+Now you should have a valid disconnected mirror of the chosen `RELEASE`.
+You can validate the results checking the following resources:
+- `CatalogSources`:
+  - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1alpha1~CatalogSource/instances
+  ```
+  oc get catsrc -n openshift-marketplace | grep v$( echo ${RELEASE} | cut -d. -f1 )-$( echo ${RELEASE} | cut -d. -f2 )
+  
+  ```
+- `ImageContentSourcePolicies`:
+  - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/cluster/operator.openshift.io~v1alpha1~ImageContentSourcePolicy/instances
+  ```
+  oc get imagecontentsourcepolicy | grep v$( echo ${RELEASE} | cut -d. -f1 )-$( echo ${RELEASE} | cut -d. -f2 )
+  
+  ```
+It can also be useful to have a look at the following related resources:
+- `Subscriptions`:
+  - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1alpha1~Subscription/instances
+  ```
+  oc get sub -A
+  
+  ```
+- `PackageManifests`:
+  - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/packages.operators.coreos.com~v1~PackageManifest/instances
+  ```
+  oc get packagemanifest -A
+  
+  ```
+- `Operators`:
+  - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/cluster/operators.coreos.com~v1~Operator/instances
+  ```
+  oc get operator
+  
+  ```
+- `OperatorGroups`:
+  - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1~OperatorGroup/instances
+  ```
+  oc get og -A
+  
+  ```
+- `OperatorConditions`:
+  - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v2~OperatorCondition/instances
+  ```
+  oc get condition -A
+  
+  ```
+- `InstallPlans`:
+  - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1alpha1~InstallPlan/instances
+  ```
+  oc get ip -A
+  
+  ```
+- `ClusterServiceVersions`:
+  - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1alpha1~ClusterServiceVersion/instances
+  ```
+  oc get csv -A
+  
+  ```
+  
