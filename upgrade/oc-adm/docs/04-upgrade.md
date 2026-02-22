@@ -20,27 +20,27 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 Make sure that:
 - The cluster is in healthy state by running the following command:
   ```
-  oc-${OCP_RELEASE_OLD} get nodes
+  oc get nodes
   
   ```
 - The machine config pools (MCP) are up to date by running the following command:
   ```
-  oc-${OCP_RELEASE_OLD} get mcp
+  oc get mcp
   
   ```
 - All cluster operators are in healthy state by running the following command:
   ```
-  oc-${OCP_RELEASE_OLD} get co
+  oc get co
   
   ```
 - Configuring the Rook-Ceph Toolbox in OpenShift Data Foundation 4.8:
   ```
-  oc-${OCP_RELEASE_OLD} patch OCSInitialization ocsinit -n openshift-storage --type json --patch  '[{ "op": "replace", "path": "/spec/enableCephTools", "value": true }]'
+  oc patch OCSInitialization ocsinit -n openshift-storage --type json --patch  '[{ "op": "replace", "path": "/spec/enableCephTools", "value": true }]'
   
   ```
 - OpenShift Container Storage (OCS) ceph status is HEALTH_OK by running the following command:
   ```
-  oc-${OCP_RELEASE_OLD} -n openshift-storage rsh `oc-${OCP_RELEASE_OLD} get pods -n openshift-storage | grep ceph-tool | cut -d ' ' -f1` ceph status
+  oc -n openshift-storage rsh `oc-${OCP_RELEASE_OLD} get pods -n openshift-storage | grep ceph-tool | cut -d ' ' -f1` ceph status
   
   ```
 
@@ -55,29 +55,37 @@ NOTE:
    ```
    export MIRROR_HOST=mirror.hub.sebastian-colomar.com
 
-   for n in $(oc-${OCP_RELEASE_OLD} get nodes -o name); do echo "== $n =="; oc-${OCP_RELEASE_OLD} debug "$n" -q -- chroot /host grep -R "${MIRROR_HOST}:${MIRROR_PORT}"'"' /etc/containers || echo "Not found"; done
+   for n in oc get nodes -o name); do echo "== $n =="; oc debug "$n" -q -- chroot /host grep -R "${MIRROR_HOST}:${MIRROR_PORT}"'"' /etc/containers || echo "Not found"; done
 
    ```
    
 4.2. Retrieve the sha256 sum value for the release from the image signature ConfigMap:
 
    ```
-   export LOCAL_REGISTRY=${MIRROR_HOST}:${MIRROR_PORT}
-   export OCP_REPOSITORY=ocp
-   export OCP_RELEASE_NEW=4.9.59
-   export OCP_RELEASE_OLD=4.8.37
-   export RELEASE_NAME=ocp-release
+   if [ -z "${RELEASE}" ]; then
+     echo "ERROR: RELEASE is not set or empty"
+     exit 1
+   fi
 
-   export MIRROR_OCP_REPOSITORY=mirror-${OCP_REPOSITORY}
+   LOCAL_REGISTRY=${MIRROR_HOST}:${MIRROR_PORT}
+   OCP_REPOSITORY=ocp
+   RELEASE_NAME=ocp-release
 
-   export SHA256_SUM_VALUE=$( cut -d'"' -f14 ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}-${OCP_RELEASE_NEW}/config/signature-sha256-*.yaml | cut -d- -f2 )
+   MIRROR_OCP_REPOSITORY=mirror-${OCP_REPOSITORY}
+
+   SHA256_SUM_VALUE=$( cut -d'"' -f14 ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}-${RELEASE}/config/signature-sha256-*.yaml | cut -d- -f2 )
 
    ```
 
-4.3. To Select the stable-4.9 channel, run this patch command on the CLI:
+4.3. To Select the channel, run this patch command on the CLI:
 
    ```
-   oc-${OCP_RELEASE_OLD} patch clusterversion version --type merge -p '{"spec": {"channel": "stable-4.9"}}'
+   if [ -z "${VERSION}" ]; then
+     echo "ERROR: VERSION is not set or empty"
+     exit 1
+   fi
+
+   oc patch clusterversion version --type merge -p '{"spec": {"channel": "stable-'${VERSION}'"}}'
 
    ```
 
@@ -85,34 +93,37 @@ NOTE:
    - https://access.redhat.com/articles/6329921
 
    ```
-   oc-${OCP_RELEASE_OLD} -n openshift-config patch cm admin-acks --patch '{"data":{"ack-4.8-kube-1.22-api-removals-in-4.9":"true"}}' --type=merge
+   oc -n openshift-config patch cm admin-acks --patch '{"data":{"ack-4.8-kube-1.22-api-removals-in-4.9":"true"}}' --type=merge
 
    ```
   
-4.6. Update the cluster:
+ 4.6. UPDATE THE CLUSTER:
+
+   WARNING:
+   > THIS WILL UPDATE THE CLUSTER
 
    ```
-   oc-${OCP_RELEASE_OLD} adm upgrade --allow-explicit-upgrade --to-image ${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY}-${OCP_RELEASE_NEW}@sha256:${SHA256_SUM_VALUE}
+   oc adm upgrade --allow-explicit-upgrade --to-image ${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY}-${RELEASE}@sha256:${SHA256_SUM_VALUE}
 
    ```
 
 4.7. (ONLY IF NECESSARY) Force an explicit upgrade with version set:
 
    ```
-   oc-${OCP_RELEASE_OLD} patch clusterversion version --type=merge -p '{"spec":{"desiredUpdate":{"image":"'${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY}@sha256:${SHA256_SUM_VALUE}'","version":"'${OCP_RELEASE_NEW}'","force":true}}}'
+   oc patch clusterversion version --type=merge -p '{"spec":{"desiredUpdate":{"image":"'${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY}@sha256:${SHA256_SUM_VALUE}'","version":"'${OCP_RELEASE_NEW}'","force":true}}}'
 
    ```
 
 4.8. Monitor the upgrade:
    - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/cluster/config.openshift.io~v1~ClusterVersion/version
    ```
-   oc-${OCP_RELEASE_NEW} get clusterversion version -o jsonpath='{range .status.conditions[*]}{.type}{"\t"}{.status}{"\t"}{.reason}{"\t"}{.message}{"\n"}{end}'
+   oc get clusterversion version -o jsonpath='{range .status.conditions[*]}{.type}{"\t"}{.status}{"\t"}{.reason}{"\t"}{.message}{"\n"}{end}'
 
    ```
 
 4.9. Watch the CVO logs while it downloads/unpacks:
    - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-cluster-version/pods
    ```
-   oc-${OCP_RELEASE_NEW} -n openshift-cluster-version logs deploy/cluster-version-operator -f
+   oc -n openshift-cluster-version logs deploy/cluster-version-operator -f
 
    ```
