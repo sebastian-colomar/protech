@@ -30,6 +30,7 @@ Red Hat references:
   Before continuing, set the `RELEASE` environment variable to match the CURRENT cluster version, which is `4.8.37`.
   ```
   export RELEASE=4.8.37
+
   ```
   You can now continue with the following steps:
   - [Fully disconnected (air-gapped) mirror registry](../01-mirroring.md)
