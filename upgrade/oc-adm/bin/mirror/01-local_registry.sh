@@ -1,11 +1,13 @@
 date
 
-#3.2. (IF NOT ALREADY PRESENT) Deploy the local container registry using the Distribution container image with the HTTP protocol:   mkdir -p ${REMOVABLE_MEDIA_PATH}/containers
+#3.2. (IF NOT ALREADY PRESENT) Deploy the local container registry using the Distribution container image with the HTTP protocol:  
+
+unalias cp mv rm || true
+
+mkdir -p ${REMOVABLE_MEDIA_PATH}/containers
 mkdir -p ${REMOVABLE_MEDIA_PATH}/containers/cache
 mkdir -p ${REMOVABLE_MEDIA_PATH}/containers/containers
 mkdir -p ${REMOVABLE_MEDIA_PATH}/containers/containers-run
-
-unalias cp mv rm || true
 
 tee ${REMOVABLE_MEDIA_PATH}/containers/storage.conf 0<<EOF
 [storage]
