@@ -25,7 +25,7 @@ export HOST=jumphost
 export RELEASE=4.8.37
 #export RELEASE=4.9.59
 #export RELEASE=4.10.64
-SCRIPT=upgrade/oc-adm/bin/mirror.sh
+SCRIPT=upgrade/oc-adm/bin/mirroring.sh
 
 ```
 ```
@@ -72,7 +72,7 @@ export HOST=mirror
 export RELEASE=4.8.37
 #export RELEASE=4.9.59
 #export RELEASE=4.10.64
-SCRIPT=upgrade/oc-adm/bin/mirror.sh
+SCRIPT=upgrade/oc-adm/bin/mirroring.sh
 
 ```
 ```
