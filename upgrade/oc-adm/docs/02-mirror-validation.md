@@ -104,7 +104,7 @@ NOTE:
 
 2.6. Update the current custom catalog source of the `ocs-operator` to use the custom mirror catalog:
 
-   ## WARNING
+   ### WARNING
   
    > Make sure that the **RELEASE** value is still the same as the cluster’s **original release**.
    >
