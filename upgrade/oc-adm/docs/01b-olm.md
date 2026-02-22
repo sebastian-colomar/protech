@@ -4,7 +4,7 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 ---
 
-# 2. Using Operator Lifecycle Manager on restricted networks 
+# 1B. Using Operator Lifecycle Manager on restricted networks 
 
 ## Red Hat references:
 > - https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/html/operators/administrator-tasks
@@ -28,13 +28,13 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 
 ### Procedure
 
-2.1. The environment variables should already be set from the previous step.
+1B.1. The environment variables should already be set from the previous step.
 
    - If you start a new session, you must set them again as described in step `1.3` of the document below:
       - [Getting your Jumphost ready](01-ocp.md)
 
 
-2.2. Allow unsigned registries for the Certified Operator Index:
+1B.2. Allow unsigned registries for the Certified Operator Index:
 
    ```
    sudo sh -c '
@@ -51,7 +51,7 @@ An index image, based on the Operator bundle format, is a containerized snapshot
    '
    ```
 
-2.3. Run the source index image that you want to prune in a container:
+1B.3. Run the source index image that you want to prune in a container:
    ```
    unalias cp mv rm || true
    
@@ -83,7 +83,7 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 
    ```
 
-2.4. Use the grpcurl command to get a list of the packages provided by the index:
+1B.4. Use the grpcurl command to get a list of the packages provided by the index:
    ```
    remote_transfer() {
       MIRROR_HOST=mirror.sebastian-colomar.com
@@ -101,7 +101,7 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 
    ```
    
-2.5. Inspect the `${RH_INDEX}-${version}.txt` file and identify which package names from this list you want to keep in your pruned index.
+1B.5. Inspect the `${RH_INDEX}-${version}.txt` file and identify which package names from this list you want to keep in your pruned index.
 
    Alternatively, list your current subscriptions:
    ```
@@ -109,7 +109,7 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 
    ```
 
-2.6. Deploy the local container registry using the Distribution container image with the HTTP protocol:
+1B.6. Deploy the local container registry using the Distribution container image with the HTTP protocol:
    ```
    mkdir -p ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}
      
@@ -126,7 +126,7 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 
    ```
 
-2.7. Run the following command to prune the source index of all but the specified packages and push the new index image to your target registry:
+1B.7. Run the following command to prune the source index of all but the specified packages and push the new index image to your target registry:
    ```
    ln -sfnT ${BINARY_PATH}/oc-${RELEASE} ${BINARY_PATH}/oc-${VERSION}
    ln -sfnT ${BINARY_PATH}/opm-${RELEASE} ${BINARY_PATH}/opm-${VERSION}
@@ -165,9 +165,9 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 
    ```
 
-2.8. Inspect the `${RH_INDEX}-${version}-pruned.txt` file and identify which package names from this list you want to keep in your pruned index.
+1B.8. Inspect the `${RH_INDEX}-${version}-pruned.txt` file and identify which package names from this list you want to keep in your pruned index.
 
-2.9. Run the following command on your workstation with unrestricted network access to mirror the content to local files:
+1B.9. Run the following command on your workstation with unrestricted network access to mirror the content to local files:
    ```
    index_image_download() {
       export MIRROR_OLM_REPOSITORY=mirror-${pkg}
@@ -199,7 +199,7 @@ An index image, based on the Operator bundle format, is a containerized snapshot
    
    ```
 
-2.10. Copy the directory that is generated in your current directory to removable media:
+1B.10. Copy the directory that is generated in your current directory to removable media:
    ```
    index_image_tar() {
       cd ${REMOVABLE_MEDIA_PATH}
@@ -228,7 +228,7 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 
    ```
 
-2.11. Upload the generated tarball to the mirror host:
+1B.11. Upload the generated tarball to the mirror host:
    ```
    index_image_transfer() {
       remote_transfer ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar ${REMOVABLE_MEDIA_PATH}/${INDEX_CONTAINER_NAME}.txt ${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}.tar   
@@ -256,7 +256,7 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 
    ```
 
-## (ONLY IF NECESSARY) Disabling the default OperatorHub sources 
+## 1B.12 (ONLY IF NECESSARY) Disabling the default OperatorHub sources 
 
 Operator catalogs that source content provided by Red Hat and community projects are configured for OperatorHub by default during an OpenShift Container Platform installation. In a restricted network environment, you must disable the default catalogs as a cluster administrator. You can then configure OperatorHub to use local catalog sources.
 
