@@ -9,48 +9,42 @@
 ### 1.1. From the `jumphost` execute the following commands:
 
 ```
-export GITHUB_BRANCH=main
-export GITHUB_USER=sebastian-colomar
+GITHUB_BRANCH=main
+GITHUB_REPO=protech
+GITHUB_USER=sebastian-colomar
 
-export GITHUB_REPO=protech
-export SCRIPT=mirror.sh
-export VARS=values.sh
+```
+```
+rm -rf ${GITHUB_REPO}
+git clone --branch ${GITHUB_BRANCH} --single-branch -- https://github.com/${GITHUB_USER}/${GITHUB_REPO}
+
+```
+### 1.2. Now you can execute the mirroring script:
+```
 export HOST=jumphost
-
-export GITHUB_PATH=${GITHUB_REPO}-$( date +%s )
-export BIN=${HOME}/${GITHUB_PATH}/upgrade/v4.10/bin
-export FULL_PATH=${BIN}/${HOST}
-
-```
-```
-git clone --branch ${GITHUB_BRANCH} --single-branch -- https://github.com/${GITHUB_USER}/${GITHUB_REPO} ${GITHUB_PATH}
-
-```
-### 1.2. If necessary, modify the environment variables:
-```
-vi ${BIN}/${VARS}
-
-```
-### 1.3. Now you can execute the mirroring script:
-```
-source ${BIN}/${VARS}
-source ${BIN}/${SCRIPT}
-
-```
-### 1.4. Once finished, you can transfer the upgrade repository to the mirror host:
-```
-export MIRROR_HOST=mirror.sebastian-colomar.com
-export REMOTE_USER=ec2-user
-export SSH_KEY=${HOME}/key.txt
+export RELEASE=4.8.37
+#export RELEASE=4.9.59
+#export RELEASE=4.10.64
+SCRIPT=upgrade/oc-adm/bin/mirror.sh
 
 ```
 ```
-tar cfvz ${GITHUB_REPO}.tgz ${GITHUB_PATH}
+nohup bash ${GITHUB_REPO}/${SCRIPT}.sh 1> ${HOST}-$( date +%s ).log 2>& 1 &
 
+```
+### 1.3. Once finished, you can transfer the upgrade repository to the mirror host:
+```
+MIRROR_HOST=mirror.sebastian-colomar.com
+REMOTE_USER=ec2-user
+SSH_KEY=${HOME}/key.txt
+
+```
+```
+tar cfvz ${GITHUB_REPO}.tgz ${GITHUB_REPO}
 scp -i ${SSH_KEY} ${GITHUB_REPO}.tgz ${REMOTE_USER}@${MIRROR_HOST}:
 
 ```
-### 1.5 Now you can log in into the mirror host and continue there the mirroring process:
+### 1.4. Now you can log in into the mirror host and continue there the mirroring process:
 ```
 ssh -i ${SSH_KEY} ${REMOTE_USER}@${MIRROR_HOST}
 
@@ -62,34 +56,26 @@ ssh -i ${SSH_KEY} ${REMOTE_USER}@${MIRROR_HOST}
 ### 2.1. From the `mirror host` execute the following commands:
 
 ```
-export GITHUB_REPO=protech
-export REMOTE_USER=ec2-user
-
-export SCRIPT=mirror.sh
-export VARS=values.sh
-export HOST=mirror
-
-export GITHUB_PATH=${GITHUB_REPO}-$( date +%s )
-export BIN=${HOME}/${GITHUB_PATH}/upgrade/v4.10/bin
-export FULL_PATH=${BIN}/${HOST}
+GITHUB_REPO=protech
+REMOTE_USER=ec2-user
 
 ```
 ```
-mkdir -p ${GITHUB_PATH}
-
+mkdir -p ${GITHUB_REPO}
 sudo mv -fv /home/${REMOTE_USER}/${GITHUB_REPO}.tgz ${HOME}
-
-tar fvxz ${GITHUB_REPO}.tgz -C ${GITHUB_PATH} --strip-components=1
-
-```
-### 2.2 If necessary, modify the environment variables:
-```
-vi ${BIN}/${VARS}
+tar fvxz ${GITHUB_REPO}.tgz -C ${GITHUB_REPO} --strip-components=1
 
 ```
-### 2.3. Now you can execute the mirroring script:
+### 2.2. Now you can execute the mirroring script:
 ```
-source ${BIN}/${VARS}
-source ${BIN}/${SCRIPT}
+export HOST=mirror
+export RELEASE=4.8.37
+#export RELEASE=4.9.59
+#export RELEASE=4.10.64
+SCRIPT=upgrade/oc-adm/bin/mirror.sh
+
+```
+```
+nohup bash ${GITHUB_REPO}/${SCRIPT}.sh 1> ${HOST}-$( date +%s ).log 2>& 1 &
 
 ```
