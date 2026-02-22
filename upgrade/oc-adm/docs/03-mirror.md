@@ -13,63 +13,100 @@ NOTE:
 #### Procedure
 3.1. Set the required environment variables:
    
-   ```
+   WARNING
+   > The `RELEASE` variable for the version you want to mirror should already be exported)
+
+   ```  
+   export ARCH_CATALOG=amd64
    export ARCH_RELEASE=x86_64
+   
    export BINARIES="oc opm"
    export BINARY_PATH=${HOME}/bin
+   
    export CONTAINER_IMAGE=docker.io/library/registry
    export CONTAINER_IMAGE_TAG=2.7
    export CONTAINER_NAME=registry
    export CONTAINER_PORT=5000
    export CONTAINER_VOLUME=/var/lib/registry
+   
+   #export LOCAL_SECRET_JSON=${XDG_RUNTIME_DIR}/containers/auth.json
+   #export LOCAL_SECRET_JSON=${HOME}/.docker/config.json
+   export LOCAL_SECRET_JSON=${HOME}/auth/pull-secret.json
+   
+   export MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
+   export MINOR=$( echo ${RELEASE} | cut -d. -f2 )
+   export PATCH=$( echo ${RELEASE} | cut -d. -f3 )
+   
    export MIRROR_HOST=mirror.hub.sebastian-colomar.com
    export MIRROR_PORT=5000
    export MIRROR_PROTOCOL=http
-   export OCP_RELEASE_NEW=4.9.59
-   export OCP_RELEASE_OLD=4.8.37
+   
    export OCP_REPOSITORY=ocp
    export PACKAGES="openshift-client opm"
+   
+   # PKGS_CERTIFIED contains the operators from the certified-operator-index
+   # "ako-operator" is just an example for testing purposes, simulating an external operator such as IBM operators
+   export PKGS_CERTIFIED='ako-operator'
+   # PKGS_REDHAT contains the operators from the redhat-operator-index
+   export PKGS_REDHAT='cluster-logging elasticsearch-operator local-storage-operator mcg-operator ocs-operator odf-csi-addons-operator odf-operator'
+   
    export PRODUCT_REPO=openshift-release-dev
-   export RELEASE_NAME=ocp-
+   export RELEASE_NAME=ocp-release
+   export REMOTE_USER=ec2-user
    export REMOVABLE_MEDIA_PATH=/mnt/mirror
+   
    export RH_INDEX_LIST='certified-operator-index redhat-operator-index'
-   export RH_INDEX_VERSION_NEW=v4.9
-   export RH_INDEX_VERSION_OLD=v4.8
+   
    export RH_REGISTRY=registry.redhat.io
    export RH_REPOSITORY=redhat
-
+   
+   export SSH_KEY=${HOME}/auth/key.txt
+   
+   # These variables are derived from the previous ones:
    export CONTAINERS_STORAGE_CONF=${REMOVABLE_MEDIA_PATH}/containers/storage.conf
    export LOCAL_REGISTRY=${MIRROR_HOST}:${MIRROR_PORT}
-   export MIRROR_OCP_REPOSITORY=mirror-${OCP_REPOSITORY}
+   export MIRROR_OCP_REPOSITORY=mirror-${OCP_REPOSITORY}-${RELEASE}
    export TMPDIR=${REMOVABLE_MEDIA_PATH}/containers/cache
+   export VERSION=v${MAJOR}.${MINOR}
 
    ```
 
 3.2. Deploy the local container registry using the Distribution container image with the HTTP protocol:
    ```
+   unalias cp mv rm || true
+   
    mkdir -p ${REMOVABLE_MEDIA_PATH}/containers
    mkdir -p ${REMOVABLE_MEDIA_PATH}/containers/cache
    mkdir -p ${REMOVABLE_MEDIA_PATH}/containers/containers
    mkdir -p ${REMOVABLE_MEDIA_PATH}/containers/containers-run
-
+   
    tee ${REMOVABLE_MEDIA_PATH}/containers/storage.conf 0<<EOF
    [storage]
    driver = "overlay"
    graphroot = "${REMOVABLE_MEDIA_PATH}/containers/containers"
    runroot = "${REMOVABLE_MEDIA_PATH}/containers/containers-run"
    EOF
-
-   podman info | egrep 'graphRoot:|runRoot:|imageCopyTmpDir:'
-
+   
    semanage fcontext -a -t container_file_t "${REMOVABLE_MEDIA_PATH}/containers/containers(/.*)?"
    semanage fcontext -a -t container_var_run_t "${REMOVABLE_MEDIA_PATH}/containers/containers-run(/.*)?"
    restorecon -Rv ${REMOVABLE_MEDIA_PATH}/containers/containers ${REMOVABLE_MEDIA_PATH}/containers/containers-run
-
+   
+   podman info | egrep 'graphRoot:|runRoot:|imageCopyTmpDir:'
+   
+   mkdir -p ${HOME}/.docker
+   cp -fv ${LOCAL_SECRET_JSON} ${HOME}/.docker/config.json
+   
    mkdir -p ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}
-
+   
    podman load -i ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar
-
-   podman run -d --name ${CONTAINER_NAME} --restart=always -p ${MIRROR_PORT}:${CONTAINER_PORT} -v ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}:${CONTAINER_VOLUME}:Z ${CONTAINER_IMAGE}:${CONTAINER_IMAGE_TAG}
+   
+   podman run -d -e REGISTRY_STORAGE_DELETE_ENABLED=true --name ${CONTAINER_NAME} --replace --restart=always -p ${MIRROR_PORT}:${CONTAINER_PORT} -v ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}:${CONTAINER_VOLUME}:Z ${CONTAINER_IMAGE}:${CONTAINER_IMAGE_TAG}
+   
+   tee /etc/containers/registries.conf.d/99-localhost-insecure.conf >/dev/null <<EOF
+   [[registry]]
+   location = "localhost:${MIRROR_PORT}"
+   insecure = true
+   EOF
 
    ```
 
@@ -82,46 +119,55 @@ NOTE:
    cd ${HOME}
    mkdir -p ${BINARY_PATH}
    grep -q ":${BINARY_PATH}:" ~/.bashrc || echo "export PATH=\"${BINARY_PATH}:\${PATH}\"" | tee -a ~/.bashrc
-   source ~/.bashrc
-
-   unalias cp mv rm
-
-   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
-     for package in ${PACKAGES}; do
-       mv ${REMOVABLE_MEDIA_PATH}/${package}-linux-${release}.tar.gz ${HOME}
-       tar fvxz ${package}-linux-${release}.tar.gz
-     done
-     for binary in ${BINARIES}; do
-       mv ${binary} ${BINARY_PATH}/${binary}-${release}
-     done
+   #source ~/.bashrc
+   unalias cp mv rm 2>/dev/null || true
+   for package in ${PACKAGES}; do
+     mv -fv ${REMOVABLE_MEDIA_PATH}/${package}-linux-${RELEASE}.tar.gz ${HOME} || true
+     tar fxvz ${package}-linux-${RELEASE}.tar.gz
    done
-
-   rm ${BINARY_PATH}/oc
-   rm kubectl
-   rm README.md
-
-   ln -s ${BINARY_PATH}/oc-${OCP_RELEASE_NEW} ${BINARY_PATH}/oc-${RH_INDEX_VERSION_NEW}
-   ln -s ${BINARY_PATH}/oc-${OCP_RELEASE_OLD} ${BINARY_PATH}/oc-${RH_INDEX_VERSION_OLD}
-
-   ln -s ${BINARY_PATH}/opm-${OCP_RELEASE_NEW} ${BINARY_PATH}/opm-${RH_INDEX_VERSION_NEW}
-   ln -s ${BINARY_PATH}/opm-${OCP_RELEASE_OLD} ${BINARY_PATH}/opm-${RH_INDEX_VERSION_OLD}
+   for binary in ${BINARIES}; do
+     mv -fv ${binary} ${BINARY_PATH}/${binary}-${RELEASE}
+   done
+   
+   rm -fv kubectl
+   rm -fv README.md
+   
+   rm -fv ${BINARY_PATH}/oc
+   rm -fv ${BINARY_PATH}/opm
+   
+   ln -sfnT ${BINARY_PATH}/oc-${RELEASE} ${BINARY_PATH}/oc-${VERSION}
+   ln -sfnT ${BINARY_PATH}/opm-${RELEASE} ${BINARY_PATH}/opm-${VERSION}
+   
+   ln -sfnT ${BINARY_PATH}/oc-${RELEASE} ${BINARY_PATH}/oc
+   ln -sfnT ${BINARY_PATH}/opm-${RELEASE} ${BINARY_PATH}/opm
 
    ```   
 
 3.4. Extract the tar archives containing the directory of the mirrored images and catalogs and its contents:
 
    ```
-   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
-      cd ${REMOVABLE_MEDIA_PATH}
-      tar fvx ${MIRROR_OCP_REPOSITORY}-${release}.tar
+   sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}
+   
+   repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}   
+   mkdir -p ${repo_path}   
+   tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
+   
+   # CERTIFIED OPERATOR INDEX
+   RH_INDEX=certified-operator-index
+   for pkg in ${PKGS_CERTIFIED}; do
+      MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
+      repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
+      mkdir -p ${repo_path}
+      tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
    done
-
-   for RH_INDEX in ${RH_INDEX_LIST}; do
-      export MIRROR_OLM_REPOSITORY=mirror-${RH_INDEX}   
-      for version in ${RH_INDEX_VERSION_NEW} ${RH_INDEX_VERSION_OLD}; do
-         cd ${REMOVABLE_MEDIA_PATH}
-         tar fvx ${MIRROR_OLM_REPOSITORY}-${version}.tar
-      done
+   
+   # REDHAT OPERATOR INDEX
+   RH_INDEX=redhat-operator-index
+   for pkg in ${PKGS_REDHAT}; do
+      MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
+      repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
+      mkdir -p ${repo_path}
+      tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
    done
 
    ```
@@ -136,77 +182,128 @@ NOTE:
 3.6. Allow HTTP connections to the mirror registry:
 
    ```
-   oc-${OCP_RELEASE_OLD} patch image.config.openshift.io/cluster --type=merge -p '{"spec":{"registrySources":{"insecureRegistries":["'${LOCAL_REGISTRY}'"]}}}'
+   oc-${RELEASE} patch image.config.openshift.io/cluster --type=merge -p '{"spec":{"registrySources":{"insecureRegistries":["'${LOCAL_REGISTRY}'"]}}}'
 
    ```
 
 3.7. Upload the release images to the local container registry:
 
    ```
-   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
-      sudo mkdir -p ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}-${release}
-   done
-
-   sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}
-
-   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
-      oc-${release} image mirror "file://openshift/release:${release}-${ARCH_RELEASE}*" ${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY}-${release} --from-dir=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}-${release} --insecure
-   done
+   oc-${RELEASE} image mirror "file://openshift/release:${RELEASE}-${ARCH_RELEASE}*" ${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY} --from-dir=${repo_path} --insecure
 
    ```
 
 3.8. Create the mirrored release image signature ConfigMap manifest:
 
    ```
-   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
-      oc-${OCP_RELEASE_OLD} apply -f ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}-${release}/config/signature-sha256-*.yaml
+   targets="${repo_path}/config/signature-sha256-*.yaml"
+   shopt -s nullglob
+   for target in ${targets}; do
+     oc-${RELEASE} apply --dry-run=client -f ${target} >/dev/null 2>&1 && oc-${RELEASE} apply -f ${target}
    done
+   shopt -u nullglob
 
    ```
 
 3.9. Create the ImageContentSourcePolicy manifest:
 
    ```
-   for release in ${OCP_RELEASE_NEW} ${OCP_RELEASE_OLD}; do
-      oc-${OCP_RELEASE_OLD} apply -f ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}-${release}/config/icsp.yaml
+   target=${repo_path}/config/icsp.yaml
+   shopt -s nullglob
+   for target in ${targets}; do
+     oc-${RELEASE} apply --dry-run=client -f ${target} >/dev/null 2>&1 && oc-${RELEASE} apply -f ${target}
    done
+   shopt -u nullglob
 
    ```
      
 3.10. Upload the catalog images to the local container registry:
    ```
-   for RH_INDEX in ${RH_INDEX_LIST}; do
-      export MIRROR_OLM_REPOSITORY=mirror-${RH_INDEX}
-      for version in ${RH_INDEX_VERSION_NEW} ${RH_INDEX_VERSION_OLD}; do
-         cd ${REMOVABLE_MEDIA_PATH}/${MIRROR_OLM_REPOSITORY}-${version}
-         oc-${version} adm catalog mirror file://${MIRROR_OLM_REPOSITORY}-${version}/${RH_REPOSITORY}/${RH_INDEX}:${version} ${LOCAL_REGISTRY}/${MIRROR_OLM_REPOSITORY}-${version} --insecure
-      done
+   index_image_upload() {
+     if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
+       MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
+       repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
+       cd ${repo_path}
+       oc-${VERSION} adm catalog mirror file://${MIRROR_INDEX_REPOSITORY}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION} ${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY} --insecure
+     else
+       echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
+     fi
+   }
+   
+   # CERTIFIED OPERATOR INDEX
+   export RH_INDEX=certified-operator-index
+   for pkg in ${PKGS_CERTIFIED}; do
+     index_image_upload
+   done
+   
+   # REDHAT OPERATOR INDEX
+   export RH_INDEX=redhat-operator-index
+   for pkg in ${PKGS_REDHAT}; do
+     index_image_upload
    done
 
    ```
 
-3.11. Create the CatalogSource object by running the following command to specify the catalogSource.yaml file in your manifests directory:
+3.11. Create the CatalogSource object by running the following command:
    ```
-   for RH_INDEX in ${RH_INDEX_LIST}; do
-      export MIRROR_OLM_REPOSITORY=mirror-${RH_INDEX}   
-      for version in ${RH_INDEX_VERSION_NEW} ${RH_INDEX_VERSION_OLD}; do
-         sed -i 's|name: .*$|name: '${MIRROR_OLM_REPOSITORY}-${version//./-}'|' ${REMOVABLE_MEDIA_PATH}/${MIRROR_OLM_REPOSITORY}-${version}/manifests-${RH_INDEX}-*/catalogSource.yaml
-         oc-${OCP_RELEASE_OLD} apply -f ${REMOVABLE_MEDIA_PATH}/${MIRROR_OLM_REPOSITORY}-${version}/manifests-${RH_INDEX}-*/catalogSource.yaml
-      done
+   index_image_upload() {
+     if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
+       MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
+       repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
+       shopt -s nullglob
+       name=${MIRROR_INDEX_REPOSITORY//./-}
+       for target in ${repo_path}/manifests-${RH_INDEX}-*/catalogSource.yaml; do
+         sed -i "s|name: .*$|name: ${name}|" ${target}
+         oc-${RELEASE} apply --dry-run=client -f ${target} >/dev/null 2>&1 && oc-${RELEASE} apply -f ${target}
+       done
+       shopt -u nullglob
+     else
+       echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
+     fi
+   }
+   
+   # CERTIFIED OPERATOR INDEX
+   export RH_INDEX=certified-operator-index
+   for pkg in ${PKGS_CERTIFIED}; do
+     index_image_upload
+   done
+   
+   # REDHAT OPERATOR INDEX
+   export RH_INDEX=redhat-operator-index
+   for pkg in ${PKGS_REDHAT}; do
+     index_image_upload
    done
 
    ```
 
 3.12. Create the ImageContentSourcePolicy (ICSP) object by running the following command to specify the imageContentSourcePolicy.yaml file in your manifests directory:
    ```
-   for RH_INDEX in ${RH_INDEX_LIST}; do
-      export MIRROR_OLM_REPOSITORY=mirror-${RH_INDEX}
-      for version in ${RH_INDEX_VERSION_NEW} ${RH_INDEX_VERSION_OLD}; do
-         cd ${REMOVABLE_MEDIA_PATH}/${MIRROR_OLM_REPOSITORY}-${version}
-         oc-${version} adm catalog mirror ${LOCAL_REGISTRY}/${MIRROR_OLM_REPOSITORY}-${version}/${RH_REPOSITORY}-${RH_INDEX}:${version} ${LOCAL_REGISTRY}/${MIRROR_OLM_REPOSITORY}-${version} --insecure --manifests-only
-         sed -i 's|name: .*$|name: '${MIRROR_OLM_REPOSITORY}-${version//./-}'|' ${REMOVABLE_MEDIA_PATH}/${MIRROR_OLM_REPOSITORY}-${version}/manifests-${RH_REPOSITORY}-${RH_INDEX}-*/imageContentSourcePolicy.yaml
-         oc-${OCP_RELEASE_OLD} apply -f ${REMOVABLE_MEDIA_PATH}/${MIRROR_OLM_REPOSITORY}-${version}/manifests-${RH_REPOSITORY}-${RH_INDEX}-*/imageContentSourcePolicy.yaml
-      done
+   index_image_upload() {
+     if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
+       MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
+       repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
+       shopt -s nullglob
+       oc-${VERSION} adm catalog mirror ${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY}/${RH_REPOSITORY}-${RH_INDEX}:${VERSION} ${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY} --insecure --manifests-only
+       for target in ${repo_path}/manifests-${RH_REPOSITORY}-${RH_INDEX}-*/imageContentSourcePolicy.yaml; do
+         sed -i "s|name: .*$|name: ${name}|" $target
+         oc-${RELEASE} apply --dry-run=client -f $target >/dev/null 2>&1 && oc-${RELEASE} apply -f $target
+       done
+       shopt -u nullglob
+     else
+       echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
+     fi
+   }
+   
+   # CERTIFIED OPERATOR INDEX
+   export RH_INDEX=certified-operator-index
+   for pkg in ${PKGS_CERTIFIED}; do
+     index_image_upload
+   done
+   
+   # REDHAT OPERATOR INDEX
+   export RH_INDEX=redhat-operator-index
+   for pkg in ${PKGS_REDHAT}; do
+     index_image_upload
    done
 
    ```
