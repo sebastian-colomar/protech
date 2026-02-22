@@ -5,7 +5,21 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 --- 
 
-# 4. Preparation for the upgrade
+# 2. Preparation for the Upgrade: Mirror Validation
+
+## Motivation
+
+> Before starting the cluster release upgrade, we will first verify that the mirrored operator catalog is healthy and consistent.
+>
+> The cluster release must be upgraded before upgrading any operators. However, since it is not possible to downgrade the cluster release if something goes wrong, we want to ensure that the operator CatalogSources are working correctly before proceeding.
+>
+> In this step, we will not upgrade any operators. We will only update the operator Subscriptions to point to the new mirrored catalog instead of the original source. The operator versions will remain exactly the same as in the current cluster state.
+
+## Warning
+
+> During this step, we are **not** upgrading the cluster or any operators.
+> We are only changing the operator Subscriptions to use the new mirror, while keeping the same versions and releases as before.
+
 
 ## Prerequisites
 > You must have a recent etcd backup in case your update fails and you must restore your cluster to a previous state.
@@ -51,7 +65,8 @@ NOTE:
 
 #### Procedure
 
-4.1. Validate that the ImageContentSourcePolicy has been rendered into a MachineConfig and successfully rolled out to all nodes before proceeding:
+2.1. Validate that the ImageContentSourcePolicies have been rendered into a MachineConfig and successfully rolled out to all nodes before proceeding:
+   - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/cluster/operator.openshift.io~v1alpha1~ImageContentSourcePolicy/instances
    ```
    export MIRROR_HOST=mirror.hub.sebastian-colomar.com
 
@@ -59,53 +74,348 @@ NOTE:
 
    ```
    
-4.2. Validate the content of the ImageContentSourcePolicy:
+2.2. Validate the content of the ImageContentSourcePolicy:
 
    ```
 
    ```
 
-4.3. Validate the CatalogSources:
-
+2.3. Validate the CatalogSources:
+   - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1alpha1~CatalogSource/instances
+   ```
+   oc get catsrc -A  
    ```
 
+2.4. Check the current Subscriptions:
+   - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1alpha1~Subscription/instances
    ```
+   oc get sub -A
+   ```
+---
 
-4.4. Upgrading to an OCP version higher than 4.8 requires manual acknowledgment from the administrator. For more information, see Preparing to upgrade to OpenShift Container Platform 4.9:
-   - https://access.redhat.com/articles/6329921
+### OpenShift Container Storage operator (OCS)
+
+2.5. Ensure that all OpenShift Container Storage Pods, including the operator pods, are in Running state in the `openshift-storage` namespace:
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-storage/pods
+
+    ```
+    oc -n openshift-storage get po
+    ```
+
+2.6. Update the current custom catalog source of the `ocs-operator` to use the custom mirror catalog:
+
+   ## WARNING
+  
+   > Make sure that the **RELEASE** value is still the same as the cluster’s **original release**.
+   >
+   > **No upgrade must happen at this stage.**
 
    ```
-   oc -n openshift-config patch cm admin-acks --patch '{"data":{"ack-4.8-kube-1.22-api-removals-in-4.9":"true"}}' --type=merge
+   NAMESPACE=openshift-storage
+   pkg=ocs-operator
+
+   ```
+   ```
+   if [ -z "${RELEASE}" ]; then
+     echo "ERROR: RELEASE is not set or empty"
+     exit 1
+   fi
+
+   MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
+   MINOR=$( echo ${RELEASE} | cut -d. -f2 )
+   PATCH=$( echo ${RELEASE} | cut -d. -f3 )
+   VERSION=v${MAJOR}.${MINOR}
+
+   ```
+   ```
+   MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
+   CATALOG_SOURCE=${MIRROR_INDEX_REPOSITORY//./-}
+
+   ```
+   ```  
+   oc patch sub ${pkg} -n ${NAMESPACE} --type json --patch '[{"op": "replace", "path": "/spec/source", "value": "'${CATALOG_SOURCE}'" }]'
 
    ```
   
- 4.6. UPDATE THE CLUSTER:
+2.7. Verify that the OpenShift Container Platform cluster is still running the original release and that no upgrade has been performed:
 
-   WARNING:
-   > THIS WILL UPDATE THE CLUSTER
+    oc get clusterversion
+
+2.8. Ensure that the OpenShift Container Storage cluster is healthy and data is resilient:
+
+    oc -n openshift-storage rsh `oc get pods -n openshift-storage | grep ceph-tool | cut -d ' ' -f1` ceph status
+
+2.9. Navigate to "Storage Overview" and check both "Block and File" and "Object" tabs for the green tick on the status card. Green tick indicates that the storage cluster, object service and data resiliency are all healthy:
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/ocs-dashboards/block-file
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/ocs-dashboards/object
+
+2.10. Ensure that all OpenShift Container Storage Pods, including the operator pods, are in Running state in the `openshift-storage` namespace:
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-storage/pods
+
+    ```
+    oc -n openshift-storage get po
+    ```
+
+---
+
+### OpenShift Local Storage operator (LSO)
+
+2.11. Ensure that all OpenShift Local Storage Pods, including the operator pods, are in Running state in the `openshift-local-storage` namespace:
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-local-storage/pods
+
+    ```
+    oc -n openshift-local-storage get po
+    ```
+
+2.12. Update the current custom catalog source of the `local-storage-operator` to use the custom mirror catalog:
+
+   ## WARNING
+  
+   > Make sure that the **RELEASE** value is still the same as the cluster’s **original release**.
+   >
+   > **No upgrade must happen at this stage.**
 
    ```
-   oc adm upgrade --allow-explicit-upgrade --to-image ${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY}-${RELEASE}@sha256:${SHA256_SUM_VALUE}
+   NAMESPACE=openshift-local-storage
+   pkg=local-storage-operator
+
+   ```
+   ```
+   if [ -z "${RELEASE}" ]; then
+     echo "ERROR: RELEASE is not set or empty"
+     exit 1
+   fi
+
+   MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
+   MINOR=$( echo ${RELEASE} | cut -d. -f2 )
+   PATCH=$( echo ${RELEASE} | cut -d. -f3 )
+   VERSION=v${MAJOR}.${MINOR}
+
+   ```
+   ```
+   MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
+   CATALOG_SOURCE=${MIRROR_INDEX_REPOSITORY//./-}
+
+   ```
+   ```  
+   oc patch sub ${pkg} -n ${NAMESPACE} --type json --patch '[{"op": "replace", "path": "/spec/source", "value": "'${CATALOG_SOURCE}'" }]'
+
+   ```
+  
+2.13. Ensure that all OpenShift Local Storage Pods, including the operator pods, are in Running state in the `openshift-local-storage` namespace:
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-local-storage/pods
+
+    ```
+    oc -n openshift-local-storage get po
+    ```
+
+---
+
+### ElasticSearch operator
+
+
+2.14. Ensure that all Elastic Search and OpenShift Cluster Logging Pods, including the operator pods, are in Ready state in the `openshift-logging` namespace:
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-operators-redhat/pods
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-logging/pods
+
+    ```
+    oc -n openshift-operators-redhat get po
+
+    oc -n openshift-logging get po
+
+    ```
+
+2.15. Ensure that the Elasticsearch cluster is healthy:
+
+    oc exec -n openshift-logging -c elasticsearch svc/elasticsearch -- health
+    
+
+2.16. Update the current custom catalog source of the `elasticsearch-operator` to use the custom mirror catalog:
+
+   ## WARNING
+  
+   > Make sure that the **RELEASE** value is still the same as the cluster’s **original release**.
+   >
+   > **No upgrade must happen at this stage.**
+
+   ```
+   NAMESPACE=openshift-operators-redhat
+   pkg=elasticsearch-operator
+
+   ```
+   ```
+   if [ -z "${RELEASE}" ]; then
+     echo "ERROR: RELEASE is not set or empty"
+     exit 1
+   fi
+
+   MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
+   MINOR=$( echo ${RELEASE} | cut -d. -f2 )
+   PATCH=$( echo ${RELEASE} | cut -d. -f3 )
+   VERSION=v${MAJOR}.${MINOR}
+
+   ```
+   ```
+   MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
+   CATALOG_SOURCE=${MIRROR_INDEX_REPOSITORY//./-}
+
+   ```
+   ```  
+   oc patch sub ${pkg} -n ${NAMESPACE} --type json --patch '[{"op": "replace", "path": "/spec/source", "value": "'${CATALOG_SOURCE}'" }]'
 
    ```
 
-4.7. (ONLY IF NECESSARY) Force an explicit upgrade with version set:
+
+2.17. Ensure that all Elastic Search and OpenShift Cluster Logging Pods, including the operator pods, are in Ready state in the `openshift-logging` namespace:
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-operators-redhat/pods
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-logging/pods
+
+    ```
+    oc -n openshift-operators-redhat get po
+
+    oc -n openshift-logging get po
+
+    ```
+
+2.18. Ensure that the Elasticsearch cluster is healthy:
+
+    oc exec -n openshift-logging -c elasticsearch svc/elasticsearch -- health
+    
+
+2.19. Ensure that the Elasticsearch cron jobs are created:
+
+    oc -n openshift-logging get cj
+    
+
+2.20. Verify that the log store is updated and the indices are green. Verify that the output includes the `app-00000x, infra-00000x, audit-00000x, .security` indices:
+
+    oc exec -n openshift-logging -c elasticsearch svc/elasticsearch-cluster -- indices | grep -E "health|app-|audit-|infra-|.security"
+    
+
+2.21. Verify that the log collector is healthy:
+
+    oc -n openshift-logging get ds collector
+    
+
+2.22. Verify that the pod contains a collector container:
+
+    oc -n openshift-logging get ds collector -o jsonpath='{range .spec.template.spec.containers[*]}{.name}{"\n"}{end}' | grep collector
+    
+
+2.23. Verify that the Kibana pod is in Ready status:
+
+    oc -n openshift-logging get pods -l component=kibana -o jsonpath='{range .items[*]}{.metadata.name}{" -> "}{.status.conditions[?(@.type=="Ready")].status}{"\n"}{end}'
+
+
+---
+
+### Openshift Cluster Logging operator
+
+2.24. Ensure that all OpenShift Cluster Logging Pods, including the operator pods, are in Ready state in the `openshift-logging` namespace:
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-logging/pods
+
+    ```
+    oc -n openshift-logging get po
+
+    ```
+
+2.25. Update the current custom catalog source of the `cluster-logging` to use the custom mirror catalog:
+
+   ## WARNING
+  
+   > Make sure that the **RELEASE** value is still the same as the cluster’s **original release**.
+   >
+   > **No upgrade must happen at this stage.**
 
    ```
-   oc patch clusterversion version --type=merge -p '{"spec":{"desiredUpdate":{"image":"'${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY}@sha256:${SHA256_SUM_VALUE}'","version":"'${OCP_RELEASE_NEW}'","force":true}}}'
+   NAMESPACE=openshift-logging
+   pkg=cluster-logging
 
    ```
-
-4.8. Monitor the upgrade:
-   - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/cluster/config.openshift.io~v1~ClusterVersion/version
    ```
-   oc get clusterversion version -o jsonpath='{range .status.conditions[*]}{.type}{"\t"}{.status}{"\t"}{.reason}{"\t"}{.message}{"\n"}{end}'
+   if [ -z "${RELEASE}" ]; then
+     echo "ERROR: RELEASE is not set or empty"
+     exit 1
+   fi
 
-   ```
-
-4.9. Watch the CVO logs while it downloads/unpacks:
-   - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-cluster-version/pods
-   ```
-   oc -n openshift-cluster-version logs deploy/cluster-version-operator -f
+   MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
+   MINOR=$( echo ${RELEASE} | cut -d. -f2 )
+   PATCH=$( echo ${RELEASE} | cut -d. -f3 )
+   VERSION=v${MAJOR}.${MINOR}
 
    ```
+   ```
+   MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
+   CATALOG_SOURCE=${MIRROR_INDEX_REPOSITORY//./-}
+
+   ```
+   ```  
+   oc patch sub ${pkg} -n ${NAMESPACE} --type json --patch '[{"op": "replace", "path": "/spec/source", "value": "'${CATALOG_SOURCE}'" }]'
+
+   ```
+  
+2.26. Ensure that all OpenShift Cluster Logging Pods, including the operator pods, are in Ready state in the `openshift-logging` namespace:
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-logging/pods
+
+    ```
+    oc -n openshift-logging get po
+
+    ```
+
+---
+
+### Openshift Cluster Logging operator
+
+2.24. Ensure that all OpenShift Cluster Logging Pods, including the operator pods, are in Ready state in the `openshift-logging` namespace:
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-logging/pods
+
+    ```
+    oc -n openshift-logging get po
+
+    ```
+
+2.25. Update the current custom catalog source of the `cluster-logging` to use the custom mirror catalog:
+
+   ## WARNING
+  
+   > Make sure that the **RELEASE** value is still the same as the cluster’s **original release**.
+   >
+   > **No upgrade must happen at this stage.**
+
+   ```
+   NAMESPACE=openshift-logging
+   pkg=cluster-logging
+
+   ```
+   ```
+   if [ -z "${RELEASE}" ]; then
+     echo "ERROR: RELEASE is not set or empty"
+     exit 1
+   fi
+
+   MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
+   MINOR=$( echo ${RELEASE} | cut -d. -f2 )
+   PATCH=$( echo ${RELEASE} | cut -d. -f3 )
+   VERSION=v${MAJOR}.${MINOR}
+
+   ```
+   ```
+   MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
+   CATALOG_SOURCE=${MIRROR_INDEX_REPOSITORY//./-}
+
+   ```
+   ```  
+   oc patch sub ${pkg} -n ${NAMESPACE} --type json --patch '[{"op": "replace", "path": "/spec/source", "value": "'${CATALOG_SOURCE}'" }]'
+
+   ```
+  
+2.26. Ensure that all OpenShift Cluster Logging Pods, including the operator pods, are in Ready state in the `openshift-logging` namespace:
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-logging/pods
+
+    ```
+    oc -n openshift-logging get po
+
+    ```
+
+---
+
