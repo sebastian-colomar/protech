@@ -15,12 +15,12 @@ index_image_upload() {
     shopt -s nullglob
     name=${MIRROR_INDEX_REPOSITORY//./-}
     for target in ${repo_path}/manifests-${RH_INDEX}-*/catalogSource.yaml; do
-      sed -i "s|^name: .*$|name: ${name}|" $target
+      sed -i "s|name: .*$|name: ${name}|" $target
       oc-${RELEASE} apply --dry-run=client -f $target >/dev/null 2>&1 && oc-${RELEASE} apply -f $target
     done
     oc-${VERSION} adm catalog mirror ${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY}/${RH_REPOSITORY}-${RH_INDEX}:${VERSION} ${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY} --insecure --manifests-only
     for target in ${repo_path}/manifests-${RH_REPOSITORY}-${RH_INDEX}-*/imageContentSourcePolicy.yaml; do
-      sed -i "s|^name: .*$|name: ${name}|" $target
+      sed -i "s|name: .*$|name: ${name}|" $target
       oc-${RELEASE} apply --dry-run=client -f $target >/dev/null 2>&1 && oc-${RELEASE} apply -f $target
     done
     shopt -u nullglob
