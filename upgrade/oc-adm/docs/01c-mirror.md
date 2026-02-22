@@ -5,13 +5,13 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 ---
 
 
-# 3. Mirror registry for Red Hat OpenShift
+# 1C. Mirror registry for Red Hat OpenShift
 
 NOTE:
 > Execute this procedure on a Linux machine reachable by the OpenShift cluster and equipped with at least 1 TB of mounted storage.
 
 #### Procedure
-3.1. Set the required environment variables:
+1C.1. Set the required environment variables:
    
    WARNING
    > The `RELEASE` variable for the version you want to mirror should already be exported)
@@ -71,7 +71,7 @@ NOTE:
 
    ```
 
-3.2. Deploy the local container registry using the Distribution container image with the HTTP protocol:
+1C.2. Deploy the local container registry using the Distribution container image with the HTTP protocol:
    ```
    unalias cp mv rm || true
    
@@ -110,7 +110,7 @@ NOTE:
 
    ```
 
-3.3. Install the OpenShift CLI:
+1C.3. Install the OpenShift CLI:
    
    IMPORTANT:
    > If you are upgrading a cluster in a disconnected environment, install the oc version that you plan to upgrade to.
@@ -143,7 +143,7 @@ NOTE:
 
    ```   
 
-3.4. Extract the tar archives containing the directory of the mirrored images and catalogs and its contents:
+1C.4. Extract the tar archives containing the directory of the mirrored images and catalogs and its contents:
 
    ```
    sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}
@@ -172,28 +172,28 @@ NOTE:
    
    ```
 
-3.5. Login to the OpenShift cluster:
+1C.5. Login to the OpenShift cluster:
 
    ```
    oc login
 
    ```
 
-3.6. Allow HTTP connections to the mirror registry:
+1C.6. Allow HTTP connections to the mirror registry:
 
    ```
    oc-${RELEASE} patch image.config.openshift.io/cluster --type=merge -p '{"spec":{"registrySources":{"insecureRegistries":["'${LOCAL_REGISTRY}'"]}}}'
 
    ```
 
-3.7. Upload the release images to the local container registry:
+1C.7. Upload the release images to the local container registry:
 
    ```
    oc-${RELEASE} image mirror "file://openshift/release:${RELEASE}-${ARCH_RELEASE}*" ${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY} --from-dir=${repo_path} --insecure
 
    ```
 
-3.8. Create the mirrored release image signature ConfigMap manifest:
+1C.8. Create the mirrored release image signature ConfigMap manifest:
 
    ```
    targets="${repo_path}/config/signature-sha256-*.yaml"
@@ -205,7 +205,7 @@ NOTE:
 
    ```
 
-3.9. Create the ImageContentSourcePolicy manifest:
+1C.9. Create the ImageContentSourcePolicy manifest:
 
    ```
    target=${repo_path}/config/icsp.yaml
@@ -217,7 +217,7 @@ NOTE:
 
    ```
      
-3.10. Upload the catalog images to the local container registry:
+1C.10. Upload the catalog images to the local container registry:
    ```
    index_image_upload() {
      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
@@ -244,7 +244,7 @@ NOTE:
 
    ```
 
-3.11. Create the CatalogSource object by running the following command:
+1C.11. Create the CatalogSource object by running the following command:
    ```
    index_image_upload() {
      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
@@ -276,7 +276,7 @@ NOTE:
 
    ```
 
-3.12. Create the ImageContentSourcePolicy (ICSP) object by running the following command to specify the imageContentSourcePolicy.yaml file in your manifests directory:
+1C.12. Create the ImageContentSourcePolicy (ICSP) object by running the following command to specify the imageContentSourcePolicy.yaml file in your manifests directory:
    ```
    index_image_upload() {
      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
