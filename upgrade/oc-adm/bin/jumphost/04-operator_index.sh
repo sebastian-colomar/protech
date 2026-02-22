@@ -49,19 +49,19 @@ ln -sfnT ${BINARY_PATH}/opm-${RELEASE} ${BINARY_PATH}/opm-${VERSION}
 
 index_image_prune() {
    export INDEX_CONTAINER_NAME=${RH_INDEX}-${VERSION}-${pkg}
-   export INDEX_IMAGE=${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}   
+   INDEX_IMAGE=${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}   
    export INDEX_IMAGE_PRUNED=localhost:${MIRROR_PORT}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}
    opm-${VERSION} index prune -f ${INDEX_IMAGE} -p ${pkg} -t ${INDEX_IMAGE_PRUNED}  
    podman push ${INDEX_IMAGE_PRUNED} --remove-signatures
    podman run -d --name ${INDEX_CONTAINER_NAME} -p 50051 --replace --rm ${INDEX_IMAGE_PRUNED}
    sleep 10
-   export node_port=$( podman port ${INDEX_CONTAINER_NAME} | cut -d: -f2 )
+   node_port=$( podman port ${INDEX_CONTAINER_NAME} | cut -d: -f2 )
    podman run --network host --rm docker.io/fullstorydev/grpcurl:latest -plaintext localhost:${node_port} api.Registry/ListPackages | grep '"name"' | cut -d '"' -f4 | sort -u | tee ${REMOVABLE_MEDIA_PATH}/${INDEX_CONTAINER_NAME}.txt
 }
 
 index_image_download() {
-   export MIRROR_OLM_REPOSITORY=mirror-${pkg}
-   export MIRROR_INDEX_REPOSITORY=${MIRROR_OLM_REPOSITORY}-${VERSION}
+   MIRROR_OLM_REPOSITORY=mirror-${pkg}
+   MIRROR_INDEX_REPOSITORY=${MIRROR_OLM_REPOSITORY}-${VERSION}
    mkdir -p ${REMOVABLE_MEDIA_PATH}/${MIRROR_OLM_REPOSITORY}-${VERSION}
    cd ${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
    oc-${VERSION} adm catalog mirror ${INDEX_IMAGE_PRUNED} file://${MIRROR_INDEX_REPOSITORY} -a ${LOCAL_SECRET_JSON} --index-filter-by-os=linux/${ARCH_CATALOG} --insecure
