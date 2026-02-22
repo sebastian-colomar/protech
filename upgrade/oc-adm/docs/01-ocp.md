@@ -23,7 +23,11 @@ This process is referred to as disconnected mirroring.
 1.2. Obtain the pull secret file with Red Hat credentials from Red Hat OpenShift cluster manager and save as pull-secret.json:
    - https://console.redhat.com/openshift/install/pull-secret
      
-1.3. Set the required environment variables (the `RELEASE` variable for the version you want to mirror should already be exported):
+1.3. Set the required environment variables:
+   
+   WARNING
+   > The `RELEASE` variable for the version you want to mirror should already be exported)
+
    ```  
    export ARCH_CATALOG=amd64
    export ARCH_RELEASE=x86_64
