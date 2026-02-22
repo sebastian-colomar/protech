@@ -148,10 +148,6 @@ NOTE:
    ```
    sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}
    
-   repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}   
-   mkdir -p ${repo_path}   
-   tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
-   
    # CERTIFIED OPERATOR INDEX
    RH_INDEX=certified-operator-index
    for pkg in ${PKGS_CERTIFIED}; do
@@ -170,6 +166,10 @@ NOTE:
       tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
    done
 
+   repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}   
+   mkdir -p ${repo_path}   
+   tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
+   
    ```
 
 3.5. Login to the OpenShift cluster:
