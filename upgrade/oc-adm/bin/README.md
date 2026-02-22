@@ -29,7 +29,7 @@ SCRIPT=upgrade/oc-adm/bin/mirror.sh
 
 ```
 ```
-nohup bash ${GITHUB_REPO}/${SCRIPT} 1> ${HOST}-$( date +%s ).log 2>& 1 &
+nohup bash ${GITHUB_REPO}/${SCRIPT} 1> ${HOST}.log 2>& 1 &
 
 ```
 ### 1.3. Once finished, you can transfer the upgrade repository to the mirror host:
@@ -76,6 +76,6 @@ SCRIPT=upgrade/oc-adm/bin/mirror.sh
 
 ```
 ```
-nohup bash ${GITHUB_REPO}/${SCRIPT} 1> ${HOST}-$( date +%s ).log 2>& 1 &
+nohup bash ${GITHUB_REPO}/${SCRIPT} 1> ${HOST}.log 2>& 1 &
 
 ```
