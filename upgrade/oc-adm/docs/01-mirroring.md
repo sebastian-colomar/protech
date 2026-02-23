@@ -19,9 +19,9 @@ The full process is already scripted and available in the following repository:
 ---
 
 If you prefer to follow the manual steps or want to understand the full process, you can read the following documentation:
-### [1A. Getting your Jumphost ready](01a-ocp.md)
-### [1B. Using Operator Lifecycle Manager on restricted networks](01b-olm.md)
-### [1C. Mirror registry for Red Hat OpenShift](01c-mirror.md)
+### [1A. JUMP HOST: Getting your Jumphost ready](01a-ocp.md)
+### [1B. JUMP HOST: Using Operator Lifecycle Manager on restricted networks](01b-olm.md)
+### [1C. MIRROR HOST: Mirror registry for Red Hat OpenShift](01c-mirror.md)
 
 ---
 
