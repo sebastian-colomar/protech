@@ -11,7 +11,8 @@ To make sure everything worked correctly, check the following resources:
   ```
   for catsrc in $( oc get catsrc -n openshift-marketplace -o name | grep v${MAJOR}-${MINOR} );do
     oc get -n openshift-marketplace ${catsrc} -o jsonpath='{.metadata.name}{"\t"}{.status.connectionState.lastObservedState}{"\n"}'
-  done  
+  done
+  
   ```
 - `ImageContentSourcePolicies`:
   - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/cluster/operator.openshift.io~v1alpha1~ImageContentSourcePolicy/instances
