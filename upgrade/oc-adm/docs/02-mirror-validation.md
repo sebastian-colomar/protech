@@ -80,20 +80,3 @@ You may also find it helpful to review the following related resources:
 
    ```
    
-- Validate the content of the ImageContentSourcePolicy:
-
-   ```
-
-   ```
-
-- Validate the CatalogSources:
-   - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1alpha1~CatalogSource/instances
-   ```
-   oc get catsrc -A  
-   ```
-
-- Check the current Subscriptions:
-   - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1alpha1~Subscription/instances
-   ```
-   oc get sub -A
-   ```
