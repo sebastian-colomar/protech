@@ -189,16 +189,5 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 
    ```
 
-## 1B.12 (ONLY IF NECESSARY) Disabling the default OperatorHub sources 
-
-Operator catalogs that source content provided by Red Hat and community projects are configured for OperatorHub by default during an OpenShift Container Platform installation. In a restricted network environment, you must disable the default catalogs as a cluster administrator. You can then configure OperatorHub to use local catalog sources.
-
-### Procedure
-
-- (ONLY IF NECESSARY) Disable the sources for the default catalogs by adding `disableAllDefaultSources: true` to the OperatorHub object:
-   ```
-   oc-${RELEASE} patch OperatorHub cluster --type json -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
-   
-   ```
 
 
