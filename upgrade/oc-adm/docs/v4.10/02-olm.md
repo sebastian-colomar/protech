@@ -382,7 +382,6 @@ Operator catalogs that source content provided by Red Hat and community projects
    # CERTIFIED OPERATOR INDEX
    export RH_INDEX=certified-operator-index
    for pkg in ${PKGS_CERTIFIED}; do
-      export pkg
       index_image_prune
       index_image_download
       index_image_tar
@@ -394,7 +393,6 @@ Operator catalogs that source content provided by Red Hat and community projects
    # REDHAT OPERATOR INDEX
    export RH_INDEX=redhat-operator-index
    for pkg in ${PKGS_REDHAT}; do
-      export pkg
       index_image_prune
       index_image_download
       index_image_tar

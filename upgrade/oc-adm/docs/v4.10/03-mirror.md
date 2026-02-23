@@ -117,7 +117,6 @@ NOTE:
    cd ${REMOVABLE_MEDIA_PATH}
    export RH_INDEX=certified-operator-index
    for pkg in ${PKGS_CERTIFIED}; do
-      export pkg
       export MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${RH_INDEX_VERSION_NEW}
       tar fvx ${MIRROR_INDEX_REPOSITORY}.tar
    done
@@ -126,7 +125,6 @@ NOTE:
    cd ${REMOVABLE_MEDIA_PATH}
    export RH_INDEX=redhat-operator-index
    for pkg in ${PKGS_REDHAT}; do
-      export pkg
       export MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${RH_INDEX_VERSION_NEW}
       tar fvx ${MIRROR_INDEX_REPOSITORY}.tar
    done

@@ -166,14 +166,12 @@ NOTE:
    # CERTIFIED OPERATOR INDEX
    export RH_INDEX=certified-operator-index
    for pkg in ${PKGS_CERTIFIED}; do
-     export pkg
      index_image_extract
    done
    
    # REDHAT OPERATOR INDEX
    export RH_INDEX=redhat-operator-index
    for pkg in ${PKGS_REDHAT}; do
-     export pkg
      index_image_extract
    done
    
@@ -239,14 +237,12 @@ NOTE:
    # CERTIFIED OPERATOR INDEX
    export RH_INDEX=certified-operator-index
    for pkg in ${PKGS_CERTIFIED}; do
-     export pkg 
      index_image_upload
    done
    
    # REDHAT OPERATOR INDEX
    export RH_INDEX=redhat-operator-index
    for pkg in ${PKGS_REDHAT}; do
-     export pkg 
      index_image_upload
    done
 
@@ -271,14 +267,12 @@ NOTE:
    # CERTIFIED OPERATOR INDEX
    export RH_INDEX=certified-operator-index
    for pkg in ${PKGS_CERTIFIED}; do
-     export pkg 
      index_image_upload
    done
    
    # REDHAT OPERATOR INDEX
    export RH_INDEX=redhat-operator-index
    for pkg in ${PKGS_REDHAT}; do
-     export pkg 
      index_image_upload
    done
 
@@ -305,14 +299,12 @@ NOTE:
    # CERTIFIED OPERATOR INDEX
    export RH_INDEX=certified-operator-index
    for pkg in ${PKGS_CERTIFIED}; do
-     export pkg 
      index_image_upload
    done
    
    # REDHAT OPERATOR INDEX
    export RH_INDEX=redhat-operator-index
    for pkg in ${PKGS_REDHAT}; do
-     export pkg 
      index_image_upload
    done
 

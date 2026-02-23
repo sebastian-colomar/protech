@@ -165,7 +165,7 @@ An index image, based on the Operator bundle format, is a containerized snapshot
       INDEX_CONTAINER_NAME=${RH_INDEX}-${VERSION}-${pkg}
       MIRROR_OLM_REPOSITORY=mirror-${pkg}
       MIRROR_INDEX_REPOSITORY=${MIRROR_OLM_REPOSITORY}-${VERSION}
-      remote_transfer ${REMOVABLE_MEDIA_PATH}/${INDEX_CONTAINER_NAME}.txt ${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}.tar   
+      remote_transfer ${REMOVABLE_MEDIA_PATH}/${INDEX_CONTAINER_NAME}.txt ${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}.tar
    }
    
    index_image_process() {
@@ -179,23 +179,17 @@ An index image, based on the Operator bundle format, is a containerized snapshot
       fi
    }
    
-   date
-   
-   ```
-   ```
+   remote_transfer ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar
+
    # CERTIFIED OPERATOR INDEX
    export RH_INDEX=certified-operator-index
    for pkg in ${PKGS_CERTIFIED}; do
-      export pkg
       index_image_process
    done
    
-   ```
-   ```
    # REDHAT OPERATOR INDEX
    export RH_INDEX=redhat-operator-index
    for pkg in ${PKGS_REDHAT}; do
-      export pkg
       index_image_process
    done
 
