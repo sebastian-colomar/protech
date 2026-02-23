@@ -194,6 +194,7 @@ NOTE:
 1C.7. Upload the release images to the local container registry:
 
    ```
+   repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
    oc-${RELEASE} image mirror "file://openshift/release:${RELEASE}-${ARCH_RELEASE}*" ${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY} --from-dir=${repo_path} --insecure
 
    ```
@@ -201,6 +202,7 @@ NOTE:
 1C.8. Create the mirrored release image signature ConfigMap manifest:
 
    ```
+   repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
    targets="${repo_path}/config/signature-sha256-*.yaml"
    shopt -s nullglob
    for target in ${targets}; do
@@ -213,6 +215,7 @@ NOTE:
 1C.9. Create the ImageContentSourcePolicy manifest:
 
    ```
+   repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
    target=${repo_path}/config/icsp.yaml
    shopt -s nullglob
    for target in ${targets}; do
