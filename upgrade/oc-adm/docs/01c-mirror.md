@@ -250,7 +250,7 @@ NOTE:
 
 1C.11. Create the CatalogSource object by running the following command:
    ```
-   index_image_upload() {
+   create_catalog_source() {
      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
        MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
        repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
@@ -267,20 +267,20 @@ NOTE:
    # CERTIFIED OPERATOR INDEX
    export RH_INDEX=certified-operator-index
    for pkg in ${PKGS_CERTIFIED}; do
-     index_image_upload
+     create_catalog_source
    done
    
    # REDHAT OPERATOR INDEX
    export RH_INDEX=redhat-operator-index
    for pkg in ${PKGS_REDHAT}; do
-     index_image_upload
+     create_catalog_source
    done
 
    ```
 
 1C.12. Create the ImageContentSourcePolicy (ICSP) object by running the following command to specify the imageContentSourcePolicy.yaml file in your manifests directory:
    ```
-   index_image_upload() {
+   create_icsp() {
      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
        MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
        name=${MIRROR_INDEX_REPOSITORY//./-}
@@ -299,13 +299,13 @@ NOTE:
    # CERTIFIED OPERATOR INDEX
    export RH_INDEX=certified-operator-index
    for pkg in ${PKGS_CERTIFIED}; do
-     index_image_upload
+     create_icsp
    done
    
    # REDHAT OPERATOR INDEX
    export RH_INDEX=redhat-operator-index
    for pkg in ${PKGS_REDHAT}; do
-     index_image_upload
+     create_icsp
    done
 
    ```
