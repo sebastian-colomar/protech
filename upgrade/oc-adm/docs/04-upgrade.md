@@ -5,7 +5,7 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 --- 
 
-# 3. Updating a cluster in a disconnected environment without the OpenShift Update Service
+# 4. Updating a cluster in a disconnected environment without the OpenShift Update Service
 
 ## Prerequisites
 > You must have a recent etcd backup in case your update fails and you must restore your cluster to a previous state.
@@ -51,7 +51,7 @@ NOTE:
 
 #### Procedure
 
-3.1. Validate that the ImageContentSourcePolicy has been rendered into a MachineConfig and successfully rolled out to all nodes before proceeding:
+4.1. Validate that the ImageContentSourcePolicy has been rendered into a MachineConfig and successfully rolled out to all nodes before proceeding:
    ```
    export MIRROR_HOST=mirror.hub.sebastian-colomar.com
 
@@ -59,7 +59,7 @@ NOTE:
 
    ```
    
-3.2. Retrieve the sha256 sum value for the release from the image signature ConfigMap:
+4.2. Retrieve the sha256 sum value for the release from the image signature ConfigMap:
 
    ```
    if [ -z "${RELEASE}" ]; then
@@ -77,7 +77,7 @@ NOTE:
 
    ```
 
-3.3. To Select the channel, run this patch command on the CLI:
+4.3. To Select the channel, run this patch command on the CLI:
 
    ```
    if [ -z "${VERSION}" ]; then
@@ -89,7 +89,7 @@ NOTE:
 
    ```
 
-3.4. Upgrading to an OCP version higher than 4.8 requires manual acknowledgment from the administrator. For more information, see Preparing to upgrade to OpenShift Container Platform 4.9:
+4.4. Upgrading to an OCP version higher than 4.8 requires manual acknowledgment from the administrator. For more information, see Preparing to upgrade to OpenShift Container Platform 4.9:
    - https://access.redhat.com/articles/6329921
 
    ```
@@ -97,7 +97,7 @@ NOTE:
 
    ```
   
- 3.5. UPDATE THE CLUSTER:
+ 4.5. UPDATE THE CLUSTER:
 
    WARNING:
    > THIS WILL UPDATE THE CLUSTER
@@ -107,21 +107,21 @@ NOTE:
 
    ```
 
-3.6. (ONLY IF NECESSARY) Force an explicit upgrade with version set:
+4.6. (ONLY IF NECESSARY) Force an explicit upgrade with version set:
 
    ```
    oc patch clusterversion version --type=merge -p '{"spec":{"desiredUpdate":{"image":"'${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY}@sha256:${SHA256_SUM_VALUE}'","version":"'${OCP_RELEASE_NEW}'","force":true}}}'
 
    ```
 
-3.7. Monitor the upgrade:
+4.7. Monitor the upgrade:
    - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/cluster/config.openshift.io~v1~ClusterVersion/version
    ```
    oc get clusterversion version -o jsonpath='{range .status.conditions[*]}{.type}{"\t"}{.status}{"\t"}{.reason}{"\t"}{.message}{"\n"}{end}'
 
    ```
 
-3.8. Watch the CVO logs while it downloads/unpacks:
+4.8. Watch the CVO logs while it downloads/unpacks:
    - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-cluster-version/pods
    ```
    oc -n openshift-cluster-version logs deploy/cluster-version-operator -f
