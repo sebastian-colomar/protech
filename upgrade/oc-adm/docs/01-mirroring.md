@@ -24,3 +24,5 @@ If you prefer to follow the manual steps or want to understand the full process,
 ### [1C. Mirror registry for Red Hat OpenShift](01c-mirror.md)
 
 ---
+
+# 2. [Verify the mirroring process](02-mirror-validation.md)
