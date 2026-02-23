@@ -151,7 +151,7 @@ This process is referred to as disconnected mirroring.
 
    ```
 
-1A.9. Upload the release and the openshift client tarball to the mirror host:
+1A.9. Transfer the release images and the openshift client tarball to the mirror host:
    ```
    export MIRROR_HOST=mirror.sebastian-colomar.com
    mirror_remote_exec() {
