@@ -117,6 +117,8 @@ An index image, based on the Operator bundle format, is a containerized snapshot
    
    rm -fv ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar
    podman save -o ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar ${CONTAINER_IMAGE}:${CONTAINER_IMAGE_TAG}
+
+   remote_transfer ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar
    
    tee /etc/containers/registries.conf.d/99-localhost-insecure.conf >/dev/null <<EOF
    [[registry]]
@@ -130,14 +132,6 @@ An index image, based on the Operator bundle format, is a containerized snapshot
    ```
    ln -sfnT ${BINARY_PATH}/oc-${RELEASE} ${BINARY_PATH}/oc-${VERSION}
    ln -sfnT ${BINARY_PATH}/opm-${RELEASE} ${BINARY_PATH}/opm-${VERSION}
-
-   remote_transfer() {
-      MIRROR_HOST=mirror.sebastian-colomar.com
-      ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo mkdir -p ${REMOVABLE_MEDIA_PATH}"
-      ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo chown -R ${REMOTE_USER}. ${REMOVABLE_MEDIA_PATH}"
-      scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$@" ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
-      ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}"
-   }
 
    index_image_prune() {
       INDEX_CONTAINER_NAME=${RH_INDEX}-${VERSION}-${pkg}
@@ -161,13 +155,17 @@ An index image, based on the Operator bundle format, is a containerized snapshot
    }
    
    index_image_tar() {
+      MIRROR_OLM_REPOSITORY=mirror-${pkg}
+      MIRROR_INDEX_REPOSITORY=${MIRROR_OLM_REPOSITORY}-${VERSION}
       cd ${REMOVABLE_MEDIA_PATH}
       tar cfv ${MIRROR_INDEX_REPOSITORY}.tar ${MIRROR_INDEX_REPOSITORY}     
    }
    
    index_image_transfer() {
       INDEX_CONTAINER_NAME=${RH_INDEX}-${VERSION}-${pkg}
-      remote_transfer ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar ${REMOVABLE_MEDIA_PATH}/${INDEX_CONTAINER_NAME}.txt ${REMOVABLE_MEDIA_PATH}/${INDEX_CONTAINER_NAME}.tar   
+      MIRROR_OLM_REPOSITORY=mirror-${pkg}
+      MIRROR_INDEX_REPOSITORY=${MIRROR_OLM_REPOSITORY}-${VERSION}
+      remote_transfer ${REMOVABLE_MEDIA_PATH}/${INDEX_CONTAINER_NAME}.txt ${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}.tar   
    }
    
    index_image_process() {
