@@ -188,6 +188,7 @@ An index image, based on the Operator bundle format, is a containerized snapshot
    # CERTIFIED OPERATOR INDEX
    export RH_INDEX=certified-operator-index
    for pkg in ${PKGS_CERTIFIED}; do
+      export pkg
       index_image_process
    done
    
@@ -196,6 +197,7 @@ An index image, based on the Operator bundle format, is a containerized snapshot
    # REDHAT OPERATOR INDEX
    export RH_INDEX=redhat-operator-index
    for pkg in ${PKGS_REDHAT}; do
+      export pkg
       index_image_process
    done
 
