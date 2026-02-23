@@ -5,13 +5,18 @@ To make sure everything worked correctly, check the following resources:
 - `CatalogSources`:
   - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1alpha1~CatalogSource/instances
   ```
-  oc get catsrc -n openshift-marketplace | grep v$( echo ${RELEASE} | cut -d. -f1 )-$( echo ${RELEASE} | cut -d. -f2 )
+  oc get catsrc -n openshift-marketplace  | grep v${MAJOR}-${MINOR}
   
+  ```
+  ```
+  for catsrc in $( oc get catsrc -n openshift-marketplace -o name | grep v${MAJOR}-${MINOR} );do
+    oc get -n openshift-marketplace ${catsrc} -o jsonpath='{.metadata.name}{"\t"}{.status.connectionState.lastObservedState}{"\n"}'
+  done  
   ```
 - `ImageContentSourcePolicies`:
   - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/cluster/operator.openshift.io~v1alpha1~ImageContentSourcePolicy/instances
   ```
-  oc get imagecontentsourcepolicy | grep v$( echo ${RELEASE} | cut -d. -f1 )-$( echo ${RELEASE} | cut -d. -f2 )
+  oc get imagecontentsourcepolicy | grep v${MAJOR}-${MINOR}
   
   ```
 You may also find it helpful to review the following related resources:
