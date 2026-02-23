@@ -24,7 +24,7 @@ You may also find it helpful to review the following related resources:
 - `Subscriptions`:
   - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1alpha1~Subscription/instances
   ```
-  oc get sub -A | grep v$( echo ${RELEASE} | cut -d. -f1 )-$( echo ${RELEASE} | cut -d. -f2 )
+  oc get sub -A | grep v${MAJOR}-${MINOR}
   
   ```
 - `PackageManifests`:
