@@ -167,7 +167,7 @@ An index image, based on the Operator bundle format, is a containerized snapshot
    
    index_image_transfer() {
       INDEX_CONTAINER_NAME=${RH_INDEX}-${VERSION}-${pkg}
-      remote_transfer ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar ${REMOVABLE_MEDIA_PATH}/${INDEX_CONTAINER_NAME}.txt ${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}.tar   
+      remote_transfer ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar ${REMOVABLE_MEDIA_PATH}/${INDEX_CONTAINER_NAME}.txt ${REMOVABLE_MEDIA_PATH}/${INDEX_CONTAINER_NAME}.tar   
    }
    
    index_image_process() {
