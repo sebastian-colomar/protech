@@ -5,6 +5,10 @@ To make sure everything worked correctly, check the following resources:
 - `CatalogSources`:
   - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1alpha1~CatalogSource/instances
   ```
+  oc get catsrc -A
+  
+  ```
+  ```
   oc get catsrc -n openshift-marketplace  | grep v${MAJOR}-${MINOR}
   
   ```
@@ -17,6 +21,10 @@ To make sure everything worked correctly, check the following resources:
 - `ImageContentSourcePolicies`:
   - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/cluster/operator.openshift.io~v1alpha1~ImageContentSourcePolicy/instances
   ```
+  oc get imagecontentsourcepolicy
+  
+  ```
+  ```
   oc get imagecontentsourcepolicy | grep v${MAJOR}-${MINOR}
   
   ```
@@ -24,7 +32,7 @@ You may also find it helpful to review the following related resources:
 - `Subscriptions`:
   - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1alpha1~Subscription/instances
   ```
-  oc get sub -A | grep v${MAJOR}-${MINOR}
+  oc get sub -A
   
   ```
 - `PackageManifests`:
