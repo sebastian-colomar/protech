@@ -80,3 +80,4 @@ nohup bash ${GITHUB_REPO}/${SCRIPT} 1> ${HOST}.log 2> ${HOST}-errors.log &
 ```
 
 ## 3. Mirror validation
+  - [Verify the mirroring process](../docs/02-mirror-validation.md)
