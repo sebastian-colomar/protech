@@ -179,14 +179,20 @@ An index image, based on the Operator bundle format, is a containerized snapshot
       fi
    }
    
+   ```
+   ```
    remote_transfer ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar
 
+   ```
+   ```
    # CERTIFIED OPERATOR INDEX
    export RH_INDEX=certified-operator-index
    for pkg in ${PKGS_CERTIFIED}; do
       index_image_process
    done
    
+   ```
+   ```
    # REDHAT OPERATOR INDEX
    export RH_INDEX=redhat-operator-index
    for pkg in ${PKGS_REDHAT}; do
