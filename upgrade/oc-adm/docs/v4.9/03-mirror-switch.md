@@ -407,6 +407,6 @@ Operator catalogs that source content provided by Red Hat and community projects
 
 - (ONLY IF NECESSARY) Disable the sources for the default catalogs by adding `disableAllDefaultSources: true` to the OperatorHub object:
    ```
-   oc-${RELEASE} patch OperatorHub cluster --type json -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
+   oc patch OperatorHub cluster --type json -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
    
    ```
