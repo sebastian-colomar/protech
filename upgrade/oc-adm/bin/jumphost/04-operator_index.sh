@@ -48,9 +48,9 @@ ln -sfnT ${BINARY_PATH}/oc-${RELEASE} ${BINARY_PATH}/oc-${VERSION}
 ln -sfnT ${BINARY_PATH}/opm-${RELEASE} ${BINARY_PATH}/opm-${VERSION}
 
 index_image_prune() {
-   export INDEX_CONTAINER_NAME=${RH_INDEX}-${VERSION}-${pkg}
+   INDEX_CONTAINER_NAME=${RH_INDEX}-${VERSION}-${pkg}
    INDEX_IMAGE=${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}   
-   export INDEX_IMAGE_PRUNED=localhost:${MIRROR_PORT}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}
+   INDEX_IMAGE_PRUNED=localhost:${MIRROR_PORT}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}
    opm-${VERSION} index prune -f ${INDEX_IMAGE} -p ${pkg} -t ${INDEX_IMAGE_PRUNED}  
    podman push ${INDEX_IMAGE_PRUNED} --remove-signatures
    podman run -d --name ${INDEX_CONTAINER_NAME} -p 50051 --replace --rm ${INDEX_IMAGE_PRUNED}
@@ -60,6 +60,7 @@ index_image_prune() {
 }
 
 index_image_download() {
+   INDEX_IMAGE_PRUNED=localhost:${MIRROR_PORT}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}
    MIRROR_OLM_REPOSITORY=mirror-${pkg}
    MIRROR_INDEX_REPOSITORY=${MIRROR_OLM_REPOSITORY}-${VERSION}
    mkdir -p ${REMOVABLE_MEDIA_PATH}/${MIRROR_OLM_REPOSITORY}-${VERSION}
@@ -73,6 +74,7 @@ index_image_tar() {
 }
 
 index_image_transfer() {
+   INDEX_CONTAINER_NAME=${RH_INDEX}-${VERSION}-${pkg}
    remote_transfer ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar ${REMOVABLE_MEDIA_PATH}/${INDEX_CONTAINER_NAME}.txt ${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}.tar   
 }
 
