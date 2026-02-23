@@ -35,6 +35,8 @@ Red Hat references:
   You can now continue with the following steps:
   - [Fully disconnected (air-gapped) mirror registry](../01-mirroring.md)
 
+## 2. [Verify the mirroring process](../02-mirror-validation.md)
+## 3. [Connect to the new local mirror for the first time](03-mirror-switch.md)
 ## 2. [Updating a cluster in a disconnected environment](../03-upgrade.md)
 ## 3. [Upgrade OCS to Red Hat OpenShift Data Foundation (ODF)](04-ocs2odf.md)
 ## 4. [Upgrade Elastic Search and Cluster Logging](../06-logging.md)
