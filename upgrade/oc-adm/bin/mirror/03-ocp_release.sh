@@ -23,7 +23,7 @@ oc-${RELEASE} image mirror "file://openshift/release:${RELEASE}-${ARCH_RELEASE}*
 
 targets="${repo_path}/config/signature-sha256-*.yaml"
 for target in ${targets}; do
-  oc-${RELEASE} apply --dry-run=client -f ${target} >/dev/null 2>&1 && oc-${RELEASE} apply -f ${target}
+  oc-${RELEASE} apply -f ${target}
 done
 
 
@@ -31,7 +31,7 @@ done
 
 target=${repo_path}/config/icsp.yaml
 for target in ${targets}; do
-  oc-${RELEASE} apply --dry-run=client -f ${target} >/dev/null 2>&1 && oc-${RELEASE} apply -f ${target}
+  oc-${RELEASE} apply -f ${target}
 done
 
 
