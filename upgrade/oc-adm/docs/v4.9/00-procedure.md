@@ -32,9 +32,9 @@ export RELEASE=4.8.37
 ```
 You can now continue with the following steps:
 
-## 1A. [Fully disconnected (air-gapped) mirror registry](../01-mirroring.md)
-## 2A. [Verify the mirroring process](../02-mirror-validation.md)
-## 3A. [Connect to the new local mirror for the first time](03-mirror-switch.md)
+## 1. [Fully disconnected (air-gapped) mirror registry](../01-mirroring.md)
+## 2. [Verify the mirroring process](../02-mirror-validation.md)
+## 3. [Connect to the new local mirror for the first time](03-mirror-switch.md)
 
 ---
 
@@ -49,12 +49,12 @@ export RELEASE=4.9.59
 ```
 You can now continue with the following steps:
 
-## 1B. [Fully disconnected (air-gapped) mirror registry](../01-mirroring.md)
-## 2B. [Verify the mirroring process](../02-mirror-validation.md)
+## 1-bis. [Fully disconnected (air-gapped) mirror registry](../01-mirroring.md)
+## 2-bis. [Verify the mirroring process](../02-mirror-validation.md)
 
 ---
 
-## 2. [Updating a cluster in a disconnected environment](../03-upgrade.md)
+## 4. [Updating a cluster in a disconnected environment](../04-upgrade.md)
 ## 3. [Upgrade OCS to Red Hat OpenShift Data Foundation (ODF)](04-ocs2odf.md)
 ## 4. [Upgrade Elastic Search and Cluster Logging](../06-logging.md)
 ## 5. [Upgrade AKO operator (as an example of external operators)](../07-ako.md)
