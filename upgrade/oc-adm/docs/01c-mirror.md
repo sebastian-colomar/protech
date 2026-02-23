@@ -291,6 +291,7 @@ NOTE:
        MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
        repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
        shopt -s nullglob
+       cd ${repo_path}
        oc-${VERSION} adm catalog mirror ${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY}/${RH_REPOSITORY}-${RH_INDEX}:${VERSION} ${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY} --insecure --manifests-only
        for target in ${repo_path}/manifests-${RH_REPOSITORY}-${RH_INDEX}-*/imageContentSourcePolicy.yaml; do
          sed -i "s|name: .*$|name: ${name}|" $target
