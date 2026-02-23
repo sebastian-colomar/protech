@@ -105,7 +105,7 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 
    Alternatively, list your current subscriptions:
    ```
-   export PKGS=$(oc-${OCP_RELEASE_OLD} get subscriptions -A -o jsonpath='{range .items[*]}{.spec.name}{"\n"}{end}' | sort -u | paste -sd, -)
+   export PKGS=$(oc get subscriptions -A -o jsonpath='{range .items[*]}{.spec.name}{"\n"}{end}' | sort -u | paste -sd, -)
 
    ```
 
