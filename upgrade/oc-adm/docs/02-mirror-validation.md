@@ -1,4 +1,4 @@
-## 3. Verify the mirroring process
+## 2. Verify the mirroring process
 
 You should now have a valid disconnected mirror of the selected `RELEASE`.
 To make sure everything worked correctly, check the following resources:
