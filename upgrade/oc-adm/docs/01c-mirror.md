@@ -289,6 +289,7 @@ NOTE:
    index_image_upload() {
      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
        MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
+       name=${MIRROR_INDEX_REPOSITORY//./-}
        repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
        shopt -s nullglob
        cd ${repo_path}
