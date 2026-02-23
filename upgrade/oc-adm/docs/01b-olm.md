@@ -126,7 +126,7 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 
    ```
 
-1B.7. Run the following command to prune the source index of all but the specified packages and push the new index image to your target registry:
+1B.7. Prune the source index of all but the specified packages and push the new index image to your target registry. Then mirror the content to local files. AFter that, copy the directory that is generated in your current directory to removable media. Finally, upload the generated tarball to the mirror host:
    ```
    ln -sfnT ${BINARY_PATH}/oc-${RELEASE} ${BINARY_PATH}/oc-${VERSION}
    ln -sfnT ${BINARY_PATH}/opm-${RELEASE} ${BINARY_PATH}/opm-${VERSION}
@@ -139,36 +139,10 @@ An index image, based on the Operator bundle format, is a containerized snapshot
       podman push ${INDEX_IMAGE_PRUNED} --remove-signatures
       podman run -d --name ${INDEX_CONTAINER_NAME} -p 50051 --replace --rm ${INDEX_IMAGE_PRUNED}
       sleep 10
-      export node_port=$( podman port ${INDEX_CONTAINER_NAME} | cut -d: -f2 )
+      node_port=$( podman port ${INDEX_CONTAINER_NAME} | cut -d: -f2 )
       podman run --network host --rm docker.io/fullstorydev/grpcurl:latest -plaintext localhost:${node_port} api.Registry/ListPackages | grep '"name"' | cut -d '"' -f4 | sort -u | tee ${REMOVABLE_MEDIA_PATH}/${INDEX_CONTAINER_NAME}.txt
    }
    
-   # CERTIFIED OPERATOR INDEX
-   export RH_INDEX=certified-operator-index
-   for pkg in ${PKGS_CERTIFIED}; do
-      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
-         index_image_prune
-      else
-         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
-      fi
-   done
-   
-   # REDHAT OPERATOR INDEX
-   export RH_INDEX=redhat-operator-index
-   for pkg in ${PKGS_REDHAT}; do
-      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
-         index_image_prune
-      else
-         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
-      fi
-   done
-
-   ```
-
-1B.8. Inspect the `${RH_INDEX}-${version}-pruned.txt` file and identify which package names from this list you want to keep in your pruned index.
-
-1B.9. Run the following command on your workstation with unrestricted network access to mirror the content to local files:
-   ```
    index_image_download() {
       INDEX_IMAGE_PRUNED=localhost:${MIRROR_PORT}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}
       MIRROR_OLM_REPOSITORY=mirror-${pkg}
@@ -178,82 +152,39 @@ An index image, based on the Operator bundle format, is a containerized snapshot
       oc-${VERSION} adm catalog mirror ${INDEX_IMAGE_PRUNED} file://${MIRROR_INDEX_REPOSITORY} -a ${LOCAL_SECRET_JSON} --index-filter-by-os=linux/${ARCH_CATALOG} --insecure
    }
    
-   # CERTIFIED OPERATOR INDEX
-   export RH_INDEX=certified-operator-index
-   for pkg in ${PKGS_CERTIFIED}; do
-      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
-         index_image_download
-      else
-         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
-      fi
-   done
-   
-   # REDHAT OPERATOR INDEX
-   export RH_INDEX=redhat-operator-index
-   for pkg in ${PKGS_REDHAT}; do
-      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
-         index_image_download
-      else
-         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
-      fi
-   done
-   
-   ```
-
-1B.10. Copy the directory that is generated in your current directory to removable media:
-   ```
    index_image_tar() {
       cd ${REMOVABLE_MEDIA_PATH}
       tar cfv ${MIRROR_INDEX_REPOSITORY}.tar ${MIRROR_INDEX_REPOSITORY}     
    }
    
-   # CERTIFIED OPERATOR INDEX
-   export RH_INDEX=certified-operator-index
-   for pkg in ${PKGS_CERTIFIED}; do
-      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
-         index_image_tar
-      else
-         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
-      fi
-   done
-   
-   # REDHAT OPERATOR INDEX
-   export RH_INDEX=redhat-operator-index
-   for pkg in ${PKGS_REDHAT}; do
-      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
-         index_image_tar
-      else
-         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
-      fi
-   done
-
-   ```
-
-1B.11. Upload the generated tarball to the mirror host:
-   ```
    index_image_transfer() {
       INDEX_CONTAINER_NAME=${RH_INDEX}-${VERSION}-${pkg}
       remote_transfer ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar ${REMOVABLE_MEDIA_PATH}/${INDEX_CONTAINER_NAME}.txt ${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}.tar   
    }
    
-   # CERTIFIED OPERATOR INDEX
-   export RH_INDEX=certified-operator-index
-   for pkg in ${PKGS_CERTIFIED}; do
+   index_image_process() {
       if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
+         index_image_prune
+         index_image_download
+         index_image_tar
          index_image_transfer
       else
          echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
       fi
+   }
+   
+   date
+   
+   # CERTIFIED OPERATOR INDEX
+   export RH_INDEX=certified-operator-index
+   for pkg in ${PKGS_CERTIFIED}; do
+      index_image_process
    done
    
    # REDHAT OPERATOR INDEX
    export RH_INDEX=redhat-operator-index
    for pkg in ${PKGS_REDHAT}; do
-      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
-         index_image_transfer
-      else
-         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
-      fi
+      index_image_process
    done
 
    ```
