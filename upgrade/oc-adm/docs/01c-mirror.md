@@ -143,32 +143,37 @@ NOTE:
 
    ```   
 
-1C.4. Extract the tar archives containing the directory of the mirrored images and catalogs and its contents:
+1C.4. Extract the tar archives containing the directory of the mirrored release images and catalogs and its contents:
 
    ```
    sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}
+
+   repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
+   mkdir -p ${repo_path}
+   tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
+
+   index_image_extract() {
+     if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
+       MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
+       repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
+       mkdir -p ${repo_path}
+       tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
+     else
+       echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
+     fi
+   }
    
    # CERTIFIED OPERATOR INDEX
-   RH_INDEX=certified-operator-index
+   export RH_INDEX=certified-operator-index
    for pkg in ${PKGS_CERTIFIED}; do
-      MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
-      repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
-      mkdir -p ${repo_path}
-      tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
+     index_image_extract
    done
    
    # REDHAT OPERATOR INDEX
-   RH_INDEX=redhat-operator-index
+   export RH_INDEX=redhat-operator-index
    for pkg in ${PKGS_REDHAT}; do
-      MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
-      repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
-      mkdir -p ${repo_path}
-      tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
+     index_image_extract
    done
-
-   repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}   
-   mkdir -p ${repo_path}   
-   tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
    
    ```
 
