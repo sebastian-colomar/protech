@@ -205,7 +205,7 @@ NOTE:
    repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
    targets="${repo_path}/config/signature-sha256-*.yaml"
    for target in ${targets}; do
-     oc-${RELEASE} apply --dry-run=client -f ${target} >/dev/null 2>&1 && oc-${RELEASE} apply -f ${target}
+     oc-${RELEASE} apply -f ${target}
    done
 
    ```
@@ -216,7 +216,7 @@ NOTE:
    repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
    target=${repo_path}/config/icsp.yaml
    for target in ${targets}; do
-     oc-${RELEASE} apply --dry-run=client -f ${target} >/dev/null 2>&1 && oc-${RELEASE} apply -f ${target}
+     oc-${RELEASE} apply -f ${target}
    done
 
    ```
@@ -257,7 +257,7 @@ NOTE:
        name=${MIRROR_INDEX_REPOSITORY//./-}
        for target in ${repo_path}/manifests-${RH_INDEX}-*/catalogSource.yaml; do
          sed -i "s|name: .*$|name: ${name}|" ${target}
-         oc-${RELEASE} apply --dry-run=client -f ${target} >/dev/null 2>&1 && oc-${RELEASE} apply -f ${target}
+         oc-${RELEASE} apply -f ${target}
        done
      else
        echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
@@ -289,7 +289,7 @@ NOTE:
        oc-${VERSION} adm catalog mirror ${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY}/${RH_REPOSITORY}-${RH_INDEX}:${VERSION} ${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY} --insecure --manifests-only
        for target in ${repo_path}/manifests-${RH_REPOSITORY}-${RH_INDEX}-*/imageContentSourcePolicy.yaml; do
          sed -i "s|name: .*$|name: ${name}|" $target
-         oc-${RELEASE} apply --dry-run=client -f $target >/dev/null 2>&1 && oc-${RELEASE} apply -f $target
+         oc-${RELEASE} apply -f $target
        done
      else
        echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
