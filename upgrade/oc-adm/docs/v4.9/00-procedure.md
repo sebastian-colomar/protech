@@ -32,9 +32,28 @@ export RELEASE=4.8.37
 ```
 You can now continue with the following steps:
 
-## 1. [Fully disconnected (air-gapped) mirror registry](../01-mirroring.md)
-## 2. [Verify the mirroring process](../02-mirror-validation.md)
-## 3. [Connect to the new local mirror for the first time](03-mirror-switch.md)
+## 1A. [Fully disconnected (air-gapped) mirror registry](../01-mirroring.md)
+## 2A. [Verify the mirroring process](../02-mirror-validation.md)
+## 3A. [Connect to the new local mirror for the first time](03-mirror-switch.md)
+
+---
+
+Now that your cluster is fully using the sources from the new local mirror, you can begin the actual upgrade.
+
+To do this, run the mirroring process again. This time, set the target release to `4.9.59`.
+
+Before continuing, set the `RELEASE` environment variable to match the CURRENT cluster version, which is `4.9.59`.
+```
+export RELEASE=4.9.59
+
+```
+You can now continue with the following steps:
+
+## 1B. [Fully disconnected (air-gapped) mirror registry](../01-mirroring.md)
+## 2B. [Verify the mirroring process](../02-mirror-validation.md)
+
+---
+
 ## 2. [Updating a cluster in a disconnected environment](../03-upgrade.md)
 ## 3. [Upgrade OCS to Red Hat OpenShift Data Foundation (ODF)](04-ocs2odf.md)
 ## 4. [Upgrade Elastic Search and Cluster Logging](../06-logging.md)
