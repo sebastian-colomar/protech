@@ -204,11 +204,9 @@ NOTE:
    ```
    repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
    targets="${repo_path}/config/signature-sha256-*.yaml"
-   shopt -s nullglob
    for target in ${targets}; do
      oc-${RELEASE} apply --dry-run=client -f ${target} >/dev/null 2>&1 && oc-${RELEASE} apply -f ${target}
    done
-   shopt -u nullglob
 
    ```
 
@@ -217,11 +215,9 @@ NOTE:
    ```
    repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
    target=${repo_path}/config/icsp.yaml
-   shopt -s nullglob
    for target in ${targets}; do
      oc-${RELEASE} apply --dry-run=client -f ${target} >/dev/null 2>&1 && oc-${RELEASE} apply -f ${target}
    done
-   shopt -u nullglob
 
    ```
      
@@ -258,13 +254,11 @@ NOTE:
      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
        MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
        repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
-       shopt -s nullglob
        name=${MIRROR_INDEX_REPOSITORY//./-}
        for target in ${repo_path}/manifests-${RH_INDEX}-*/catalogSource.yaml; do
          sed -i "s|name: .*$|name: ${name}|" ${target}
          oc-${RELEASE} apply --dry-run=client -f ${target} >/dev/null 2>&1 && oc-${RELEASE} apply -f ${target}
        done
-       shopt -u nullglob
      else
        echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
      fi
@@ -291,14 +285,12 @@ NOTE:
        MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
        name=${MIRROR_INDEX_REPOSITORY//./-}
        repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
-       shopt -s nullglob
        cd ${repo_path}
        oc-${VERSION} adm catalog mirror ${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY}/${RH_REPOSITORY}-${RH_INDEX}:${VERSION} ${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY} --insecure --manifests-only
        for target in ${repo_path}/manifests-${RH_REPOSITORY}-${RH_INDEX}-*/imageContentSourcePolicy.yaml; do
          sed -i "s|name: .*$|name: ${name}|" $target
          oc-${RELEASE} apply --dry-run=client -f $target >/dev/null 2>&1 && oc-${RELEASE} apply -f $target
        done
-       shopt -u nullglob
      else
        echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
      fi
