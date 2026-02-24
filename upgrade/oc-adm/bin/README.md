@@ -64,6 +64,9 @@ REMOTE_USER=ec2-user
 ```
 mkdir -p ${HOME}/${GITHUB_REPO}
 sudo mv -fv /home/${REMOTE_USER}/${GITHUB_REPO}.tgz ${HOME}
+
+```
+```
 tar fvxz ${HOME}/${GITHUB_REPO}.tgz -C ${HOME}/${GITHUB_REPO} --strip-components=1
 
 ```
