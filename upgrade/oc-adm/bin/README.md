@@ -26,6 +26,7 @@ git clone --branch ${GITHUB_BRANCH} --single-branch -- https://github.com/${GITH
 
 ```
 export HOST=jumphost
+export KUBECONFIG=/root/auth/kubeconfig
 SCRIPT=upgrade/oc-adm/bin/mirroring.sh
 
 ```
