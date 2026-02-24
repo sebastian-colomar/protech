@@ -2,7 +2,7 @@ date
  
 echo STARTED Upload the catalog images to the local container registry:
 echo STARTED Create the CatalogSource object by running the following command to specify the catalogSource.yaml file in your manifests directory:
-echo STARTED Create the ImageContentSourcePolicy (ICSP) object by running the following command to specify the imageContentSourcePolicy.yaml file in your manifests directory:
+echo 'STARTED Create the ImageContentSourcePolicy (ICSP) object by running the following command to specify the imageContentSourcePolicy.yaml file in your manifests directory:'
 
 index_image_upload() {
   if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
@@ -46,6 +46,6 @@ echo FINISHED REDHAT OPERATOR INDEX
 
 echo FINISHED Upload the catalog images to the local container registry:
 echo FINISHED Create the CatalogSource object by running the following command to specify the catalogSource.yaml file in your manifests directory:
-echo FINISHED Create the ImageContentSourcePolicy (ICSP) object by running the following command to specify the imageContentSourcePolicy.yaml file in your manifests directory:
+echo 'FINISHED Create the ImageContentSourcePolicy (ICSP) object by running the following command to specify the imageContentSourcePolicy.yaml file in your manifests directory:'
 
 date
