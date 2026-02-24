@@ -13,21 +13,21 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
    curl -s ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/_catalog | jq .
    ```
    ```
-   curl -s ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/${MIRROR_OCP_REPOSITORY}-${RELEASE}/tags/list | jq .
+   curl -s ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/${MIRROR_OCP_REPOSITORY}/tags/list | jq .
    ```
    ```
-   curl -s ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/${MIRROR_OCP_REPOSITORY}-${RELEASE}/tags/list | jq -r '.tags[]'
+   curl -s ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/${MIRROR_OCP_REPOSITORY}/tags/list | jq -r '.tags[]'
    ```
    ```
-   for tag in $( curl -s ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/${MIRROR_OCP_REPOSITORY}-${RELEASE}/tags/list | jq -r '.tags[]' );do
-      curl -sIH 'Accept: application/vnd.docker.distribution.manifest.v2+json' ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/${MIRROR_OCP_REPOSITORY}-${RELEASE}/manifests/${tag} | awk /Docker-Content-Digest/'{print "'${tag}'",$2}'
+   for tag in $( curl -s ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/${MIRROR_OCP_REPOSITORY}/tags/list | jq -r '.tags[]' );do
+      curl -sIH 'Accept: application/vnd.docker.distribution.manifest.v2+json' ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/${MIRROR_OCP_REPOSITORY}/manifests/${tag} | awk /Docker-Content-Digest/'{print "'${tag}'",$2}'
    done
    ```
    ```
-   ls ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}/docker/registry/v2/repositories/${MIRROR_OCP_REPOSITORY}-${RELEASE}/_manifests/revisions/sha256/
+   ls ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}/docker/registry/v2/repositories/${MIRROR_OCP_REPOSITORY}/_manifests/revisions/sha256/
    ```
    ```
-   podman exec ${CONTAINER_NAME} ls ${CONTAINER_VOLUME}/docker/registry/v2/repositories/${MIRROR_OCP_REPOSITORY}-${RELEASE}/_manifests/revisions/sha256/
+   podman exec ${CONTAINER_NAME} ls ${CONTAINER_VOLUME}/docker/registry/v2/repositories/${MIRROR_OCP_REPOSITORY}/_manifests/revisions/sha256/
    ```
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/settings/cluster/clusteroperators
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/all-namespaces/operators.coreos.com~v1alpha1~CatalogSource
