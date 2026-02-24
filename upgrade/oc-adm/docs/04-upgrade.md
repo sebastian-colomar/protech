@@ -109,7 +109,7 @@ NOTE:
 4.6. (ONLY IF NECESSARY) Force an explicit upgrade with version set:
 
    ```
-   oc patch clusterversion version --type=merge -p '{"spec":{"desiredUpdate":{"image":"'${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY}@sha256:${SHA256_SUM_VALUE}'","version":"'${OCP_RELEASE_NEW}'","force":true}}}'
+   oc patch clusterversion version --type=merge -p '{"spec":{"desiredUpdate":{"image":"'${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY}@sha256:${SHA256_SUM_VALUE}'","version":"'${RELEASE}'","force":true}}}'
 
    ```
 
