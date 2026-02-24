@@ -22,7 +22,7 @@ git clone --branch ${GITHUB_BRANCH} --single-branch -- https://github.com/${GITH
 ### 1.2. You can now run the mirroring script:
 
 ### WARNING
-> The RELEASE variable for the version you want to mirror should already be exported)
+> The RELEASE variable for the version you want to mirror should already be exported
 
 ```
 export HOST=jumphost
