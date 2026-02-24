@@ -1,4 +1,4 @@
-set -eux
+set -euvx
 : "${HOST:?HOST must be defined}"
 : "${RELEASE:?RELEASE must be defined}"
 
