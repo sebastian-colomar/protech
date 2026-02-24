@@ -71,9 +71,9 @@ NOTE:
    OCP_REPOSITORY=ocp
    RELEASE_NAME=ocp-release
 
-   MIRROR_OCP_REPOSITORY=mirror-${OCP_REPOSITORY}
+   MIRROR_OCP_REPOSITORY=mirror-${OCP_REPOSITORY}-${RELEASE}
 
-   SHA256_SUM_VALUE=$( cut -d'"' -f14 ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}-${RELEASE}/config/signature-sha256-*.yaml | cut -d- -f2 )
+   SHA256_SUM_VALUE=$( cut -d'"' -f14 ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}/config/signature-sha256-*.yaml | cut -d- -f2 )
 
    ```
 
