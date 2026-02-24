@@ -33,7 +33,7 @@ Make sure that:
   oc get co
   
   ```
-- Configuring the Rook-Ceph Toolbox in OpenShift Data Foundation 4.8:
+- Configuring the Rook-Ceph Toolbox in OpenShift Data Foundation:
   ```
   oc patch OCSInitialization ocsinit -n openshift-storage --type json --patch  '[{ "op": "replace", "path": "/spec/enableCephTools", "value": true }]'
   
