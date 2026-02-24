@@ -20,11 +20,12 @@ git clone --branch ${GITHUB_BRANCH} --single-branch -- https://github.com/${GITH
 
 ```
 ### 1.2. You can now run the mirroring script:
+
+### WARNING
+> The RELEASE variable for the version you want to mirror should already be exported)
+
 ```
 export HOST=jumphost
-export RELEASE=4.8.37
-#export RELEASE=4.9.59
-#export RELEASE=4.10.64
 SCRIPT=upgrade/oc-adm/bin/mirroring.sh
 
 ```
