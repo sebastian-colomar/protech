@@ -53,7 +53,7 @@ NOTE:
 
 4.1. Validate that the ImageContentSourcePolicy has been rendered into a MachineConfig and successfully rolled out to all nodes before proceeding:
    ```
-   export MIRROR_HOST=mirror.hub.sebastian-colomar.com
+   MIRROR_HOST=mirror.hub.sebastian-colomar.com
 
    for n in $(oc get nodes -o name); do echo "== $n =="; oc debug "$n" -q -- chroot /host grep -R "${MIRROR_HOST}:${MIRROR_PORT}"'"' /etc/containers || echo "Not found"; done
 
@@ -62,17 +62,6 @@ NOTE:
 4.2. Retrieve the sha256 sum value for the release from the image signature ConfigMap:
 
    ```
-   if [ -z "${RELEASE}" ]; then
-     echo "ERROR: RELEASE is not set or empty"
-     exit 1
-   fi
-
-   LOCAL_REGISTRY=${MIRROR_HOST}:${MIRROR_PORT}
-   OCP_REPOSITORY=ocp
-   RELEASE_NAME=ocp-release
-
-   MIRROR_OCP_REPOSITORY=mirror-${OCP_REPOSITORY}-${RELEASE}
-
    SHA256_SUM_VALUE=$( cut -d'"' -f14 ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}/config/signature-sha256-*.yaml | cut -d- -f2 )
 
    ```
@@ -80,14 +69,6 @@ NOTE:
 4.3. To Select the channel, run this patch command on the CLI:
 
    ```
-   if [ -z "${RELEASE}" ]; then
-     echo "ERROR: RELEASE is not set or empty"
-     exit 1
-   fi
-
-   MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
-   MINOR=$( echo ${RELEASE} | cut -d. -f2 )
-
    oc patch clusterversion version --type merge -p '{"spec": {"channel": "stable-'${MAJOR}.${MINOR}'"}}'
 
    ```
