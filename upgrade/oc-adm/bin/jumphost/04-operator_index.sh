@@ -1,6 +1,6 @@
 date
 
-# 2.2. Allow unsigned registries for the Certified Operator Index:
+echo STARTED Allow unsigned registries for the Certified Operator Index:
 
 sudo sh -c '
 set -euo pipefail
@@ -15,14 +15,18 @@ install -m 0644 $tmp $f
 rm -f $tmp
 '
 
-# 2.3. Run the source index image that you want to prune in a container:
+echo FINISHED Allow unsigned registries for the Certified Operator Index:
+
+echo STARTED Run the source index image that you want to prune in a container:
 
 for RH_INDEX in ${RH_INDEX_LIST}; do
    podman run --authfile ${LOCAL_SECRET_JSON} -d --name ${RH_INDEX}-${VERSION} -p 50051 --replace --rm ${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}
 done
 sleep 10
 
-# 2.4. Use the grpcurl command to get a list of the packages provided by the index:
+echo FINISHED Run the source index image that you want to prune in a container:
+
+echo STARTED Use the grpcurl command to get a list of the packages provided by the index:
 
 remote_transfer() {
    MIRROR_HOST=mirror.sebastian-colomar.com
@@ -38,11 +42,12 @@ for RH_INDEX in ${RH_INDEX_LIST}; do
    remote_transfer ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt
 done
 
+echo FINISHED Use the grpcurl command to get a list of the packages provided by the index:
 
-# 2.7. Run the following command to prune the source index of all but the specified packages and push the new index image to your target registry:
-# 2.9. Run the following command on your workstation with unrestricted network access to mirror the content to local files:
-# 2.10. Copy the directory that is generated in your current directory to removable media:
-# 2.11. Transfer the generated tarball to the mirror host:
+echo STARTED Run the following command to prune the source index of all but the specified packages and push the new index image to your target registry
+echo STARTED Run the following command on your workstation with unrestricted network access to mirror the content to local files:
+echo STARTED Copy the directory that is generated in your current directory to removable media:
+echo STARTED Transfer the generated tarball to the mirror host:
 
 ln -sfnT ${BINARY_PATH}/oc-${RELEASE} ${BINARY_PATH}/oc-${VERSION}
 ln -sfnT ${BINARY_PATH}/opm-${RELEASE} ${BINARY_PATH}/opm-${VERSION}
@@ -107,5 +112,9 @@ for pkg in ${PKGS_REDHAT}; do
    index_image_process
 done
 
-date
+echo FINISHED Run the following command to prune the source index of all but the specified packages and push the new index image to your target registry
+echo FINISHED Run the following command on your workstation with unrestricted network access to mirror the content to local files:
+echo FINISHED Copy the directory that is generated in your current directory to removable media:
+echo FINISHED Transfer the generated tarball to the mirror host:
+
 date
