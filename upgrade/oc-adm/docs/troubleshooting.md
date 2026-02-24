@@ -10,7 +10,7 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
    curl -s ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/
    ```
    ```
-   curl -s ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/_catalog
+   curl -s ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/_catalog | jq .
    ```
    ```
    curl -s ${MIRROR_PROTOCOL}://${LOCAL_REGISTRY}/v2/${OCP_REPOSITORY}-${RELEASE}/tags/list | jq .
