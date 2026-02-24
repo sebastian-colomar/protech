@@ -51,10 +51,25 @@ NOTE:
 
 #### Procedure
 
+4.0. Set the necessary environment variables:
+
+    if [ -z "${RELEASE}" ]; then
+      echo "ERROR: RELEASE is not set or empty"
+      exit 1
+    fi
+
+    MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
+    MINOR=$( echo ${RELEASE} | cut -d. -f2 )
+    MIRROR_HOST=mirror.hub.sebastian-colomar.com
+    MIRROR_PORT=5000
+    OCP_REPOSITORY=ocp
+    REMOVABLE_MEDIA_PATH=/mnt/mirror
+
+    LOCAL_REGISTRY=${MIRROR_HOST}:${MIRROR_PORT}
+    MIRROR_OCP_REPOSITORY=mirror-${OCP_REPOSITORY}-${RELEASE}
+
 4.1. Validate that the ImageContentSourcePolicy has been rendered into a MachineConfig and successfully rolled out to all nodes before proceeding:
    ```
-   MIRROR_HOST=mirror.hub.sebastian-colomar.com
-
    for n in $(oc get nodes -o name); do echo "== $n =="; oc debug "$n" -q -- chroot /host grep -R "${MIRROR_HOST}:${MIRROR_PORT}"'"' /etc/containers || echo "Not found"; done
 
    ```
