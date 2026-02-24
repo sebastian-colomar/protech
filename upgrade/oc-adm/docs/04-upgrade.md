@@ -51,6 +51,9 @@ NOTE:
 
 #### Procedure
 
+WARNING
+> The RELEASE variable for the version you want to mirror should already be exported
+
 4.0. Set the necessary environment variables:
 
     if [ -z "${RELEASE}" ]; then
