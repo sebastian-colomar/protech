@@ -1,12 +1,13 @@
 date
 
 
-#3.6. Allow HTTP connections to the mirror registry:
+echo STARTED Allow HTTP connections to the mirror registry:
 
 oc-${RELEASE} patch image.config.openshift.io/cluster --type=merge -p '{"spec":{"registrySources":{"insecureRegistries":["'${LOCAL_REGISTRY}'"]}}}'
 
+echo FINISHED Allow HTTP connections to the mirror registry:
 
-#3.7. Upload the release images to the local container registry:
+echo STARTED Upload the release images to the local container registry:
 
 repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
 
@@ -18,21 +19,24 @@ tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
 
 oc-${RELEASE} image mirror "file://openshift/release:${RELEASE}-${ARCH_RELEASE}*" ${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY} --from-dir=${repo_path} --insecure
 
+echo FINISHED Upload the release images to the local container registry:
 
-#3.8. Create the mirrored release image signature ConfigMap manifest:
+echo STARTED Create the mirrored release image signature ConfigMap manifest:
 
 targets="${repo_path}/config/signature-sha256-*.yaml"
 for target in ${targets}; do
   oc-${RELEASE} apply -f ${target}
 done
 
+echo FINISHED Create the mirrored release image signature ConfigMap manifest:
 
-#3.9. Create the ImageContentSourcePolicy manifest:
+echo STARTED Create the ImageContentSourcePolicy manifest:
 
 target=${repo_path}/config/icsp.yaml
 for target in ${targets}; do
   oc-${RELEASE} apply -f ${target}
 done
 
+echo FINISHED Create the ImageContentSourcePolicy manifest:
 
 date
