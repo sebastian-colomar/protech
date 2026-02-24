@@ -97,6 +97,10 @@ NOTE:
    WARNING:
    > THIS WILL UPDATE THE CLUSTER
 
+   Now you can update the cluster clicking the blue button with the label "Update":
+   - https://console-openshift-console.apps.hub.sebastian-colomar.com/settings/cluster
+
+   If that is not an option you can proceed manually with the upgrade:
    ```
    oc adm upgrade --allow-explicit-upgrade --to-image ${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY}-${RELEASE}@sha256:${SHA256_SUM_VALUE}
 
