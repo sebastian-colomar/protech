@@ -68,11 +68,13 @@ tar fvxz ${GITHUB_REPO}.tgz -C ${GITHUB_REPO} --strip-components=1
 
 ```
 ### 2.2. You can now run the mirroring script:
+
+### WARNING
+> The RELEASE variable for the version you want to mirror should already be exported
+
 ```
 export HOST=mirror
-export RELEASE=4.8.37
-#export RELEASE=4.9.59
-#export RELEASE=4.10.64
+export KUBECONFIG=/root/auth/kubeconfig
 SCRIPT=upgrade/oc-adm/bin/mirroring.sh
 
 ```
