@@ -51,10 +51,10 @@ NOTE:
 
 #### Procedure
 
+4.0. Set the necessary environment variables:
+
 WARNING
 > The RELEASE variable for the version you want to mirror should already be exported
-
-4.0. Set the necessary environment variables:
 
     if [ -z "${RELEASE}" ]; then
       echo "ERROR: RELEASE is not set or empty"
