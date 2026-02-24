@@ -80,20 +80,15 @@ NOTE:
 4.3. To Select the channel, run this patch command on the CLI:
 
    ```
-   if [ -z "${VERSION}" ]; then
-     echo "ERROR: VERSION is not set or empty"
+   if [ -z "${RELEASE}" ]; then
+     echo "ERROR: RELEASE is not set or empty"
      exit 1
    fi
 
-   oc patch clusterversion version --type merge -p '{"spec": {"channel": "stable-'${VERSION}'"}}'
+   MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
+   MINOR=$( echo ${RELEASE} | cut -d. -f2 )
 
-   ```
-
-4.4. Upgrading to an OCP version higher than 4.8 requires manual acknowledgment from the administrator. For more information, see Preparing to upgrade to OpenShift Container Platform 4.9:
-   - https://access.redhat.com/articles/6329921
-
-   ```
-   oc -n openshift-config patch cm admin-acks --patch '{"data":{"ack-4.8-kube-1.22-api-removals-in-4.9":"true"}}' --type=merge
+   oc patch clusterversion version --type merge -p '{"spec": {"channel": "stable-'${MAJOR}.${MINOR}'"}}'
 
    ```
   
