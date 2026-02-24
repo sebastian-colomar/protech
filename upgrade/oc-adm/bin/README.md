@@ -42,7 +42,7 @@ SSH_KEY=${HOME}/auth/key.txt
 
 ```
 ```
-tar cfvz ${HOME}/${GITHUB_REPO} ${HOME}/${GITHUB_REPO}
+tar cfvz ${HOME}/${GITHUB_REPO}.tgz ${HOME}/${GITHUB_REPO}
 scp -i ${SSH_KEY} ${HOME}/${GITHUB_REPO}.tgz ${REMOTE_USER}@${MIRROR_HOST}:
 
 ```
