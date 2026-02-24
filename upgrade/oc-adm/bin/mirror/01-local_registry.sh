@@ -1,6 +1,6 @@
 date
 
-#3.2. (IF NOT ALREADY PRESENT) Deploy the local container registry using the Distribution container image with the HTTP protocol:  
+echo STARTED '(IF NOT ALREADY PRESENT) Deploy the local container registry using the Distribution container image with the HTTP protocol:'
 
 unalias cp mv rm || true
 
@@ -36,5 +36,7 @@ tee /etc/containers/registries.conf.d/99-localhost-insecure.conf >/dev/null <<EO
 location = "localhost:${MIRROR_PORT}"
 insecure = true
 EOF
+
+echo FINISHED '(IF NOT ALREADY PRESENT) Deploy the local container registry using the Distribution container image with the HTTP protocol:'
 
 date
