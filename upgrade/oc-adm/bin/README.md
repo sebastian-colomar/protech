@@ -15,8 +15,8 @@ GITHUB_USER=sebastian-colomar
 
 ```
 ```
-rm -rf ${GITHUB_REPO}
-git clone --branch ${GITHUB_BRANCH} --single-branch -- https://github.com/${GITHUB_USER}/${GITHUB_REPO}
+rm -rf ${HOME}/${GITHUB_REPO}
+git clone --branch ${GITHUB_BRANCH} --single-branch -- https://github.com/${GITHUB_USER}/${GITHUB_REPO} ${HOME}/${GITHUB_REPO}
 
 ```
 ### 1.2. You can now run the mirroring script:
@@ -42,8 +42,8 @@ SSH_KEY=${HOME}/auth/key.txt
 
 ```
 ```
-tar cfvz ${GITHUB_REPO}.tgz ${GITHUB_REPO}
-scp -i ${SSH_KEY} ${GITHUB_REPO}.tgz ${REMOTE_USER}@${MIRROR_HOST}:
+tar cfvz ${HOME}/${GITHUB_REPO} ${HOME}/${GITHUB_REPO}
+scp -i ${SSH_KEY} ${HOME}/${GITHUB_REPO}.tgz ${REMOTE_USER}@${MIRROR_HOST}:
 
 ```
 ### 1.4. You can now log in to the mirror host and continue the mirroring process there:
@@ -62,9 +62,9 @@ REMOTE_USER=ec2-user
 
 ```
 ```
-mkdir -p ${GITHUB_REPO}
+mkdir -p ${HOME}/${GITHUB_REPO}
 sudo mv -fv /home/${REMOTE_USER}/${GITHUB_REPO}.tgz ${HOME}
-tar fvxz ${GITHUB_REPO}.tgz -C ${GITHUB_REPO} --strip-components=1
+tar fvxz ${HOME}/${GITHUB_REPO}.tgz -C ${HOME}/${GITHUB_REPO} --strip-components=1
 
 ```
 ### 2.2. You can now run the mirroring script:
@@ -79,7 +79,7 @@ SCRIPT=upgrade/oc-adm/bin/mirroring.sh
 
 ```
 ```
-nohup bash ${GITHUB_REPO}/${SCRIPT} 1> ${HOST}.log 2> ${HOST}-errors.log &
+nohup bash ${HOME}/${GITHUB_REPO}/${SCRIPT} 1> ${HOME}/${HOST}.log 2> ${HOME}/${HOST}-errors.log &
 
 ```
 
