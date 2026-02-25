@@ -5,7 +5,7 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 --- 
 
-# 3. Preparation for the Upgrade: Mirror Switch
+# 2B. Preparation for the Upgrade: Mirror Switch
 
 ## Motivation
 
@@ -73,14 +73,14 @@ NOTE:
 
 ### OpenShift Container Storage operator (OCS)
 
-3.5. Ensure that all OpenShift Container Storage Pods, including the operator pods, are in Running state in the `openshift-storage` namespace:
+2B.1. Ensure that all OpenShift Container Storage Pods, including the operator pods, are in Running state in the `openshift-storage` namespace:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-storage/pods
 
     ```
     oc -n openshift-storage get po
     ```
 
-3.6. Update the current custom catalog source of the `ocs-operator` to use the custom mirror catalog:
+2B.2. Update the current custom catalog source of the `ocs-operator` to use the custom mirror catalog:
 
    ### WARNING
   
@@ -115,19 +115,19 @@ NOTE:
 
    ```
   
-3.7. Verify that the OpenShift Container Platform cluster is still running the original release and that no upgrade has been performed:
+2B.3. Verify that the OpenShift Container Platform cluster is still running the original release and that no upgrade has been performed:
 
     oc get clusterversion
 
-3.8. Ensure that the OpenShift Container Storage cluster is healthy and data is resilient:
+2B.4. Ensure that the OpenShift Container Storage cluster is healthy and data is resilient:
 
     oc -n openshift-storage rsh `oc get pods -n openshift-storage | grep ceph-tool | cut -d ' ' -f1` ceph status
 
-3.9. Navigate to "Storage Overview" and check both "Block and File" and "Object" tabs for the green tick on the status card. Green tick indicates that the storage cluster, object service and data resiliency are all healthy:
+2B.5. Navigate to "Storage Overview" and check both "Block and File" and "Object" tabs for the green tick on the status card. Green tick indicates that the storage cluster, object service and data resiliency are all healthy:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/ocs-dashboards/block-file
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/ocs-dashboards/object
 
-3.10. Ensure that all OpenShift Container Storage Pods, including the operator pods, are in Running state in the `openshift-storage` namespace:
+2B.6. Ensure that all OpenShift Container Storage Pods, including the operator pods, are in Running state in the `openshift-storage` namespace:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-storage/pods
 
     ```
@@ -138,14 +138,14 @@ NOTE:
 
 ### OpenShift Local Storage operator (LSO)
 
-3.11. Ensure that all OpenShift Local Storage Pods, including the operator pods, are in Running state in the `openshift-local-storage` namespace:
+2B.7. Ensure that all OpenShift Local Storage Pods, including the operator pods, are in Running state in the `openshift-local-storage` namespace:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-local-storage/pods
 
     ```
     oc -n openshift-local-storage get po
     ```
 
-3.12. Update the current custom catalog source of the `local-storage-operator` to use the custom mirror catalog:
+2B.8. Update the current custom catalog source of the `local-storage-operator` to use the custom mirror catalog:
 
    ### WARNING
   
@@ -180,7 +180,7 @@ NOTE:
 
    ```
   
-3.13. Ensure that all OpenShift Local Storage Pods, including the operator pods, are in Running state in the `openshift-local-storage` namespace:
+2B.9. Ensure that all OpenShift Local Storage Pods, including the operator pods, are in Running state in the `openshift-local-storage` namespace:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-local-storage/pods
 
     ```
@@ -192,7 +192,7 @@ NOTE:
 ### ElasticSearch operator
 
 
-3.14. Ensure that all Elastic Search and OpenShift Cluster Logging Pods, including the operator pods, are in Ready state in the `openshift-logging` namespace:
+2B.10. Ensure that all Elastic Search and OpenShift Cluster Logging Pods, including the operator pods, are in Ready state in the `openshift-logging` namespace:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-operators-redhat/pods
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-logging/pods
 
@@ -203,12 +203,12 @@ NOTE:
 
     ```
 
-3.15. Ensure that the Elasticsearch cluster is healthy:
+2B.11. Ensure that the Elasticsearch cluster is healthy:
 
     oc exec -n openshift-logging -c elasticsearch svc/elasticsearch -- health
     
 
-3.16. Update the current custom catalog source of the `elasticsearch-operator` to use the custom mirror catalog:
+2B.12. Update the current custom catalog source of the `elasticsearch-operator` to use the custom mirror catalog:
 
    ### WARNING
   
@@ -244,7 +244,7 @@ NOTE:
    ```
 
 
-3.17. Ensure that all Elastic Search and OpenShift Cluster Logging Pods, including the operator pods, are in Ready state in the `openshift-logging` namespace:
+2B.13. Ensure that all Elastic Search and OpenShift Cluster Logging Pods, including the operator pods, are in Ready state in the `openshift-logging` namespace:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-operators-redhat/pods
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-logging/pods
 
@@ -255,32 +255,32 @@ NOTE:
 
     ```
 
-3.18. Ensure that the Elasticsearch cluster is healthy:
+2B.14. Ensure that the Elasticsearch cluster is healthy:
 
     oc exec -n openshift-logging -c elasticsearch svc/elasticsearch -- health
     
 
-3.19. Ensure that the Elasticsearch cron jobs are created:
+2B.15. Ensure that the Elasticsearch cron jobs are created:
 
     oc -n openshift-logging get cj
     
 
-3.20. Verify that the log store is updated and the indices are green. Verify that the output includes the `app-00000x, infra-00000x, audit-00000x, .security` indices:
+2B.16. Verify that the log store is updated and the indices are green. Verify that the output includes the `app-00000x, infra-00000x, audit-00000x, .security` indices:
 
     oc exec -n openshift-logging -c elasticsearch svc/elasticsearch-cluster -- indices | grep -E "health|app-|audit-|infra-|.security"
     
 
-3.21. Verify that the log collector is healthy:
+2B.17. Verify that the log collector is healthy:
 
     oc -n openshift-logging get ds collector
     
 
-3.22. Verify that the pod contains a collector container:
+2B.18. Verify that the pod contains a collector container:
 
     oc -n openshift-logging get ds collector -o jsonpath='{range .spec.template.spec.containers[*]}{.name}{"\n"}{end}' | grep collector
     
 
-3.23. Verify that the Kibana pod is in Ready status:
+2B.19. Verify that the Kibana pod is in Ready status:
 
     oc -n openshift-logging get pods -l component=kibana -o jsonpath='{range .items[*]}{.metadata.name}{" -> "}{.status.conditions[?(@.type=="Ready")].status}{"\n"}{end}'
 
@@ -289,7 +289,7 @@ NOTE:
 
 ### Openshift Cluster Logging operator
 
-3.24. Ensure that all OpenShift Cluster Logging Pods, including the operator pods, are in Ready state in the `openshift-logging` namespace:
+2B.20. Ensure that all OpenShift Cluster Logging Pods, including the operator pods, are in Ready state in the `openshift-logging` namespace:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-logging/pods
 
     ```
@@ -297,7 +297,7 @@ NOTE:
 
     ```
 
-3.25. Update the current custom catalog source of the `cluster-logging` to use the custom mirror catalog:
+2B.21. Update the current custom catalog source of the `cluster-logging` to use the custom mirror catalog:
 
    ### WARNING
   
@@ -332,7 +332,7 @@ NOTE:
 
    ```
   
-3.26. Ensure that all OpenShift Cluster Logging Pods, including the operator pods, are in Ready state in the `openshift-logging` namespace:
+2B.22. Ensure that all OpenShift Cluster Logging Pods, including the operator pods, are in Ready state in the `openshift-logging` namespace:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-logging/pods
 
     ```
@@ -344,7 +344,7 @@ NOTE:
 
 ### AKO operator provided by VMware (as an example of external provider operator)
 
-3.27. Ensure that all AKO Pods, including the operator pods, are in Ready state in the `avi-system` namespace:
+2B.23. Ensure that all AKO Pods, including the operator pods, are in Ready state in the `avi-system` namespace:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-logging/pods
 
     ```
@@ -352,7 +352,7 @@ NOTE:
 
     ```
 
-3.28. Update the current custom catalog source of the `ako-operator` to use the custom mirror catalog:
+2B.24. Update the current custom catalog source of the `ako-operator` to use the custom mirror catalog:
 
    ### WARNING
   
@@ -387,7 +387,7 @@ NOTE:
 
    ```
   
-3.29. Ensure that all AKO Pods, including the operator pods, are in Ready state in the `avi-system` namespace:
+2B.25. Ensure that all AKO Pods, including the operator pods, are in Ready state in the `avi-system` namespace:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-logging/pods
 
     ```
@@ -397,7 +397,7 @@ NOTE:
 
 ---
 
-## 3.30 (ONLY IF NECESSARY) Disabling the default OperatorHub sources 
+## 2B.26 (ONLY IF NECESSARY) Disabling the default OperatorHub sources 
 
 > Once the sources are switched to the new local mirror, you can disable the default OperatorHub sources.
 
