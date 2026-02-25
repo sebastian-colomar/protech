@@ -40,8 +40,12 @@ Make sure that:
   ```
 - OpenShift Container Storage (OCS) ceph status is HEALTH_OK by running the following command:
   ```
-  oc -n openshift-storage rsh `oc get pods -n openshift-storage | grep ceph-tool | cut -d ' ' -f1` ceph status
+  oc exec deploy/rook-ceph-tools -- ceph status
   
+  ```
+  ```
+  oc exec deploy/rook-ceph-tools -- ceph health detail
+    
   ```
 
 NOTE:
