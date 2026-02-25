@@ -53,6 +53,8 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 
 1B.3. Run the source index image that you want to prune in a container:
    ```
+   echo started '1B.3. Run the source index image that you want to prune in a container:'
+
    unalias cp mv rm || true
    
    mkdir -p ${REMOVABLE_MEDIA_PATH}/containers
@@ -80,6 +82,8 @@ An index image, based on the Operator bundle format, is a containerized snapshot
       podman run --authfile ${LOCAL_SECRET_JSON} -d --name ${RH_INDEX}-${VERSION} -p 50051 --replace --rm ${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}
    done
    sleep 10
+
+   echo finished '1B.3. Run the source index image that you want to prune in a container:'
 
    ```
 
