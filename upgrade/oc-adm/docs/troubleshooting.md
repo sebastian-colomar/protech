@@ -29,6 +29,10 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
    ```
    podman exec ${CONTAINER_NAME} ls ${CONTAINER_VOLUME}/docker/registry/v2/repositories/${MIRROR_OCP_REPOSITORY}/_manifests/revisions/sha256/
    ```
+   ```
+   AUTH=$(jq -r '.auths["registry.redhat.io"].auth' /root/auth/pull-secret.json)
+   curl -H "Authorization: Basic $AUTH" https://registry.redhat.io/v2/xxx
+   ```
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/settings/cluster/clusteroperators
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/all-namespaces/operators.coreos.com~v1alpha1~CatalogSource
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/all-namespaces/operators.coreos.com~v1alpha1~ClusterServiceVersion
