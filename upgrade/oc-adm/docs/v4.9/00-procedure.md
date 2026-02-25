@@ -64,6 +64,6 @@ You can now continue with the following steps:
    ```
 
 ## 4. [Updating a cluster in a disconnected environment](../04-upgrade.md)
-## 3. [Upgrade OCS to Red Hat OpenShift Data Foundation (ODF)](04-ocs2odf.md)
-## 4. [Upgrade Elastic Search and Cluster Logging](../06-logging.md)
-## 5. [Upgrade AKO operator (as an example of external operators)](../07-ako.md)
+## 5. [Upgrade OCS to ODF (Red Hat OpenShift Data Foundation)](05-ocs2odf.md)
+## 6. [Upgrade Elastic Search and Cluster Logging](../06-logging.md)
+## 7. [Upgrade AKO operator (as an example of external operators)](../07-ako.md)
