@@ -76,7 +76,7 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
       CHANNEL=stable-4.9
       NAMESPACE=openshift-marketplace
-      SOURCE=mirror-redhat-operator-index-v4-9
+      SOURCE=mirror-mcg-operator-v4-9
       
       oc -n openshift-storage patch subscription mcg-operator --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${NAMESPACE}'"}}'
 
