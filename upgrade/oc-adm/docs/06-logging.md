@@ -24,139 +24,159 @@ oc -n openshift-logging get po
 ```
 
 1.2. Ensure that the Elasticsearch cluster is healthy:
-
-    oc exec -n openshift-logging -c elasticsearch svc/elasticsearch -- health
+```
+oc exec -n openshift-logging -c elasticsearch svc/elasticsearch -- health
     
-
+```
 1.3. Ensure that the Elasticsearch cron jobs are created:
+```
+oc -n openshift-logging get cj
 
-    oc -n openshift-logging get cj
-    
-
+```
 1.4. Verify that the log store is updated and the indices are green. Verify that the output includes the `app-00000x, infra-00000x, audit-00000x, .security` indices:
+```
+oc exec -n openshift-logging -c elasticsearch svc/elasticsearch-cluster -- indices | grep -E "health|app-|audit-|infra-|.security"
 
-    oc exec -n openshift-logging -c elasticsearch svc/elasticsearch-cluster -- indices | grep -E "health|app-|audit-|infra-|.security"
-    
+```
 
 1.5. Verify that the log collector is healthy:
+```
+oc -n openshift-logging get ds collector
 
-    oc -n openshift-logging get ds collector
-    
+```    
 
 1.6. Verify that the pod contains a collector container:
+```
+oc -n openshift-logging get ds collector -o jsonpath='{range .spec.template.spec.containers[*]}{.name}{"\n"}{end}' | grep collector
 
-    oc -n openshift-logging get ds collector -o jsonpath='{range .spec.template.spec.containers[*]}{.name}{"\n"}{end}' | grep collector
-    
+``` 
 
 1.7. Verify that the Kibana pod is in Ready status:
-
-    oc -n openshift-logging get pods -l component=kibana -o jsonpath='{range .items[*]}{.metadata.name}{" -> "}{.status.conditions[?(@.type=="Ready")].status}{"\n"}{end}'
+```
+oc -n openshift-logging get pods -l component=kibana -o jsonpath='{range .items[*]}{.metadata.name}{" -> "}{.status.conditions[?(@.type=="Ready")].status}{"\n"}{end}'
     
+```
 
 1.8. UPDATE the OpenShift Elasticsearch Operator:
     
 WARNING
 > This will update the operator
     
-      CHANNEL=stable-5.5
-      NAMESPACE=openshift-operators-redhat
-      SOURCE=mirror-elasticsearch-operator-v4-9
-      SOURCE_NAMESPACE=openshift-marketplace
-      SUB=elasticsearch-operator
-      
-      oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NAMESPACE}'"}}'    
+```
+CHANNEL=stable-5.5
+NAMESPACE=openshift-operators-redhat
+SOURCE=mirror-elasticsearch-operator-v4-9
+SOURCE_NAMESPACE=openshift-marketplace
+SUB=elasticsearch-operator
+
+oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NAMESPACE}'"}}'    
  
+```
 1.9. Ensure that all Elastic Search and OpenShift Cluster Logging Pods, including the operator pods, are in Ready state in the `openshift-logging` namespace:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-operators-redhat/pods
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-logging/pods
 
-    ```
-    oc -n openshift-operators-redhat get po
+```
+oc -n openshift-operators-redhat get po
 
-    oc -n openshift-logging get po
+oc -n openshift-logging get po
 
-    ```
+```
 
 1.10. Ensure that the Elasticsearch cluster is healthy:
-
-    oc exec -n openshift-logging -c elasticsearch svc/elasticsearch -- health
+```
+oc exec -n openshift-logging -c elasticsearch svc/elasticsearch -- health
     
+```
 
 1.11. Ensure that the Elasticsearch cron jobs are created:
-
-    oc -n openshift-logging get cj
+```
+oc -n openshift-logging get cj
     
+```
 
 1.12. Verify that the log store is updated and the indices are green. Verify that the output includes the `app-00000x, infra-00000x, audit-00000x, .security` indices:
-
-    oc exec -n openshift-logging -c elasticsearch svc/elasticsearch-cluster -- indices | grep -E "health|app-|audit-|infra-|.security"
+```
+oc exec -n openshift-logging -c elasticsearch svc/elasticsearch-cluster -- indices | grep -E "health|app-|audit-|infra-|.security"
     
+```
 
 1.13. Verify that the log collector is healthy:
-
-    oc -n openshift-logging get ds collector
+```
+oc -n openshift-logging get ds collector
     
+```
 
 1.14. Verify that the pod contains a collector container:
-
-    oc -n openshift-logging get ds collector -o jsonpath='{range .spec.template.spec.containers[*]}{.name}{"\n"}{end}' | grep collector
+```
+oc -n openshift-logging get ds collector -o jsonpath='{range .spec.template.spec.containers[*]}{.name}{"\n"}{end}' | grep collector
     
+```
 
 1.15. Verify that the Kibana pod is in Ready status:
-
-    oc -n openshift-logging get pods -l component=kibana -o jsonpath='{range .items[*]}{.metadata.name}{" -> "}{.status.conditions[?(@.type=="Ready")].status}{"\n"}{end}'
+```
+oc -n openshift-logging get pods -l component=kibana -o jsonpath='{range .items[*]}{.metadata.name}{" -> "}{.status.conditions[?(@.type=="Ready")].status}{"\n"}{end}'
     
+```
 
 1.16. UPDATE the OpenShift Cluster Logging Operator:
     
 WARNING
 > This will update the operator
 
-      CHANNEL=stable-5.5
-      NAMESPACE=openshift-logging
-      SOURCE=mirror-cluster-logging-v4-9
-      SOURCE_NAMESPACE=openshift-marketplace
-      SUB=cluster-logging
-      
-      oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NAMESPACE}'"}}'        
+```
+CHANNEL=stable-5.5
+NAMESPACE=openshift-logging
+SOURCE=mirror-cluster-logging-v4-9
+SOURCE_NAMESPACE=openshift-marketplace
+SUB=cluster-logging
+
+oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NAMESPACE}'"}}'        
  
+```
 1.17. Ensure that all Elastic Search and OpenShift Cluster Logging Pods, including the operator pods, are in Ready state in the `openshift-logging` namespace:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-operators-redhat/pods
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-logging/pods
 
-    ```
-    oc -n openshift-operators-redhat get po
+```
+oc -n openshift-operators-redhat get po
 
-    oc -n openshift-logging get po
+oc -n openshift-logging get po
 
-    ```
+```
 
 1.18. Ensure that the Elasticsearch cluster is healthy:
-
-    oc exec -n openshift-logging -c elasticsearch svc/elasticsearch -- health
+```
+oc exec -n openshift-logging -c elasticsearch svc/elasticsearch -- health
     
+```
 
 1.19. Ensure that the Elasticsearch cron jobs are created:
-
-    oc -n openshift-logging get cj
+```
+oc -n openshift-logging get cj
     
+```
 
 1.20. Verify that the log store is updated and the indices are green. Verify that the output includes the `app-00000x, infra-00000x, audit-00000x, .security` indices:
-
-    oc exec -n openshift-logging -c elasticsearch svc/elasticsearch-cluster -- indices | grep -E "health|app-|audit-|infra-|.security"
+```
+oc exec -n openshift-logging -c elasticsearch svc/elasticsearch-cluster -- indices | grep -E "health|app-|audit-|infra-|.security"
     
+```
 
 1.21. Verify that the log collector is healthy:
-
-    oc -n openshift-logging get ds collector
+```
+oc -n openshift-logging get ds collector
     
+```
 
 1.22. Verify that the pod contains a collector container:
-
-    oc -n openshift-logging get ds collector -o jsonpath='{range .spec.template.spec.containers[*]}{.name}{"\n"}{end}' | grep collector
+```
+oc -n openshift-logging get ds collector -o jsonpath='{range .spec.template.spec.containers[*]}{.name}{"\n"}{end}' | grep collector
     
+```
 
 1.23. Verify that the Kibana pod is in Ready status:
+```
+oc -n openshift-logging get pods -l component=kibana -o jsonpath='{range .items[*]}{.metadata.name}{" -> "}{.status.conditions[?(@.type=="Ready")].status}{"\n"}{end}'
 
-    oc -n openshift-logging get pods -l component=kibana -o jsonpath='{range .items[*]}{.metadata.name}{" -> "}{.status.conditions[?(@.type=="Ready")].status}{"\n"}{end}'
-
+```
