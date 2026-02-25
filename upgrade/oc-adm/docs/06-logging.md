@@ -59,7 +59,8 @@ oc -n openshift-logging get pods -l component=kibana -o jsonpath='{range .items[
 
 1.8. UPDATE the OpenShift Elasticsearch Operator:
     
-WARNING
+> WARNING
+> 
 > This will update the operator
     
 ```
@@ -121,7 +122,8 @@ oc -n openshift-logging get pods -l component=kibana -o jsonpath='{range .items[
 
 1.16. UPDATE the OpenShift Cluster Logging Operator:
     
-WARNING
+> WARNING
+> 
 > This will update the operator
 
 ```
