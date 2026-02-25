@@ -5,10 +5,10 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 ---
 
 
-# 1C. Mirror registry for Red Hat OpenShift
+# 1C. MIRROR HOST: Mirror registry for Red Hat OpenShift
 
 NOTE:
-> Execute this procedure on a Linux machine reachable by the OpenShift cluster and equipped with at least 1 TB of mounted storage.
+> Execute this procedure on a Linux machine reachable by the OpenShift cluster and equipped with at least 1 TB of mounted storage (MIRROR HOST).
 
 #### Procedure
 1C.1. Set the required environment variables:
@@ -16,7 +16,9 @@ NOTE:
    WARNING
    > The `RELEASE` variable for the version you want to mirror should already be exported)
 
-   ```  
+   ```
+   echo started '1C.1. Set the required environment variables:'
+
    export ARCH_CATALOG=amd64
    export ARCH_RELEASE=x86_64
    
@@ -68,6 +70,8 @@ NOTE:
    export MIRROR_OCP_REPOSITORY=mirror-${OCP_REPOSITORY}-${RELEASE}
    export TMPDIR=${REMOVABLE_MEDIA_PATH}/containers/cache
    export VERSION=v${MAJOR}.${MINOR}
+
+   echo finished '1C.1. Set the required environment variables:'
 
    ```
 
@@ -146,6 +150,8 @@ NOTE:
 1C.4. Extract the tar archives containing the directory of the mirrored release images and catalogs and its contents:
 
    ```
+   echo started '1C.4. Extract the tar archives containing the directory of the mirrored release images and catalogs and its contents:'
+
    sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}
 
    repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
@@ -174,7 +180,9 @@ NOTE:
    for pkg in ${PKGS_REDHAT}; do
      index_image_extract
    done
-   
+
+   echo finished '1C.4. Extract the tar archives containing the directory of the mirrored release images and catalogs and its contents:'
+
    ```
 
 1C.5. Login to the OpenShift cluster:
@@ -194,8 +202,12 @@ NOTE:
 1C.7. Upload the release images to the local container registry:
 
    ```
+   echo started '1C.7. Upload the release images to the local container registry:'
+
    repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
    oc-${RELEASE} image mirror "file://openshift/release:${RELEASE}-${ARCH_RELEASE}*" ${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY} --from-dir=${repo_path} --insecure
+
+   echo finished '1C.7. Upload the release images to the local container registry:'
 
    ```
 
@@ -223,6 +235,8 @@ NOTE:
      
 1C.10. Upload the catalog images to the local container registry:
    ```
+   echo started '1C.10. Upload the catalog images to the local container registry:'
+
    index_image_upload() {
      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
        MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
@@ -246,10 +260,14 @@ NOTE:
      index_image_upload
    done
 
+   echo finished '1C.10. Upload the catalog images to the local container registry:'
+
    ```
 
 1C.11. Create the CatalogSource object by running the following command:
    ```
+   echo started '1C.11. Create the CatalogSource object by running the following command:'
+
    create_catalog_source() {
      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
        MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
@@ -276,10 +294,14 @@ NOTE:
      create_catalog_source
    done
 
+   echo finished '1C.11. Create the CatalogSource object by running the following command:'
+
    ```
 
 1C.12. Create the ImageContentSourcePolicy (ICSP) object by running the following command to specify the imageContentSourcePolicy.yaml file in your manifests directory:
    ```
+   echo started '1C.12. Create the ImageContentSourcePolicy (ICSP) object by running the following command to specify the imageContentSourcePolicy.yaml file in your manifests directory:'
+
    create_icsp() {
      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
        MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
@@ -296,17 +318,21 @@ NOTE:
      fi
    }
    
-   # CERTIFIED OPERATOR INDEX
+   echo started '# CERTIFIED OPERATOR INDEX'
    export RH_INDEX=certified-operator-index
    for pkg in ${PKGS_CERTIFIED}; do
      create_icsp
    done
+   echo finished '# CERTIFIED OPERATOR INDEX'
    
-   # REDHAT OPERATOR INDEX
+   echo started '# REDHAT OPERATOR INDEX'
    export RH_INDEX=redhat-operator-index
    for pkg in ${PKGS_REDHAT}; do
      create_icsp
    done
+   echo finished '# REDHAT OPERATOR INDEX'
+
+   echo finished '1C.12. Create the ImageContentSourcePolicy (ICSP) object by running the following command to specify the imageContentSourcePolicy.yaml file in your manifests directory:'
 
    ```
 
