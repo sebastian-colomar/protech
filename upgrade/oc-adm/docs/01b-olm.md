@@ -85,6 +85,8 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 
 1B.4. Use the grpcurl command to get a list of the packages provided by the index:
    ```
+   echo started '1B.4. Use the grpcurl command to get a list of the packages provided by the index:'
+
    remote_transfer() {
       MIRROR_HOST=mirror.sebastian-colomar.com
       ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo mkdir -p ${REMOVABLE_MEDIA_PATH}"
@@ -98,6 +100,8 @@ An index image, based on the Operator bundle format, is a containerized snapshot
       podman run --network host --rm docker.io/fullstorydev/grpcurl:latest -plaintext localhost:${node_port} api.Registry/ListPackages | grep '"name"' | cut -d '"' -f4 | sort -u | tee ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt
       remote_transfer ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt
    done
+
+   echo finished '1B.4. Use the grpcurl command to get a list of the packages provided by the index:'
 
    ```
    
@@ -130,6 +134,8 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 
 1B.7. Prune the source index of all but the specified packages and push the new index image to your target registry. Then mirror the content to local files. AFter that, copy the directory that is generated in your current directory to removable media. Finally, upload the generated tarball to the mirror host:
    ```
+   echo started '1B.7. Prune the source index of all but the specified packages and push the new index image to your target registry. Then mirror the content to local files. AFter that, copy the directory that is generated in your current directory to removable media. Finally, upload the generated tarball to the mirror host:'
+
    ln -sfnT ${BINARY_PATH}/oc-${RELEASE} ${BINARY_PATH}/oc-${VERSION}
    ln -sfnT ${BINARY_PATH}/opm-${RELEASE} ${BINARY_PATH}/opm-${VERSION}
 
@@ -178,26 +184,34 @@ An index image, based on the Operator bundle format, is a containerized snapshot
          echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
       fi
    }
-   
+
    ```
    ```
    remote_transfer ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar
 
    ```
    ```
-   # CERTIFIED OPERATOR INDEX
+   echo started '# CERTIFIED OPERATOR INDEX'
+
    export RH_INDEX=certified-operator-index
    for pkg in ${PKGS_CERTIFIED}; do
       index_image_process
    done
    
+   echo finished '# CERTIFIED OPERATOR INDEX'
+
    ```
    ```
-   # REDHAT OPERATOR INDEX
+   echo started '# REDHAT OPERATOR INDEX'
+
    export RH_INDEX=redhat-operator-index
    for pkg in ${PKGS_REDHAT}; do
       index_image_process
    done
+
+   echo finished '# REDHAT OPERATOR INDEX'
+
+   echo finished '1B.7. Prune the source index of all but the specified packages and push the new index image to your target registry. Then mirror the content to local files. AFter that, copy the directory that is generated in your current directory to removable media. Finally, upload the generated tarball to the mirror host:'
 
    ```
 
