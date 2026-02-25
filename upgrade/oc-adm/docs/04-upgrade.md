@@ -44,6 +44,10 @@ Make sure that:
   
   ```
   ```
+  oc exec deploy/rook-ceph-tools -- ceph progress
+  
+  ```
+  ```
   oc exec deploy/rook-ceph-tools -- ceph health detail
     
   ```
