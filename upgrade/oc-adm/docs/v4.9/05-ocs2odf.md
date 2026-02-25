@@ -96,7 +96,7 @@ oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHAN
 
 ```
 
-5.1.15. Fix the OCS operator subscription:
+5.1.15. UPDATE the OCS operator subscription:
 ```
 CHANNEL=stable-4.9
 NAMESPACE=openshift-storage
