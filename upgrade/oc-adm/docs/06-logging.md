@@ -54,13 +54,14 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
     
 
 1.8. UPDATE the current custom catalog source of the `elasticsearch-operator` operator to use the custom mirror catalog as shown:
-
-    alias oc=oc-4.9.59
-
-    export CATALOG_SOURCE=mirror-redhat-operator-index-v4-8
-       
-    oc patch subscription elasticsearch-operator -n openshift-operators-redhat --type json --patch '[{"op": "replace", "path": "/spec/source", "value": "'${CATALOG_SOURCE}'" }]'
     
+      CHANNEL=stable-5.5
+      NAMESPACE=openshift-operators-redhat
+      SOURCE=mirror-elasticsearch-operator-v4-9
+      SOURCE_NAMESPACE=openshift-marketplace
+      SUB=elasticsearch-operator
+      
+      oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NAMESPACE}'"}}'    
  
 1.9. Ensure that all Elastic Search and OpenShift Cluster Logging Pods, including the operator pods, are in Ready state in the `openshift-logging` namespace:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-operators-redhat/pods
