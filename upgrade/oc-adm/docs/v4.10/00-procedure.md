@@ -25,9 +25,16 @@ Red Hat references:
 
 ---
 
-# 1. [Preparing your mirror host](01-ocp.md)
-# 2. [Using Operator Lifecycle Manager on restricted networks](02-olm.md)
-# 3. [Mirror registry for Red Hat OpenShift](03-mirror.md)
-# 4. [Updating a cluster in a disconnected environment](04-upgrade.md)
-# 5. [Upgrade OCS to Red Hat OpenShift Data Foundation (ODF)](05-odf.md)
-# 6. [Upgrade Elastic Search and Cluster Logging](06-logging.md)
+Before continuing, set the `RELEASE` environment variable to match the DESIRED cluster version, which is `4.10.64`.
+```
+export RELEASE=4.10.64
+
+```
+You can now continue with the following steps:
+
+## 1. [Fully disconnected (air-gapped) mirror registry](../01-mirroring.md)
+## 2. [Verify the mirroring process](../02-mirror-validation.md)
+## 3. [Updating a cluster in a disconnected environment](../03-upgrade.md)
+## 4. [Upgrade OpenShift Data Foundation (ODF)](04-odf.md)
+## 5. [Upgrade Elastic Search and Cluster Logging](../05-logging.md)
+## 6. [Upgrade AKO operator (as an example of external operators)](../06-ako.md)
