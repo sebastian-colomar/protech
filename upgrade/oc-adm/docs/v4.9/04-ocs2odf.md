@@ -75,18 +75,22 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 4.1.15. Fix the MCG operator subscription:
 
       CHANNEL=stable-4.9
-      NAMESPACE=openshift-marketplace
+      NAMESPACE=openshift-storage
       SOURCE=mirror-mcg-operator-v4-9
+      SOURCE_NAMESPACE=openshift-marketplace
+      SUB=mcg-operator
       
-      oc -n openshift-storage patch sub mcg-operator --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${NAMESPACE}'"}}'
+      oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NAMESPACE}'"}}'
 
 4.1.15. Fix the OCS operator subscription:
 
       CHANNEL=stable-4.9
-      NAMESPACE=openshift-marketplace
+      NAMESPACE=openshift-storage
       SOURCE=mirror-ocs-operator-v4-9
+      SOURCE_NAMESPACE=openshift-marketplace
+      SUB=ocs-operator
       
-      oc -n openshift-storage patch sub mcg-operator --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${NAMESPACE}'"}}'
+      oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NAMESPACE}'"}}'
 
 4.1.16. Verify that the OpenShift Data Foundation cluster is healthy and data is resilient:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/odf/cluster
