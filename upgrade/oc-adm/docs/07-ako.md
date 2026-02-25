@@ -23,7 +23,7 @@ oc -n ${NS} get po
 1.2.UPDATE the AKO operator:
 ```
 CHANNEL=stable
-NS=openshift-storage
+NS=avi-system
 SOURCE=mirror-ako-operator-v4-9
 SOURCE_NS=openshift-marketplace
 SUB=ako-operator
