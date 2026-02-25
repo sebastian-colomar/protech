@@ -72,7 +72,15 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
     oc patch console.operator cluster -n openshift-storage --type json -p '[{"op": "add", "path": "/spec/plugins", "value": ["odf-console"]}]'
 
-4.1.15. Verify that the OpenShift Data Foundation cluster is healthy and data is resilient:
+4.1.15. Fix the MCG operator:
+
+      CHANNEL=stable-4.9
+      NAMESPACE=openshift-marketplace
+      SOURCE=mirror-redhat-operator-index-v4-9
+      
+      oc -n openshift-storage patch subscription mcg-operator --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${NAMESPACE}'"}}'
+
+4.1.16. Verify that the OpenShift Data Foundation cluster is healthy and data is resilient:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/odf/cluster
 
 4.1.16. Navigate to Storage OpenShift Data foundation Storage Systems tab and then click on the storage system name:
