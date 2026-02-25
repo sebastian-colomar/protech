@@ -15,11 +15,17 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 5.1.1. Check that the current custom catalog source of the ocs-operator and local-storage-operator are using the custom mirror catalog as shown:
 ```
-oc get sub local-storage-operator -n openshift-local-storage -o jsonpath='{.spec.source}{" / "}{.spec.sourceNamespace}{" / "}{.spec.channel}{"\n"}'
+NAMESPACE=openshift-local-storage
+SUBSCRIPTOION=local-storage-operator
+
+oc get sub ${SUBSCRIPTOION} -n ${NAMESPACE} -o jsonpath='{.spec.source}{" / "}{.spec.sourceNamespace}{" / "}{.spec.channel}{"\n"}'
 
 ```
 ```
-oc get sub ocs-operator -n openshift-storage -o jsonpath='{.spec.source}{" / "}{.spec.sourceNamespace}{" / "}{.spec.channel}{"\n"}'
+NAMESPACE=openshift-storage
+SUBSCRIPTOION=ocs-operator
+
+oc get sub ${SUBSCRIPTOION} -n ${NAMESPACE} -o jsonpath='{.spec.source}{" / "}{.spec.sourceNamespace}{" / "}{.spec.channel}{"\n"}'
 
 ```
     
