@@ -28,7 +28,9 @@ This process is referred to as disconnected mirroring.
    WARNING
    > The `RELEASE` variable for the version you want to mirror should already be exported
 
-   ```  
+   ```
+   echo STARTED '1A.3. Set the required environment variables:'
+
    export ARCH_CATALOG=amd64
    export ARCH_RELEASE=x86_64
    
@@ -81,6 +83,8 @@ This process is referred to as disconnected mirroring.
    export TMPDIR=${REMOVABLE_MEDIA_PATH}/containers/cache
    export VERSION=v${MAJOR}.${MINOR}
 
+   echo FINISHED '1A.3. Set the required environment variables:'
+
    ```
 
 1A.4. Install the OpenShift CLI by downloading the binary:
@@ -88,7 +92,9 @@ This process is referred to as disconnected mirroring.
    IMPORTANT:
    > If you are upgrading a cluster in a disconnected environment, install the oc version that you plan to upgrade to.
 
-   ```   
+   ```
+   echo STARTED '1A.4. Install the OpenShift CLI by downloading the binary:'
+
    cd ${HOME}
    mkdir -p ${BINARY_PATH}
    grep -q ":${BINARY_PATH}:" ~/.bashrc || echo "export PATH=\"${BINARY_PATH}:\${PATH}\"" | tee -a ~/.bashrc
@@ -113,6 +119,8 @@ This process is referred to as disconnected mirroring.
    
    ln -sfnT ${BINARY_PATH}/oc-${RELEASE} ${BINARY_PATH}/oc
    ln -sfnT ${BINARY_PATH}/opm-${RELEASE} ${BINARY_PATH}/opm
+
+   echo FINISHED '1A.4. Install the OpenShift CLI by downloading the binary:'
    
    ```
 
@@ -128,31 +136,45 @@ This process is referred to as disconnected mirroring.
 1A.6. Mirror the images and configuration manifests to a directory on the removable media:
 
    ```
+   echo started '1A.6. Mirror the images and configuration manifests to a directory on the removable media:'
+
    sudo mkdir -p ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
    sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}
    oc-${RELEASE} adm release mirror -a ${LOCAL_SECRET_JSON} quay.io/${PRODUCT_REPO}/${RELEASE_NAME}:${RELEASE}-${ARCH_RELEASE} --to-dir=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
+
+   echo finished '1A.6. Mirror the images and configuration manifests to a directory on the removable media:'
 
    ```
 
 1A.7. Retrieve the ImageContentSourcePolicy:
 
    ```
+   echo started '1A.7. Retrieve the ImageContentSourcePolicy:'
+
    oc-${RELEASE} adm release mirror -a ${LOCAL_SECRET_JSON} quay.io/${PRODUCT_REPO}/${RELEASE_NAME}:${RELEASE}-${ARCH_RELEASE} --to=${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY} --to-release-image=${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY}:${RELEASE}-${ARCH_RELEASE} --insecure --dry-run | tee ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}/config/icsp.yaml
    sed -i '0,/ImageContentSourcePolicy/d' ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}/config/icsp.yaml
    sed -i 's/name: .*$/name: '${MIRROR_OCP_REPOSITORY}'/' ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}/config/icsp.yaml
+
+   echo finished '1A.7. Retrieve the ImageContentSourcePolicy:'
 
    ```
 
 1A.8. Create a tar archive containing the directory and its contents:
 
    ```
+   echo started '1A.8. Create a tar archive containing the directory and its contents:'
+
    cd ${REMOVABLE_MEDIA_PATH}
    tar cfv ${MIRROR_OCP_REPOSITORY}.tar ${MIRROR_OCP_REPOSITORY}
+
+   echo finished '1A.8. Create a tar archive containing the directory and its contents:'
 
    ```
 
 1A.9. Transfer the release images and the openshift client tarball to the mirror host:
    ```
+   echo started '1A.9. Transfer the release images and the openshift client tarball to the mirror host:'
+
    export MIRROR_HOST=mirror.sebastian-colomar.com
    mirror_remote_exec() {
       ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "$@"
@@ -172,5 +194,7 @@ This process is referred to as disconnected mirroring.
    for package in ${PACKAGES}; do
       scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${HOME}/${package}-linux-${RELEASE}.tar.gz ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
    done
+
+   echo finished '1A.9. Transfer the release images and the openshift client tarball to the mirror host:'
 
    ```
