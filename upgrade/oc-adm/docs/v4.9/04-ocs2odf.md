@@ -26,7 +26,7 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 4.1.3. Ensure that the OpenShift Container Storage cluster is healthy and data is resilient:
 
-    oc -n openshift-storage rsh `oc get pods -n openshift-storage | grep ceph-tool | cut -d ' ' -f1` ceph status
+    oc exec deploy/rook-ceph-tools -- ceph status
 
 4.1.4. Navigate to "Storage Overview" and check both "Block and File" and "Object" tabs for the green tick on the status card. Green tick indicates that the storage cluster, object service and data resiliency are all healthy:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/ocs-dashboards/block-file
