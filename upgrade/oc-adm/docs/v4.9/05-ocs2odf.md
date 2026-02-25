@@ -4,7 +4,7 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 ---
 
-# 5.1. Upgrade OCS to Red Hat OpenShift Data Foundation (ODF)
+# 5.1. Upgrade OCS to ODF (Red Hat OpenShift Data Foundation)
 
 ## REFERENCES:
 - https://www.ibm.com/docs/en/cloud-paks/cloudpak-data-system/2.0.0?topic=ocp-ocs-upgrade-in-connected-environment-by-using-red-hat-openshift-console-ui
@@ -129,7 +129,7 @@ WARNING:
 5.2.1. Go to the installed operators under `openshift-local-storage` namespace and click Local Storage operator:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-local-storage/operators.coreos.com~v1alpha1~ClusterServiceVersion/local-storage-operator.4.8.0-202212051626
 
-5.2.2. Go to the subscription and update the channel and the source to use 4.9:
+5.2.2. UPDATE the OpenShift Local Storage operator:
 ```
 CHANNEL=4.9
 NAMESPACE=openshift-local-storage
