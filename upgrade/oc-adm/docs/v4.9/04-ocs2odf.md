@@ -116,7 +116,13 @@ WARNING:
 
 4.2.2. Go to the subscription and update the channel and the source to use 4.9:
 
-    oc -n openshift-local-storage patch subscription local-storage-operator --type=merge -p '{"spec":{"channel":"4.9","source":"mirror-redhat-operator-index-v4-9","sourceNamespace":"openshift-marketplace"}}'
+      CHANNEL=4.9
+      NAMESPACE=openshift-local-storage
+      SOURCE=mirror-local-storage-operator-v4-9
+      SOURCE_NAMESPACE=openshift-marketplace
+      SUB=local-storage-operator
+      
+      oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NAMESPACE}'"}}'
 
 4.2.3. Verify the successful update:
 
