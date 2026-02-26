@@ -35,6 +35,6 @@ You can now continue with the following steps:
 ## 1. [Fully disconnected (air-gapped) mirror registry](../01-mirroring.md)
 ## 2. [Verify the mirroring process](../02-mirror-validation.md)
 ## 3. [Updating a cluster in a disconnected environment](../03-upgrade.md)
-## 4. [Upgrade OpenShift Data Foundation (ODF)](04-odf.md)
+## 4. [Upgrade OpenShift Data Foundation (ODF)](../04-odf.md)
 ## 5. [Upgrade Elastic Search and Cluster Logging](../05-logging.md)
 ## 6. [Upgrade AKO operator (as an example of external operators)](../06-ako.md)
