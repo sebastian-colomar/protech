@@ -160,8 +160,11 @@ NOTE:
    sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}
    
    repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
+
    mkdir -p ${repo_path}
+
    cd ${REMOVABLE_MEDIA_PATH}
+
    tar fvx ${repo_path}.tar
    
    index_image_extract() {
