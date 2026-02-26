@@ -156,14 +156,14 @@ NOTE:
 
    ```
    echo started '1C.4. Extract the tar archives containing the directory of the mirrored release images and catalogs and its contents:'
-
+   
    sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}
-
+   
    repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
    mkdir -p ${repo_path}
    cd ${REMOVABLE_MEDIA_PATH}
    tar fvx ${repo_path}.tar
-
+   
    index_image_extract() {
      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
        MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
@@ -187,9 +187,9 @@ NOTE:
    for pkg in ${PKGS_REDHAT}; do
      index_image_extract
    done
-
+   
    echo finished '1C.4. Extract the tar archives containing the directory of the mirrored release images and catalogs and its contents:'
-
+   
    ```
 
 1C.5. Login to the OpenShift cluster:
