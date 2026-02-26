@@ -31,6 +31,11 @@ This process is referred to as disconnected mirroring.
    ```
    echo STARTED '1A.3. Set the required environment variables:'
 
+   if [ -z "${RELEASE}" ]; then
+     echo "ERROR: RELEASE is not set or empty"
+     exit 1
+   fi
+
    export ARCH_CATALOG=amd64
    export ARCH_RELEASE=x86_64
    
