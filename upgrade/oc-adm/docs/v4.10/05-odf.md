@@ -16,54 +16,54 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 5.1.1. Update the current custom catalog source of the ocs-operator and local-storage-operator to use the custom mirror catalog as shown:
 
-    ```
-    NS=openshift-local-storage
-    SOURCE=mirror-local-storage-operator-v4-10
-    SOURCE_NS=openshift-marketplace
-    SUB=local-storage-operator
-    
-    oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'    
- 
-    ```
-    ```
-    NS=openshift-storage
-    SOURCE=mirror-ocs-operator-v4-10
-    SOURCE_NS=openshift-marketplace
-    SUB=ocs-operator
-    
-    oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'    
- 
-    ```
-    ```
-    NS=openshift-storage
-    SOURCE=mirror-odf-operator-v4-10
-    SOURCE_NS=openshift-marketplace
-    SUB=odf-operator
-    
-    oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'    
- 
-    ```
-    ```
-    NS=openshift-storage
-    SOURCE=mirror-mcg-operator-v4-10
-    SOURCE_NS=openshift-marketplace
-    SUB=mcg-operator
-    
-    oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'    
- 
-    ```
+```
+NS=openshift-local-storage
+SOURCE=mirror-local-storage-operator-v4-10
+SOURCE_NS=openshift-marketplace
+SUB=local-storage-operator
+
+oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'    
+
+```
+```
+NS=openshift-storage
+SOURCE=mirror-ocs-operator-v4-10
+SOURCE_NS=openshift-marketplace
+SUB=ocs-operator
+
+oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'    
+
+```
+```
+NS=openshift-storage
+SOURCE=mirror-odf-operator-v4-10
+SOURCE_NS=openshift-marketplace
+SUB=odf-operator
+
+oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'    
+
+```
+```
+NS=openshift-storage
+SOURCE=mirror-mcg-operator-v4-10
+SOURCE_NS=openshift-marketplace
+SUB=mcg-operator
+
+oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'    
+
+```
 5.1.2. Ensure that the OpenShift Container Platform cluster has been successfully updated to version 4.10.64:
 
-    ```
-    oc get clusterversion
+```
+oc get clusterversion
 
-    ```
+```
 5.1.3. Ensure that the OpenShift Container Storage cluster is healthy and data is resilient:
 
-    ```
-    oc -n openshift-storage exec deploy/rook-ceph-tools -- ceph status
+```
+oc -n openshift-storage exec deploy/rook-ceph-tools -- ceph status
 
-    ```
+```
 5.1.4. Navigate to "Storage Overview" and check both "Block and File" and "Object" tabs for the green tick on the status card. Green tick indicates that the storage cluster, object service and data resiliency are all healthy:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/ocs-dashboards/block-file
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/ocs-dashboards/object
@@ -71,10 +71,10 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 5.1.5. Ensure that all OpenShift Container Storage Pods, including the operator pods, are in Running state in the `openshift-storage` namespace:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-storage/pods
 
-    ```
-    oc -n openshift-storage get po
+```
+oc -n openshift-storage get po
 
-    ```
+```
 
 5.1.6. Ensure that you have sufficient time to complete the OpenShift Data Foundation update process, as the update time varies depending on the number of OSDs that run in the cluster.
 
@@ -96,15 +96,15 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 5.1.13. Update the current custom catalog source of the `odf-csi-addons-operator` to use the custom mirror catalog as shown:
 
-    ```
-    NS=openshift-storage
-    SOURCE=mirror-odf-csi-addons-operator-v4-10
-    SOURCE_NS=openshift-marketplace
-    SUB=odf-csi-addons-operator
-    
-    oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'    
- 
-    ```
+```
+NS=openshift-storage
+SOURCE=mirror-odf-csi-addons-operator-v4-10
+SOURCE_NS=openshift-marketplace
+SUB=odf-csi-addons-operator
+
+oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'    
+
+```
 
 ## Verification steps
 
@@ -139,11 +139,11 @@ WARNING:
 
 5.2.3. Verify the successful update:
 
-    ```
-    oc -n openshift-local-storage get csv
+```
+oc -n openshift-local-storage get csv
 
-    oc -n openshift-local-storage get po
+oc -n openshift-local-storage get po
 
-    oc -n openshift-local-storage get sub
+oc -n openshift-local-storage get sub
 
-    ```
+```
