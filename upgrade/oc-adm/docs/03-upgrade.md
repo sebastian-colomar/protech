@@ -84,7 +84,7 @@ WARNING
   ```
 3.2. Validate that the ImageContentSourcePolicy has been rendered into a MachineConfig and successfully rolled out to all nodes before proceeding:
    ```
-   for n in $(oc get nodes -o name); do echo "== $n =="; oc debug "$n" -q -- chroot /host grep -r -E "${RELEASE}|${VERSION}" /etc/containers || echo "Not found"; done
+   for n in $(oc get nodes -o name); do echo "== $n =="; oc debug "$n" -q -- chroot /host grep -r "${MIRROR_OCP_REPOSITORY}" /etc/containers || echo "Not found"; done
 
    ```
    
