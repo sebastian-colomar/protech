@@ -19,6 +19,11 @@ NOTE:
    ```
    echo started '1C.1. Set the required environment variables:'
 
+   if [ -z "${RELEASE}" ]; then
+     echo "ERROR: RELEASE is not set or empty"
+     exit 1
+   fi
+
    export ARCH_CATALOG=amd64
    export ARCH_RELEASE=x86_64
    
