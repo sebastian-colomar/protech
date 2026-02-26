@@ -27,6 +27,15 @@ oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"source":"'${SOURCE}'","s
 ```
 ```
 NS=openshift-storage
+SOURCE=mirror-mcg-operator-v4-10
+SOURCE_NS=openshift-marketplace
+SUB=mcg-operator
+
+oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'    
+
+```
+```
+NS=openshift-storage
 SOURCE=mirror-ocs-operator-v4-10
 SOURCE_NS=openshift-marketplace
 SUB=ocs-operator
@@ -43,15 +52,7 @@ SUB=odf-operator
 oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'    
 
 ```
-```
-NS=openshift-storage
-SOURCE=mirror-mcg-operator-v4-10
-SOURCE_NS=openshift-marketplace
-SUB=mcg-operator
 
-oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'    
-
-```
 5.1.2. Ensure that the OpenShift Container Platform cluster has been successfully updated to version 4.10.64:
 
 ```
