@@ -64,6 +64,7 @@ NOTE:
 WARNING
 > The RELEASE variable for the version you want to mirror should already be exported
 
+    ```
     if [ -z "${RELEASE}" ]; then
       echo "ERROR: RELEASE is not set or empty"
       exit 1
@@ -78,10 +79,12 @@ WARNING
 
     LOCAL_REGISTRY=${MIRROR_HOST}:${MIRROR_PORT}
     MIRROR_OCP_REPOSITORY=mirror-${OCP_REPOSITORY}-${RELEASE}
+    VERSION=v${MAJOR}.${MINOR}
 
+    ```
 3.2. Validate that the ImageContentSourcePolicy has been rendered into a MachineConfig and successfully rolled out to all nodes before proceeding:
    ```
-   for n in $(oc get nodes -o name); do echo "== $n =="; oc debug "$n" -q -- chroot /host grep -R "${MIRROR_HOST}:${MIRROR_PORT}"'"' /etc/containers || echo "Not found"; done
+   for n in $(oc get nodes -o name); do echo "== $n =="; oc debug "$n" -q -- chroot /host grep -r -E "${RELEASE}|${VERSION}"'"' /etc/containers || echo "Not found"; done
 
    ```
    

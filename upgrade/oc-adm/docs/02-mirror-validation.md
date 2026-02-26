@@ -74,9 +74,17 @@ You may also find it helpful to review the following related resources:
 - Validate that the ImageContentSourcePolicies have been rendered into a MachineConfig and successfully rolled out to all nodes before proceeding:
    - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/cluster/operator.openshift.io~v1alpha1~ImageContentSourcePolicy/instances
    ```
-   export MIRROR_HOST=mirror.hub.sebastian-colomar.com
+   if [ -z "${RELEASE}" ]; then
+     echo "ERROR: RELEASE is not set or empty"
+     exit 1
+   fi
 
-   for n in $(oc get nodes -o name); do echo "== $n =="; oc debug "$n" -q -- chroot /host grep -R "${MIRROR_HOST}:${MIRROR_PORT}"'"' /etc/containers || echo "Not found"; done
+   MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
+   MINOR=$( echo ${RELEASE} | cut -d. -f2 )
+   VERSION=v${MAJOR}.${MINOR}
+ 
+   for n in $(oc get nodes -o name); do echo "== $n =="; oc debug "$n" -q -- chroot /host grep -r -E "${RELEASE}|${VERSION}"'"' /etc/containers || echo "Not found"; done
+
 
    ```
    
