@@ -202,8 +202,6 @@ An index image, based on the Operator bundle format, is a containerized snapshot
       index_image_process
    done
    
-   echo finished '# CERTIFIED OPERATOR INDEX'
-
    ```
    ```
    echo started '# REDHAT OPERATOR INDEX'
@@ -213,11 +211,4 @@ An index image, based on the Operator bundle format, is a containerized snapshot
       index_image_process
    done
 
-   echo finished '# REDHAT OPERATOR INDEX'
-
-   echo finished '1B.7. Prune the source index of all but the specified packages and push the new index image to your target registry. Then mirror the content to local files. AFter that, copy the directory that is generated in your current directory to removable media. Finally, upload the generated tarball to the mirror host:'
-
    ```
-
-
-
