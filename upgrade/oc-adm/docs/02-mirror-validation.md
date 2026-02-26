@@ -83,7 +83,7 @@ You may also find it helpful to review the following related resources:
    MINOR=$( echo ${RELEASE} | cut -d. -f2 )
    VERSION=v${MAJOR}.${MINOR}
  
-   for n in $(oc get nodes -o name); do echo "== $n =="; oc debug "$n" -q -- chroot /host grep -r -E "${RELEASE}|${VERSION}"'"' /etc/containers || echo "Not found"; done
+   for n in $(oc get nodes -o name); do echo "== $n =="; oc debug "$n" -q -- chroot /host grep -r -E "${RELEASE}|${VERSION}" /etc/containers || echo "Not found"; done
 
 
    ```
