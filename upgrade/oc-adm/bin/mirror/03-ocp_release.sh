@@ -15,7 +15,8 @@ sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}
 
 mkdir -p ${repo_path}
 
-tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
+cd ${REMOVABLE_MEDIA_PATH}
+tar fvx ${repo_path}.tar
 
 oc-${RELEASE} image mirror "file://openshift/release:${RELEASE}-${ARCH_RELEASE}*" ${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY} --from-dir=${repo_path} --insecure
 

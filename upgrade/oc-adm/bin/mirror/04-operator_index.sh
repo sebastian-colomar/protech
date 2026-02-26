@@ -9,7 +9,8 @@ index_image_upload() {
     MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
     repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
     mkdir -p ${repo_path}
-    tar fvx ${repo_path}.tar -C ${repo_path} --strip-components=1
+    cd ${REMOVABLE_MEDIA_PATH}
+    tar fvx ${repo_path}.tar
     cd ${repo_path}
     oc-${VERSION} adm catalog mirror file://${MIRROR_INDEX_REPOSITORY}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION} ${LOCAL_REGISTRY}/${MIRROR_INDEX_REPOSITORY} --insecure
     name=${MIRROR_INDEX_REPOSITORY//./-}
