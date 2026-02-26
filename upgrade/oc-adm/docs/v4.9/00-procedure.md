@@ -58,12 +58,12 @@ You can now continue with the following steps:
 > Upgrading to an OCP version higher than 4.8 requires manual acknowledgment from the administrator. For more information, see Preparing to upgrade to OpenShift Container Platform 4.9:
    - https://access.redhat.com/articles/6329921
 
-   ```
-   oc -n openshift-config patch cm admin-acks --patch '{"data":{"ack-4.8-kube-1.22-api-removals-in-4.9":"true"}}' --type=merge
+```
+oc -n openshift-config patch cm admin-acks --patch '{"data":{"ack-4.8-kube-1.22-api-removals-in-4.9":"true"}}' --type=merge
 
-   ```
+```
 
 ## 3. [Updating a cluster in a disconnected environment](../03-upgrade.md)
 ## 4. [Upgrade OCS to ODF (Red Hat OpenShift Data Foundation)](04-ocs2odf.md)
-## 5. [Upgrade Elastic Search and Cluster Logging](../05-logging.md)
+## 5. [Upgrade Elastic Search and Cluster Logging](05-logging.md)
 ## 6. [Upgrade AKO operator (as an example of external operators)](../06-ako.md)
