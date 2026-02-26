@@ -79,24 +79,41 @@ oc -n openshift-storage get po
 
 5.1.6. Ensure that you have sufficient time to complete the OpenShift Data Foundation update process, as the update time varies depending on the number of OSDs that run in the cluster.
 
-5.1.7. On the OpenShift Web Console, navigate to Installed Operators. Select `openshift-storage` project:
-- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-storage/operators.coreos.com~v1alpha1~ClusterServiceVersion
+5.1.7. Fix the MCG operator subscription:
+```
+CHANNEL=stable-4.10
+NAMESPACE=openshift-storage
+SOURCE=mirror-mcg-operator-v4-10
+SOURCE_NAMESPACE=openshift-marketplace
+SUB=mcg-operator
 
-5.1.8. Click the OpenShift Data Foundation operator name:
-- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-storage/operators.coreos.com~v1alpha1~ClusterServiceVersion/odf-operator.v4.9.15
+oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NAMESPACE}'"}}'
 
-5.1.9. Click the Subscription tab and click the link under Update Channel:
-- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-storage/operators.coreos.com~v1alpha1~ClusterServiceVersion/odf-operator.v4.9.15/subscription
+```
 
-5.1.10. Select the Stable-4.10 update channel and Save it.
+5.1.8. UPDATE the OCS operator subscription:
+```
+CHANNEL=stable-4.10
+NAMESPACE=openshift-storage
+SOURCE=mirror-ocs-operator-v4-10
+SOURCE_NAMESPACE=openshift-marketplace
+SUB=ocs-operator
 
-5.1.11. On the OpenShift Web Console, navigate to Installed Operators. Select `openshift-storage` project:
-- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-storage/operators.coreos.com~v1alpha1~ClusterServiceVersion
+oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NAMESPACE}'"}}'
 
-5.1.12. Wait for the OpenShift Data Foundation Operator Status to change to Up to date.
+```
+5.1.9. UPDATE the ODF operator subscription:
+```
+CHANNEL=stable-4.10
+NAMESPACE=openshift-storage
+SOURCE=mirror-ocs-operator-v4-10
+SOURCE_NAMESPACE=openshift-marketplace
+SUB=ocs-operator
 
-5.1.13. Update the current custom catalog source of the `odf-csi-addons-operator` to use the custom mirror catalog as shown:
+oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NAMESPACE}'"}}'
 
+```
+5.1.10. Update the current custom catalog source of the `odf-csi-addons-operator` to use the custom mirror catalog as shown:
 ```
 NS=openshift-storage
 SOURCE=mirror-odf-csi-addons-operator-v4-10
@@ -106,6 +123,12 @@ SUB=odf-csi-addons-operator
 oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'    
 
 ```
+
+5.1.11. On the OpenShift Web Console, navigate to Installed Operators. Select `openshift-storage` project:
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-storage/operators.coreos.com~v1alpha1~ClusterServiceVersion
+
+5.1.12. Wait for the OpenShift Data Foundation Operator Status to change to Up to date.
+
 
 ## Verification steps
 
@@ -131,13 +154,17 @@ WARNING:
 
 ## Procedure
 
-5.2.1. Go to the installed operators under `openshift-local-storage` namespace and click Local Storage operator:
-- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-local-storage/operators.coreos.com~v1alpha1~ClusterServiceVersion
+5.2.1. UPDATE the OpenShift Local Storage operator subscription:
+```
+CHANNEL=4.10
+NAMESPACE=openshift-local-storage
+SOURCE=mirror-local-storage-operator-v4-10
+SOURCE_NAMESPACE=openshift-marketplace
+SUB=local-storage-operator
 
-5.2.2. Click the Subscription tab and click the link under Update Channel.
+oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NAMESPACE}'"}}'
 
-1.10. Select the `4.10` update channel and Save it.
-
+```
 5.2.3. Verify the successful update:
 
 ```
