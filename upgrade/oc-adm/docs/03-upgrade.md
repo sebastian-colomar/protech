@@ -64,24 +64,24 @@ NOTE:
 WARNING
 > The RELEASE variable for the version you want to mirror should already be exported
 
-    ```
-    if [ -z "${RELEASE}" ]; then
-      echo "ERROR: RELEASE is not set or empty"
-      exit 1
-    fi
+  ```
+  if [ -z "${RELEASE}" ]; then
+    echo "ERROR: RELEASE is not set or empty"
+    exit 1
+  fi
 
-    MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
-    MINOR=$( echo ${RELEASE} | cut -d. -f2 )
-    MIRROR_HOST=mirror.hub.sebastian-colomar.com
-    MIRROR_PORT=5000
-    OCP_REPOSITORY=ocp
-    REMOVABLE_MEDIA_PATH=/mnt/mirror
+  MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
+  MINOR=$( echo ${RELEASE} | cut -d. -f2 )
+  MIRROR_HOST=mirror.hub.sebastian-colomar.com
+  MIRROR_PORT=5000
+  OCP_REPOSITORY=ocp
+  REMOVABLE_MEDIA_PATH=/mnt/mirror
 
-    LOCAL_REGISTRY=${MIRROR_HOST}:${MIRROR_PORT}
-    MIRROR_OCP_REPOSITORY=mirror-${OCP_REPOSITORY}-${RELEASE}
-    VERSION=v${MAJOR}.${MINOR}
+  LOCAL_REGISTRY=${MIRROR_HOST}:${MIRROR_PORT}
+  MIRROR_OCP_REPOSITORY=mirror-${OCP_REPOSITORY}-${RELEASE}
+  VERSION=v${MAJOR}.${MINOR}
 
-    ```
+  ```
 3.2. Validate that the ImageContentSourcePolicy has been rendered into a MachineConfig and successfully rolled out to all nodes before proceeding:
    ```
    for n in $(oc get nodes -o name); do echo "== $n =="; oc debug "$n" -q -- chroot /host grep -r -E "${RELEASE}|${VERSION}" /etc/containers || echo "Not found"; done
