@@ -33,7 +33,7 @@ echo FINISHED Create the mirrored release image signature ConfigMap manifest:
 
 echo STARTED Create the ImageContentSourcePolicy manifest:
 
-target=${repo_path}/config/icsp.yaml
+targets=${repo_path}/config/icsp.yaml
 for target in ${targets}; do
   oc-${RELEASE} apply -f ${target}
 done
