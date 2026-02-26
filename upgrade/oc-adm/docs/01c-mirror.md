@@ -237,7 +237,7 @@ NOTE:
 
    ```
    repo_path=${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}
-   target=${repo_path}/config/icsp.yaml
+   targets=${repo_path}/config/icsp.yaml
    for target in ${targets}; do
      oc-${RELEASE} apply -f ${target}
    done
