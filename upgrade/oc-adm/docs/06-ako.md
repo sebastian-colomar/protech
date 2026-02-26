@@ -22,11 +22,25 @@ oc -n ${NS} get po
 
 6.2.UPDATE the AKO operator:
 ```
+if [ -z "${RELEASE}" ]; then
+ echo "ERROR: RELEASE is not set or empty"
+ exit 1
+fi
+
+MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
+MINOR=$( echo ${RELEASE} | cut -d. -f2 )
+VERSION=v${MAJOR}.${MINOR}
+
+```
+```
 CHANNEL=stable
 NS=avi-system
-SOURCE=mirror-ako-operator-v4-9
 SOURCE_NS=openshift-marketplace
 SUB=ako-operator
+
+```
+```
+SOURCE=mirror-${SUB}-v${MAJOR}-${MINOR}
 
 oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'
 
