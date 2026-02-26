@@ -36,7 +36,7 @@ oc get clusterversion
 ```
 4.1.3. Ensure that the OpenShift Container Storage cluster is healthy and data is resilient:
 ```
-oc exec deploy/rook-ceph-tools -- ceph status
+oc -n openshift-storage exec deploy/rook-ceph-tools -- ceph status
 
 ```
 4.1.4. Navigate to "Storage Overview" and check both "Block and File" and "Object" tabs for the green tick on the status card. Green tick indicates that the storage cluster, object service and data resiliency are all healthy:

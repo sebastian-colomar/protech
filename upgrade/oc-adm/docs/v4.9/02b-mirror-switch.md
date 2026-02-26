@@ -54,7 +54,7 @@ Make sure that:
   ```
 - OpenShift Container Storage (OCS) ceph status is HEALTH_OK by running the following command:
   ```
-  oc -n openshift-storage rsh `oc get pods -n openshift-storage | grep ceph-tool | cut -d ' ' -f1` ceph status
+  oc -n openshift-storage exec deploy/rook-ceph-tools -- ceph status
   
   ```
 
@@ -78,6 +78,7 @@ NOTE:
 
     ```
     oc -n openshift-storage get po
+
     ```
 
 2B.2. Update the current custom catalog source of the `ocs-operator` to use the custom mirror catalog:
@@ -117,12 +118,15 @@ NOTE:
   
 2B.3. Verify that the OpenShift Container Platform cluster is still running the original release and that no upgrade has been performed:
 
-    oc get clusterversion
+  ```
+  oc get clusterversion
 
+  ```
 2B.4. Ensure that the OpenShift Container Storage cluster is healthy and data is resilient:
+  ```
+  oc -n openshift-storage exec deploy/rook-ceph-tools -- ceph status
 
-    oc -n openshift-storage rsh `oc get pods -n openshift-storage | grep ceph-tool | cut -d ' ' -f1` ceph status
-
+  ```
 2B.5. Navigate to "Storage Overview" and check both "Block and File" and "Object" tabs for the green tick on the status card. Green tick indicates that the storage cluster, object service and data resiliency are all healthy:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/ocs-dashboards/block-file
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/ocs-dashboards/object
@@ -132,6 +136,7 @@ NOTE:
 
     ```
     oc -n openshift-storage get po
+
     ```
 
 ---
@@ -143,6 +148,7 @@ NOTE:
 
     ```
     oc -n openshift-local-storage get po
+
     ```
 
 2B.8. Update the current custom catalog source of the `local-storage-operator` to use the custom mirror catalog:
@@ -185,6 +191,7 @@ NOTE:
 
     ```
     oc -n openshift-local-storage get po
+
     ```
 
 ---
@@ -257,33 +264,45 @@ NOTE:
 
 2B.14. Ensure that the Elasticsearch cluster is healthy:
 
+    ```
     oc exec -n openshift-logging -c elasticsearch svc/elasticsearch -- health
     
+    ```
 
 2B.15. Ensure that the Elasticsearch cron jobs are created:
 
+    ```
     oc -n openshift-logging get cj
     
+    ```
 
 2B.16. Verify that the log store is updated and the indices are green. Verify that the output includes the `app-00000x, infra-00000x, audit-00000x, .security` indices:
 
+    ```
     oc exec -n openshift-logging -c elasticsearch svc/elasticsearch-cluster -- indices | grep -E "health|app-|audit-|infra-|.security"
     
+    ```
 
 2B.17. Verify that the log collector is healthy:
 
+    ```
     oc -n openshift-logging get ds collector
     
+    ```
 
 2B.18. Verify that the pod contains a collector container:
 
+    ```
     oc -n openshift-logging get ds collector -o jsonpath='{range .spec.template.spec.containers[*]}{.name}{"\n"}{end}' | grep collector
     
+    ```
 
 2B.19. Verify that the Kibana pod is in Ready status:
 
+    ```
     oc -n openshift-logging get pods -l component=kibana -o jsonpath='{range .items[*]}{.metadata.name}{" -> "}{.status.conditions[?(@.type=="Ready")].status}{"\n"}{end}'
 
+    ```
 
 ---
 
@@ -410,3 +429,4 @@ Operator catalogs that source content provided by Red Hat and community projects
    oc patch OperatorHub cluster --type json -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
    
    ```
+

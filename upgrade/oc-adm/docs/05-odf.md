@@ -58,13 +58,16 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
    ```
 
 1.2. Ensure that the OpenShift Container Platform cluster has been successfully updated to the new release:
-
+    ```
     oc get clusterversion
 
+    ```
 1.3. Ensure that the OpenShift Container Storage cluster is healthy and data is resilient:
 
-    oc -n openshift-storage rsh `oc get pods -n openshift-storage | grep ceph-tool | cut -d ' ' -f1` ceph status
+    ```
+    oc -n openshift-storage exec deploy/rook-ceph-tools -- ceph status
 
+    ```
 1.4. Navigate to "Storage Overview" and check both "Block and File" and "Object" tabs for the green tick on the status card. Green tick indicates that the storage cluster, object service and data resiliency are all healthy:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/ocs-dashboards/block-file
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/ocs-dashboards/object
@@ -74,6 +77,7 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
     ```
     oc -n openshift-storage get po
+
     ```
 
 1.6. Ensure that you have sufficient time to complete the OpenShift Data Foundation update process, as the update time varies depending on the number of OSDs that run in the cluster.
@@ -85,8 +89,10 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 1.8. (IF NECESSARY) Enable the ODF console plugin:
 
+    ```
     oc patch console.operator cluster -n openshift-storage --type json -p '[{"op": "add", "path": "/spec/plugins", "value": ["odf-console"]}]'
 
+    ```
 1.9. Verify that the OpenShift Data Foundation cluster is healthy and data is resilient:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/odf/cluster
 
@@ -111,12 +117,18 @@ WARNING:
 
 2.2. Go to the subscription and update the channel and the source to use 4.9:
 
+    ```
     oc -n openshift-local-storage patch subscription local-storage-operator --type=merge -p '{"spec":{"channel":"4.9","source":"mirror-redhat-operator-index-v4-9","sourceNamespace":"openshift-marketplace"}}'
 
+    ```
 2.3. Verify the successful update:
+
+    ```
+    oc -n openshift-local-storage get csv
+
+    oc -n openshift-local-storage get po
 
     oc -n openshift-local-storage get sub
 
-    oc -n openshift-local-storage get csv
-
+    ```
 

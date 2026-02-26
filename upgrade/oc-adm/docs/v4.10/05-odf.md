@@ -16,8 +16,7 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 1.1. Update the current custom catalog source of the ocs-operator and local-storage-operator to use the custom mirror catalog as shown:
 
-    alias oc=oc-4.10.64
-
+    ```
     export CATALOG_SOURCE=mirror-redhat-operator-index-v4-10
     
     oc patch subscription local-storage-operator -n openshift-local-storage --type json --patch '[{"op": "replace", "path": "/spec/source", "value": "'${CATALOG_SOURCE}'" }]'
@@ -28,15 +27,18 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
     oc patch subscription mcg-operator -n openshift-storage --type json --patch '[{"op": "replace", "path": "/spec/source", "value": "'${CATALOG_SOURCE}'" }]'
 
+    ```
 
 1.2. Ensure that the OpenShift Container Platform cluster has been successfully updated to version 4.10.64:
-
+    ```
     oc get clusterversion
 
+    ```
 1.3. Ensure that the OpenShift Container Storage cluster is healthy and data is resilient:
+    ```
+    oc -n openshift-storage exec deploy/rook-ceph-tools -- ceph status
 
-    oc -n openshift-storage rsh `oc get pods -n openshift-storage | grep ceph-tool | cut -d ' ' -f1` ceph status
-
+    ```
 1.4. Navigate to "Storage Overview" and check both "Block and File" and "Object" tabs for the green tick on the status card. Green tick indicates that the storage cluster, object service and data resiliency are all healthy:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/ocs-dashboards/block-file
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/ocs-dashboards/object
@@ -46,6 +48,7 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
     ```
     oc -n openshift-storage get po
+
     ```
 
 1.6. Ensure that you have sufficient time to complete the OpenShift Data Foundation update process, as the update time varies depending on the number of OSDs that run in the cluster.
@@ -68,13 +71,12 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 1.13. Update the current custom catalog source of the `odf-csi-addons-operator` to use the custom mirror catalog as shown:
 
-    alias oc=oc-4.10.64
-
+    ```
     export CATALOG_SOURCE=mirror-redhat-operator-index-v4-10
         
     oc patch subscription odf-csi-addons-operator -n openshift-storage --type json --patch '[{"op": "replace", "path": "/spec/source", "value": "'${CATALOG_SOURCE}'" }]'
 
-
+    ```
 
 ## Verification steps
 
@@ -109,7 +111,11 @@ WARNING:
 
 2.3. Verify the successful update:
 
-    oc -n openshift-local-storage get sub
-
+    ```
     oc -n openshift-local-storage get csv
 
+    oc -n openshift-local-storage get po
+
+    oc -n openshift-local-storage get sub
+
+    ```
