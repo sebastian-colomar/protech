@@ -62,7 +62,7 @@ oc -n openshift-logging get pods -l component=kibana -o jsonpath='{range .items[
 > WARNING
 > 
 > This will update the operator
-    
+
 ```
 CHANNEL=stable-5.5
 NAMESPACE=openshift-operators-redhat
