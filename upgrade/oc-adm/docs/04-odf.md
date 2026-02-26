@@ -38,48 +38,84 @@ oc -n openshift-storage get po
 ```
 
 4.1.6. Ensure that you have sufficient time to complete the OpenShift Data Foundation update process, as the update time varies depending on the number of OSDs that run in the cluster.
-4.1.7. Fix the MCG operator subscription:
-```
-CHANNEL=stable-4.10
-NAMESPACE=openshift-storage
-SOURCE=mirror-mcg-operator-v4-10
-SOURCE_NAMESPACE=openshift-marketplace
-SUB=mcg-operator
 
-oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NAMESPACE}'"}}'
+4.1.7. UPDATE the ODF operator subscription:
+```
+if [ -z "${RELEASE}" ]; then
+ echo "ERROR: RELEASE is not set or empty"
+ exit 1
+fi
+
+MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
+MINOR=$( echo ${RELEASE} | cut -d. -f2 )
+VERSION=v${MAJOR}.${MINOR}
+
+```
+```
+CHANNEL=stable-v${MAJOR}.${MINOR}
+NS=openshift-storage
+SOURCE_NS=openshift-marketplace
+SUB=odf-operator
+
+```
+```
+SOURCE=mirror-${SUB}-v${MAJOR}-${MINOR}
+
+```
+```
+oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'
 
 ```
 
 4.1.8. UPDATE the OCS operator subscription:
 ```
-CHANNEL=stable-4.10
-NAMESPACE=openshift-storage
-SOURCE=mirror-ocs-operator-v4-10
-SOURCE_NAMESPACE=openshift-marketplace
+CHANNEL=stable-v${MAJOR}.${MINOR}
+NS=openshift-storage
+SOURCE_NS=openshift-marketplace
 SUB=ocs-operator
 
-oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NAMESPACE}'"}}'
+```
+```
+SOURCE=mirror-${SUB}-v${MAJOR}-${MINOR}
 
 ```
-4.1.9. UPDATE the ODF operator subscription:
 ```
-CHANNEL=stable-4.10
-NAMESPACE=openshift-storage
-SOURCE=mirror-ocs-operator-v4-10
-SOURCE_NAMESPACE=openshift-marketplace
-SUB=ocs-operator
-
-oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NAMESPACE}'"}}'
+oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'
 
 ```
+
+4.1.9. Fix the MCG operator subscription:
+
+```
+CHANNEL=stable-v${MAJOR}.${MINOR}
+NS=openshift-storage
+SOURCE_NS=openshift-marketplace
+SUB=mcg-operator
+
+```
+```
+SOURCE=mirror-${SUB}-v${MAJOR}-${MINOR}
+
+```
+```
+oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'
+
+```
+
 4.1.10. Update the current custom catalog source of the `odf-csi-addons-operator` to use the custom mirror catalog as shown:
+
 ```
 NS=openshift-storage
-SOURCE=mirror-odf-csi-addons-operator-v4-10
 SOURCE_NS=openshift-marketplace
 SUB=odf-csi-addons-operator
 
-oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'    
+```
+```
+SOURCE=mirror-${SUB}-v${MAJOR}-${MINOR}
+
+```
+```
+oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'
 
 ```
 
@@ -91,25 +127,25 @@ oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"source":"'${SOURCE}'","s
 
 ## Verification steps
 
-1.7. Verify the state of the pods on the OpenShift Web Console. Wait for all the pods in the openshift-storage namespace to restart and reach Running state:
-- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-storage/pods
-
-1.8. (IF NECESSARY) Enable the ODF console plugin:
-
-    ```
-    oc patch console.operator cluster -n openshift-storage --type json -p '[{"op": "add", "path": "/spec/plugins", "value": ["odf-console"]}]'
-
-    ```
 4.1.13. Verify the state of the pods on the OpenShift Web Console. Wait for all the pods in the openshift-storage namespace to restart and reach Running state:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-storage/pods
 
-4.1.14. Verify that the OpenShift Data Foundation cluster is healthy and data is resilient:
+4.1.14. (IF NECESSARY) Enable the ODF console plugin:
+
+```
+oc patch console.operator cluster -n openshift-storage --type json -p '[{"op": "add", "path": "/spec/plugins", "value": ["odf-console"]}]'
+
+```
+4.1.15. Verify the state of the pods on the OpenShift Web Console. Wait for all the pods in the openshift-storage namespace to restart and reach Running state:
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-storage/pods
+
+4.1.16. Verify that the OpenShift Data Foundation cluster is healthy and data is resilient:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/odf/cluster
 
-4.1.15. Navigate to Storage OpenShift Data foundation Storage Systems tab and then click on the storage system name:
+4.1.17. Navigate to Storage OpenShift Data foundation Storage Systems tab and then click on the storage system name:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/odf/cluster/systems
 
-4.1.16. Check both Block and File and Object tabs for the green tick on the status card. Green tick indicates that the storage cluster, object service and data resiliency are all healthy:
+4.1.18. Check both Block and File and Object tabs for the green tick on the status card. Green tick indicates that the storage cluster, object service and data resiliency are all healthy:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/odf/system/ocs.openshift.io~v1~storagecluster/ocs-storagecluster/overview/block-file
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/odf/system/ocs.openshift.io~v1~storagecluster/ocs-storagecluster/overview/object
 
@@ -122,16 +158,24 @@ WARNING:
 ## Procedure
 
 4.2.1. UPDATE the OpenShift Local Storage operator subscription:
+
+
 ```
-CHANNEL=4.10
-NAMESPACE=openshift-local-storage
-SOURCE=mirror-local-storage-operator-v4-10
-SOURCE_NAMESPACE=openshift-marketplace
+CHANNEL=v${MAJOR}.${MINOR}
+NS=openshift-local-storage
+SOURCE_NS=openshift-marketplace
 SUB=local-storage-operator
 
-oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NAMESPACE}'"}}'
+```
+```
+SOURCE=mirror-${SUB}-v${MAJOR}-${MINOR}
 
 ```
+```
+oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'
+
+```
+
 4.2.2. Verify the successful update:
 
 ```
