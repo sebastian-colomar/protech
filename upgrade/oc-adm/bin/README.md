@@ -50,7 +50,7 @@ SSH_KEY=${HOME}/auth/key.txt
 ```
 cd ${HOME}
 tar cfvz ${GITHUB_REPO}.tgz ${GITHUB_REPO}
-scp -i ${SSH_KEY}  -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -v ${GITHUB_REPO}.tgz ${REMOTE_USER}@${MIRROR_HOST}:
+scp -i ${SSH_KEY} -v ${GITHUB_REPO}.tgz ${REMOTE_USER}@${MIRROR_HOST}:
 
 ```
 ### 1.4. You can now log in to the mirror host and continue the mirroring process there:
