@@ -83,6 +83,13 @@ WARNING
 
   ```
 3.2. Validate that the ImageContentSourcePolicy has been rendered into a MachineConfig and successfully rolled out to all nodes before proceeding:
+
+> WARNING
+>
+> THIS STEP IS VERY IMPORTANT
+>
+> IF ANY NODES WERE NOT UPDATED WITH THE CORRECT IMAGECONTENTSOURCEPOLICY BEFORE STARTING THE UPGRADE, THE CLUSTER MAY BECOME UNSTABLE OR BROKEN.
+
    ```
    for n in $(oc get nodes -o name); do echo "== $n =="; oc debug "$n" -q -- chroot /host grep -r "${MIRROR_OCP_REPOSITORY}" /etc/containers || echo "Not found"; done
 
