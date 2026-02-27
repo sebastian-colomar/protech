@@ -93,19 +93,17 @@ WARNING
 
 - [Verify the mirroring process](02-mirror-validation.md)
 
-
-   
-3.3. Retrieve the sha256 sum value for the release from the image signature ConfigMap:
-
-   ```
-   SHA256_SUM_VALUE=$( cut -d'"' -f14 ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}/config/signature-sha256-*.yaml | cut -d- -f2 )
-
-   ```
-
-3.4. To Select the channel, run this patch command on the CLI:
+3.3. To Select the channel, run this patch command on the CLI:
 
    ```
    oc patch clusterversion version --type merge -p '{"spec": {"channel": "stable-'${MAJOR}.${MINOR}'"}}'
+
+   ```
+
+3.4. Retrieve the sha256 sum value for the release from the image signature ConfigMap:
+
+   ```
+   SHA256_SUM_VALUE=$( cut -d'"' -f14 ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}/config/signature-sha256-*.yaml | cut -d- -f2 )
 
    ```
   
