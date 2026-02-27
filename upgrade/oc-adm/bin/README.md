@@ -87,6 +87,9 @@ sudo mv -fv /home/${REMOTE_USER}/${GITHUB_REPO}.tgz ${HOME}
 ```
 mkdir -p ${HOME}/auth
 sudo mv -fv /home/${REMOTE_USER}/auth/* ${HOME}/auth
+
+```
+```
 sudo rmdir /home/${REMOTE_USER}/auth
 
 ```
