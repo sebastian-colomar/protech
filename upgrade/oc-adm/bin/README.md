@@ -83,6 +83,11 @@ tar fvxz ${GITHUB_REPO}.tgz
 > The RELEASE variable for the version you want to mirror should already be exported
 
 ```
+if [ -z "${RELEASE}" ]; then
+  echo "ERROR: RELEASE is not set or empty"
+  exit 1
+fi
+
 export HOST=mirror
 export KUBECONFIG=/root/auth/kubeconfig
 SCRIPT=upgrade/oc-adm/bin/mirroring.sh
