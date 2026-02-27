@@ -21,8 +21,6 @@ MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
 MINOR=$( echo ${RELEASE} | cut -d. -f2 )
 OCP_REPOSITORY=ocp
 
-```
-```
 # PKGS_CERTIFIED contains the operators from the certified-operator-index
 # "ako-operator" is just an example for testing purposes, simulating an external operator such as IBM operators
 PKGS_CERTIFIED='ako-operator'
@@ -31,8 +29,6 @@ PKGS_REDHAT='cluster-logging elasticsearch-operator local-storage-operator mcg-o
 
 VERSION=v${MAJOR}.${MINOR}
 
-```
-```
 check_icsp_rollout() {
   echo
   echo CHECKING IMAGE CONTENT SOURCE POLICY FOR ${pkg_fullname} ...
@@ -42,20 +38,14 @@ check_icsp_rollout() {
   done
 }
 
-```
-```
 pkg_fullname=mirror-${OCP_REPOSITORY}-${RELEASE}
 check_icsp_rollout
 
-```
-```
 for pkg in ${PKGS_CERTIFIED}; do
   pkg_fullname=mirror-${pkg}-${VERSION}
   check_icsp_rollout
 done
 
-```
-```
 for pkg in ${PKGS_REDHAT}; do
   pkg_fullname=mirror-${pkg}-${VERSION}
   check_icsp_rollout
