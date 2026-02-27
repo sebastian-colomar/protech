@@ -17,9 +17,7 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-logging/pods
 
 ```
-oc -n openshift-operators-redhat get po
-
-oc -n openshift-logging get po
+watch 'oc -n openshift-operators-redhat get po;echo;oc -n openshift-logging get po'
 
 ```
 
@@ -78,9 +76,7 @@ oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHAN
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-logging/pods
 
 ```
-oc -n openshift-operators-redhat get po
-
-oc -n openshift-logging get po
+watch 'oc -n openshift-operators-redhat get po;echo;oc -n openshift-logging get po'
 
 ```
 
@@ -141,9 +137,7 @@ oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHAN
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-logging/pods
 
 ```
-oc -n openshift-operators-redhat get po
-
-oc -n openshift-logging get po
+watch 'oc -n openshift-operators-redhat get po;echo;oc -n openshift-logging get po'
 
 ```
 
