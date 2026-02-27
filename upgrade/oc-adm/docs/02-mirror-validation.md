@@ -1,6 +1,6 @@
 ## 2. Verify the mirroring process
 
-### Validate that the ImageContentSourcePolicy for ALL THE OPERATORS has been rendered into a MachineConfig and successfully rolled out to all nodes before proceeding:
+### Validate that the ImageContentSourcePolicy for ALL THE OPERATORS has been rendered into a MachineConfig and successfully rolled out to all nodes before proceeding
 
 #### WARNING
 >
