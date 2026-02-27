@@ -40,6 +40,7 @@ check_icsp_rollout() {
     oc debug "$n" -q -- chroot /host grep -r ${pkg_fullname} /etc/containers -q && echo FOUND || echo NOT FOUND
   done
 }
+
 ```
 ```
 pkg_fullname=mirror-${OCP_REPOSITORY}-${RELEASE}
