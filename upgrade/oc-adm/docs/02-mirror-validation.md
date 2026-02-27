@@ -19,7 +19,7 @@ fi
 
 MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
 MINOR=$( echo ${RELEASE} | cut -d. -f2 )
-VERSION=v${MAJOR}.${MINOR}
+OCP_REPOSITORY=ocp
 
 ```
 ```
@@ -29,10 +29,11 @@ PKGS_CERTIFIED='ako-operator'
 # PKGS_REDHAT contains the operators from the redhat-operator-index
 PKGS_REDHAT='cluster-logging elasticsearch-operator local-storage-operator mcg-operator ocs-operator odf-csi-addons-operator odf-operator'
 
+VERSION=v${MAJOR}.${MINOR}
+
 ```
 ```
 check_icsp_rollout() {
-  pkg_fullname=mirror-${pkg}-${VERSION}
   echo CHECKING THAT THE IMAGE CONTENT SOURCE POLICY FOR ${pkg_fullname} HAS BEEN ROLLED OUT TO ALL NODES...
   for n in $(oc get nodes -o name); do
     echo "== $n =="
@@ -41,16 +42,20 @@ check_icsp_rollout() {
 }
 ```
 ```
-export RH_INDEX=certified-operator-index
+pkg_fullname=mirror-${OCP_REPOSITORY}-${RELEASE}
+check_icsp_rollout
+
+```
+```
 for pkg in ${PKGS_CERTIFIED}; do
+  pkg_fullname=mirror-${pkg}-${VERSION}
   check_icsp_rollout
 done
 
 ```
 ```
-echo started '# REDHAT OPERATOR INDEX'
-export RH_INDEX=redhat-operator-index
 for pkg in ${PKGS_REDHAT}; do
+  pkg_fullname=mirror-${pkg}-${VERSION}
   check_icsp_rollout
 done
 
