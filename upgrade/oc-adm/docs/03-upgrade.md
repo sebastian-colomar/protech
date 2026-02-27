@@ -88,12 +88,12 @@ WARNING
 >
 > THIS STEP IS VERY IMPORTANT
 >
-> IF ANY NODES WERE NOT UPDATED WITH THE CORRECT IMAGECONTENTSOURCEPOLICY BEFORE STARTING THE UPGRADE, THE CLUSTER MAY BECOME UNSTABLE OR BROKEN.
+> IF ANY NODES WERE NOT UPDATED WITH THE CORRECT IMAGE CONTENT SOURCE POLICY BEFORE STARTING THE UPGRADE,
+> THE CLUSTER MAY BECOME UNSTABLE OR BROKEN.
 
-   ```
-   for n in $(oc get nodes -o name); do echo "== $n =="; oc debug "$n" -q -- chroot /host grep -r "${MIRROR_OCP_REPOSITORY}" /etc/containers || echo "Not found"; done
+- [Verify the mirroring process](02-mirror-validation.md)
 
-   ```
+
    
 3.3. Retrieve the sha256 sum value for the release from the image signature ConfigMap:
 
