@@ -34,7 +34,8 @@ VERSION=v${MAJOR}.${MINOR}
 ```
 ```
 check_icsp_rollout() {
-  echo CHECKING THAT THE IMAGE CONTENT SOURCE POLICY FOR ${pkg_fullname} HAS BEEN ROLLED OUT TO ALL NODES...
+  echo
+  echo CHECKING IMAGE CONTENT SOURCE POLICY FOR ${pkg_fullname} ...
   for n in $(oc get nodes -o name); do
     echo "== $n =="
     oc debug "$n" -q -- chroot /host grep -r ${pkg_fullname} /etc/containers -q && echo FOUND || echo NOT FOUND
