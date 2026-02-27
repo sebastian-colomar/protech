@@ -47,7 +47,7 @@ SCRIPT=upgrade/oc-adm/bin/mirroring.sh
 
 ```
 ```
-nohup bash ${HOME}/${GITHUB_REPO}/${SCRIPT} 1> ${HOME}/${HOST}.log 2> ${HOME}/${HOST}-errors.log &
+nohup bash ${HOME}/${GITHUB_REPO}/${SCRIPT} 1> ${HOME}/${SCRIPT}.log 2> ${HOME}/${SCRIPT}-errors.log &
 
 ```
 ### 1.4. After it finishes, you can copy the upgrade repository and the pull secrets to the mirror host:
@@ -125,7 +125,7 @@ SCRIPT=upgrade/oc-adm/bin/mirroring.sh
 
 ```
 ```
-nohup bash ${HOME}/${GITHUB_REPO}/${SCRIPT} 1> ${HOME}/${HOST}.log 2> ${HOME}/${HOST}-errors.log &
+nohup bash ${HOME}/${GITHUB_REPO}/${SCRIPT} 1> ${HOME}/${SCRIPT}.log 2> ${HOME}/${SCRIPT}-errors.log &
 
 ```
 
