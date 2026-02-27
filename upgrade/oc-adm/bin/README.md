@@ -121,11 +121,12 @@ fi
 
 export HOST=mirror
 export KUBECONFIG=/root/auth/kubeconfig
-SCRIPT=upgrade/oc-adm/bin/mirroring.sh
+SCRIPT_PATH=upgrade/oc-adm/bin
+SCRIPT=mirroring.sh
 
 ```
 ```
-nohup bash ${HOME}/${GITHUB_REPO}/${SCRIPT} 1> ${HOME}/${SCRIPT}.log 2> ${HOME}/${SCRIPT}-errors.log &
+nohup bash ${HOME}/${GITHUB_REPO}/${SCRIPT_PATH}/${SCRIPT} 1> ${HOME}/${SCRIPT}.log 2> ${HOME}/${SCRIPT}-errors.log &
 
 ```
 
