@@ -20,9 +20,19 @@ rm -rf ${GITHUB_REPO}
 git clone --branch ${GITHUB_BRANCH} --single-branch -- https://github.com/${GITHUB_USER}/${GITHUB_REPO}
 
 ```
-### 1.2. You can now run the mirroring script:
+### 1.2. Check that the image pull secret is in the right location:
 
-### WARNING
+```
+ls -l ${HOME}/auth/pull-secret.json
+
+cat ${HOME}/auth/pull-secret.json
+
+```
+
+### 1.3. You can now run the mirroring script:
+
+> WARNING
+> 
 > The RELEASE variable for the version you want to mirror should already be exported
 
 ```
@@ -40,7 +50,7 @@ SCRIPT=upgrade/oc-adm/bin/mirroring.sh
 nohup bash ${HOME}/${GITHUB_REPO}/${SCRIPT} 1> ${HOME}/${HOST}.log 2> ${HOME}/${HOST}-errors.log &
 
 ```
-### 1.3. After it finishes, you can copy the upgrade repository to the mirror host:
+### 1.4. After it finishes, you can copy the upgrade repository and the pull secrets to the mirror host:
 ```
 MIRROR_HOST=mirror.sebastian-colomar.com
 REMOTE_USER=ec2-user
@@ -52,8 +62,10 @@ cd ${HOME}
 tar cfvz ${GITHUB_REPO}.tgz ${GITHUB_REPO}
 scp -i ${SSH_KEY} -v ${GITHUB_REPO}.tgz ${REMOTE_USER}@${MIRROR_HOST}:
 
+scp -i ${SSH_KEY} -r ${HOME}/auth ${REMOTE_USER}@${MIRROR_HOST}:
+
 ```
-### 1.4. You can now log in to the mirror host and continue the mirroring process there:
+### 1.5. You can now log in to the mirror host and continue the mirroring process there:
 ```
 ssh -i ${SSH_KEY} ${REMOTE_USER}@${MIRROR_HOST}
 
@@ -71,13 +83,27 @@ REMOTE_USER=ec2-user
 ```
 sudo mv -fv /home/${REMOTE_USER}/${GITHUB_REPO}.tgz ${HOME}
 
+mkdir -p ${HOME}/auth
+sudo mv -fv /home/${REMOTE_USER}/auth/* ${HOME}/auth
+sudo rmdir /home/${REMOTE_USER}/auth
+
 ```
 ```
 cd ${HOME}
 tar fvxz ${GITHUB_REPO}.tgz
 
 ```
-### 2.2. You can now run the mirroring script:
+
+### 2.2. Check that the image pull secret is in the right location:
+
+```
+ls -l ${HOME}/auth/pull-secret.json
+
+cat ${HOME}/auth/pull-secret.json
+
+```
+
+### 2.3. You can now run the mirroring script:
 
 ### WARNING
 > The RELEASE variable for the version you want to mirror should already be exported
