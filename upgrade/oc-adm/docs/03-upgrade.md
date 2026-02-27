@@ -141,3 +141,20 @@ WARNING
    oc -n openshift-cluster-version logs deploy/cluster-version-operator -f
 
    ```
+
+3.9. Troubleshooting
+
+  WARNING
+  > We strongly recommend contacting support before performing any action described in this section.
+
+  The upgrade may get stuck due to Pod Disruption Budgets (PDBs) in the OCS (OpenShift Container Storage) cluster.
+  
+  If this happens, manual intervention may be required. You can drain the affected node using the `--disable-eviction` option.
+  
+  WARNING
+  > THIS COMMAND CAN UNBLOCK THE UPGRADE BUT MAY ALSO BREAK OR DESTABILIZE THE CLUSTER IF USED INCORRECTLY
+
+  ```bash
+  oc adm drain ${HOSTNAME} --ignore-daemonsets --disable-eviction
+  ```
+  
