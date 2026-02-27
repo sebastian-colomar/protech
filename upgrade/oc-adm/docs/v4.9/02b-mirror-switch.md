@@ -63,7 +63,7 @@ NOTE:
 
 ### Preparing to upgrade the disconnected cluster
 
-### WARNING
+## WARNING
 > Before you continue, make sure you have checked and confirmed that the mirroring deployment is working correctly:
 > - [Verify the mirroring process](02-mirror-validation.md)
 
@@ -71,73 +71,9 @@ NOTE:
 
 ---
 
-2B.0. Validate that the ImageContentSourcePolicy for ALL THE OPERATORS has been rendered into a MachineConfig and successfully rolled out to all nodes before proceeding:
-
-### WARNING
->
-> THIS STEP IS VERY IMPORTANT
->
-> IF ANY NODES WERE NOT UPDATED WITH THE CORRECT IMAGECONTENTSOURCEPOLICY BEFORE STARTING THE UPGRADE, THE CLUSTER MAY BECOME UNSTABLE OR BROKEN.
-
-### WARNING
-> The RELEASE variable for the version you want to mirror should already be exported
-
-```
-if [ -z "${RELEASE}" ]; then
-  echo "ERROR: RELEASE is not set or empty"
-  exit 1
-fi
-
-MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
-MINOR=$( echo ${RELEASE} | cut -d. -f2 )
-VERSION=v${MAJOR}.${MINOR}
-
-```
-```
-# PKGS_CERTIFIED contains the operators from the certified-operator-index
-# "ako-operator" is just an example for testing purposes, simulating an external operator such as IBM operators
-PKGS_CERTIFIED='ako-operator'
-# PKGS_REDHAT contains the operators from the redhat-operator-index
-PKGS_REDHAT='cluster-logging elasticsearch-operator local-storage-operator mcg-operator ocs-operator odf-csi-addons-operator odf-operator'
-
-```
-```
-check_icsp_rollout() {
-  pkg_fullname=mirror-${pkg}-${VERSION}
-  echo CHECKING THAT THE IMAGE CONTENT SOURCE POLICY FOR ${pkg_fullname} HAS BEEN ROLLED OUT TO ALL NODES...
-  for n in $(oc get nodes -o name); do
-    echo "== $n =="
-    oc debug "$n" -q -- chroot /host grep -r ${pkg_fullname} /etc/containers -q && echo FOUND || echo NOT FOUND
-  done
-}
-```
-```
-export RH_INDEX=certified-operator-index
-for pkg in ${PKGS_CERTIFIED}; do
-  check_icsp_rollout
-done
-
-```
-```
-echo started '# REDHAT OPERATOR INDEX'
-export RH_INDEX=redhat-operator-index
-for pkg in ${PKGS_REDHAT}; do
-  check_icsp_rollout
-done
-
-```
-
 ### OpenShift Container Storage operator (OCS)
 
-2B.1. Ensure that all OpenShift Container Storage Pods, including the operator pods, are in Running state in the `openshift-storage` namespace:
-- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-storage/pods
-
-    ```
-    oc -n openshift-storage get po
-
-    ```
-
-2B.2. Update the current custom catalog source of the `ocs-operator` to use the custom mirror catalog:
+2B.0. Set the environment variables
 
    ### WARNING
   
@@ -145,11 +81,6 @@ done
    >
    > **No upgrade must happen at this stage.**
 
-   ```
-   NAMESPACE=openshift-storage
-   pkg=ocs-operator
-
-   ```
    ```
    if [ -z "${RELEASE}" ]; then
      echo "ERROR: RELEASE is not set or empty"
@@ -161,8 +92,25 @@ done
    PATCH=$( echo ${RELEASE} | cut -d. -f3 )
    VERSION=v${MAJOR}.${MINOR}
 
+   MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
+   CATALOG_SOURCE=${MIRROR_INDEX_REPOSITORY//./-}
+
    ```
+
+2B.1. Ensure that all OpenShift Container Storage Pods, including the operator pods, are in Running state in the `openshift-storage` namespace:
+- https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-storage/pods
+
+    ```
+    oc -n openshift-storage get po
+
+    ```
+
+2B.2. Update the current custom catalog source of the `ocs-operator` to use the custom mirror catalog:
+
    ```
+   NAMESPACE=openshift-storage
+   pkg=ocs-operator
+
    MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
    CATALOG_SOURCE=${MIRROR_INDEX_REPOSITORY//./-}
 
@@ -220,23 +168,6 @@ done
    pkg=local-storage-operator
 
    ```
-   ```
-   if [ -z "${RELEASE}" ]; then
-     echo "ERROR: RELEASE is not set or empty"
-     exit 1
-   fi
-
-   MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
-   MINOR=$( echo ${RELEASE} | cut -d. -f2 )
-   PATCH=$( echo ${RELEASE} | cut -d. -f3 )
-   VERSION=v${MAJOR}.${MINOR}
-
-   ```
-   ```
-   MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
-   CATALOG_SOURCE=${MIRROR_INDEX_REPOSITORY//./-}
-
-   ```
    ```  
    oc patch sub ${pkg} -n ${NAMESPACE} --type json --patch '[{"op": "replace", "path": "/spec/source", "value": "'${CATALOG_SOURCE}'" }]'
 
@@ -283,20 +214,6 @@ done
    NAMESPACE=openshift-operators-redhat
    pkg=elasticsearch-operator
 
-   ```
-   ```
-   if [ -z "${RELEASE}" ]; then
-     echo "ERROR: RELEASE is not set or empty"
-     exit 1
-   fi
-
-   MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
-   MINOR=$( echo ${RELEASE} | cut -d. -f2 )
-   PATCH=$( echo ${RELEASE} | cut -d. -f3 )
-   VERSION=v${MAJOR}.${MINOR}
-
-   ```
-   ```
    MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
    CATALOG_SOURCE=${MIRROR_INDEX_REPOSITORY//./-}
 
@@ -384,20 +301,6 @@ done
    NAMESPACE=openshift-logging
    pkg=cluster-logging
 
-   ```
-   ```
-   if [ -z "${RELEASE}" ]; then
-     echo "ERROR: RELEASE is not set or empty"
-     exit 1
-   fi
-
-   MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
-   MINOR=$( echo ${RELEASE} | cut -d. -f2 )
-   PATCH=$( echo ${RELEASE} | cut -d. -f3 )
-   VERSION=v${MAJOR}.${MINOR}
-
-   ```
-   ```
    MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
    CATALOG_SOURCE=${MIRROR_INDEX_REPOSITORY//./-}
 
@@ -439,20 +342,6 @@ done
    NAMESPACE=avi-system
    pkg=ako-operator
 
-   ```
-   ```
-   if [ -z "${RELEASE}" ]; then
-     echo "ERROR: RELEASE is not set or empty"
-     exit 1
-   fi
-
-   MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
-   MINOR=$( echo ${RELEASE} | cut -d. -f2 )
-   PATCH=$( echo ${RELEASE} | cut -d. -f3 )
-   VERSION=v${MAJOR}.${MINOR}
-
-   ```
-   ```
    MIRROR_INDEX_REPOSITORY=mirror-${pkg}-${VERSION}
    CATALOG_SOURCE=${MIRROR_INDEX_REPOSITORY//./-}
 
