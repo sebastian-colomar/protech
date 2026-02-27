@@ -1,5 +1,63 @@
 ## 2. Verify the mirroring process
 
+### Validate that the ImageContentSourcePolicy for ALL THE OPERATORS has been rendered into a MachineConfig and successfully rolled out to all nodes before proceeding:
+
+#### WARNING
+>
+> THIS STEP IS VERY IMPORTANT
+>
+> IF ANY NODES WERE NOT UPDATED WITH THE CORRECT IMAGECONTENTSOURCEPOLICY BEFORE STARTING THE UPGRADE, THE CLUSTER MAY BECOME UNSTABLE OR BROKEN.
+
+#### WARNING
+> The RELEASE variable for the version you want to mirror should already be exported
+
+```
+if [ -z "${RELEASE}" ]; then
+  echo "ERROR: RELEASE is not set or empty"
+  exit 1
+fi
+
+MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
+MINOR=$( echo ${RELEASE} | cut -d. -f2 )
+VERSION=v${MAJOR}.${MINOR}
+
+```
+```
+# PKGS_CERTIFIED contains the operators from the certified-operator-index
+# "ako-operator" is just an example for testing purposes, simulating an external operator such as IBM operators
+PKGS_CERTIFIED='ako-operator'
+# PKGS_REDHAT contains the operators from the redhat-operator-index
+PKGS_REDHAT='cluster-logging elasticsearch-operator local-storage-operator mcg-operator ocs-operator odf-csi-addons-operator odf-operator'
+
+```
+```
+check_icsp_rollout() {
+  pkg_fullname=mirror-${pkg}-${VERSION}
+  echo CHECKING THAT THE IMAGE CONTENT SOURCE POLICY FOR ${pkg_fullname} HAS BEEN ROLLED OUT TO ALL NODES...
+  for n in $(oc get nodes -o name); do
+    echo "== $n =="
+    oc debug "$n" -q -- chroot /host grep -r ${pkg_fullname} /etc/containers -q && echo FOUND || echo NOT FOUND
+  done
+}
+```
+```
+export RH_INDEX=certified-operator-index
+for pkg in ${PKGS_CERTIFIED}; do
+  check_icsp_rollout
+done
+
+```
+```
+echo started '# REDHAT OPERATOR INDEX'
+export RH_INDEX=redhat-operator-index
+for pkg in ${PKGS_REDHAT}; do
+  check_icsp_rollout
+done
+
+```
+
+---
+
 You should now have a valid disconnected mirror of the selected `RELEASE`.
 To make sure everything worked correctly, check the following resources:
 - `CatalogSources`:
