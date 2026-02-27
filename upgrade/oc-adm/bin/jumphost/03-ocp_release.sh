@@ -32,9 +32,9 @@ mirror_remote_exec() {
 }
 mirror_remote_exec "sudo mkdir -p ${REMOVABLE_MEDIA_PATH}"
 mirror_remote_exec "sudo chown -R ${REMOTE_USER}. ${REMOVABLE_MEDIA_PATH}"
-scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}.tar ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
+scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -v ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}.tar ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
 for package in ${PACKAGES}; do
-   scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${HOME}/${package}-linux-${RELEASE}.tar.gz ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
+   scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -v ${HOME}/${package}-linux-${RELEASE}.tar.gz ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
 done
 
 echo FINISHED Upload the release and the openshift client tarball to the mirror host:
