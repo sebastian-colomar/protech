@@ -15,7 +15,7 @@ This section explains how to:
 * Mirror release images and Operator catalogs to the internal registry
 * Update `ImageContentSourcePolicy` and `CatalogSource`
 * Upgrade the cluster using the `oc` CLI
-* Update Operators through OLM (Operator Lifecycle Manager)
+* Update Operators using the `oc` CLI
 * Validate cluster and Operator health after the upgrade
 
 All release images and Operator images must be mirrored and available in the internal registry before starting the upgrade.
