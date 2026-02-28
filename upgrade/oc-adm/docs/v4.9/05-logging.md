@@ -7,8 +7,8 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 # 5. Upgrade Elastic Search and Cluster Logging
 
 ## REFERENCES:
-- https://docs.redhat.com/en/documentation/openshift_container_platform/4.9/html/logging/cluster-logging-upgrading
-
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/pdf/logging/OpenShift_Container_Platform-4.8-Logging-en-US.pdf
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.9/pdf/logging/OpenShift_Container_Platform-4.9-Logging-en-US.pdf
 
 ## Procedure
 
