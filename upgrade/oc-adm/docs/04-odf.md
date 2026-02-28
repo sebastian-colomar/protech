@@ -52,7 +52,7 @@ VERSION=v${MAJOR}.${MINOR}
 
 ```
 ```
-CHANNEL=stable-v${MAJOR}.${MINOR}
+CHANNEL=stable-${MAJOR}.${MINOR}
 NS=openshift-storage
 SOURCE_NS=openshift-marketplace
 SUB=odf-operator
@@ -69,7 +69,7 @@ oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'",
 
 4.1.8. UPDATE the OCS operator subscription:
 ```
-CHANNEL=stable-v${MAJOR}.${MINOR}
+CHANNEL=stable-${MAJOR}.${MINOR}
 NS=openshift-storage
 SOURCE_NS=openshift-marketplace
 SUB=ocs-operator
@@ -87,7 +87,7 @@ oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'",
 4.1.9. Fix the MCG operator subscription:
 
 ```
-CHANNEL=stable-v${MAJOR}.${MINOR}
+CHANNEL=stable-${MAJOR}.${MINOR}
 NS=openshift-storage
 SOURCE_NS=openshift-marketplace
 SUB=mcg-operator
