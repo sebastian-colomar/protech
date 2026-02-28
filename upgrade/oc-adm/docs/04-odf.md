@@ -171,10 +171,6 @@ oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'",
 4.2.2. Verify the successful update:
 
 ```
-oc -n openshift-local-storage get csv
-
-oc -n openshift-local-storage get po
-
-oc -n openshift-local-storage get sub
+watch 'oc -n openshift-local-storage get csv;echo;oc -n openshift-local-storage get po;echo;oc -n openshift-local-storage get sub'
 
 ```
