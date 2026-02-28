@@ -173,9 +173,12 @@ WARNING
     FQDN_2=ip-10-0-166-173.ap-south-1.compute.internal
     FQDN_3=ip-10-0-219-190.ap-south-1.compute.internal
     LVD=auto-discover-devices
+    LVS=local
     NS=openshift-local-storage
     SPEC_PATH=/spec/nodeSelector/nodeSelectorTerms/0/matchExpressions/0/values/-   
     
     oc -n ${NS} patch localvolumediscovery ${LVD} --type='json' -p='[{"op":"add","path":"'${SPEC_PATH}'","value":"'${FQDN_1}'"},{"op":"add","path":"'${SPEC_PATH}'","value":"'${FQDN_2}'"},{"op":"add","path":"'${SPEC_PATH}'","value":"'${FQDN_3}'"}]'
+
+    oc -n ${NS} patch lvset                ${LVS} --type='json' -p='[{"op":"add","path":"'${SPEC_PATH}'","value":"'${FQDN_1}'"},{"op":"add","path":"'${SPEC_PATH}'","value":"'${FQDN_2}'"},{"op":"add","path":"'${SPEC_PATH}'","value":"'${FQDN_3}'"}]'
 
     ```
