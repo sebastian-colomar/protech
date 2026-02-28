@@ -12,7 +12,7 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 >
 > You can refer to the link below for detailed instructions on how to create a backup of the cluster:
 >
-> - [Control plane backup and restore](../../cluster-disaster-recovery/etcd-backup.md)
+> - [Control plane backup and restore](../../../cluster-disaster-recovery/etcd-backup.md)
 
 ### Before you begin
 - https://www.ibm.com/docs/en/cloud-paks/cloudpak-data-system/2.0.0?topic=ocp-ocs-upgrade-in-connected-environment-by-using-red-hat-openshift-console-ui
