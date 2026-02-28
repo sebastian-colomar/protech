@@ -102,20 +102,12 @@ oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'",
 
 ```
 
-4.1.10. Update the current custom catalog source of the `odf-csi-addons-operator` to use the custom mirror catalog as shown:
+4.1.10. Check the status of the pods:
 
 ```
 NS=openshift-storage
-SOURCE_NS=openshift-marketplace
-SUB=odf-csi-addons-operator
 
-```
-```
-SOURCE=mirror-${SUB}-v${MAJOR}-${MINOR}
-
-```
-```
-oc -n ${NS} patch sub ${SUB} --type=merge -p '{"spec":{"source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NS}'"}}'
+oc -n ${NS} get po
 
 ```
 
