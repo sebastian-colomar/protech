@@ -169,6 +169,13 @@ WARNING
     The solution was to update both the LVS and LVD resources to include the new hostnames (FQDNs) in the node selector configuration. Keeping both the short hostname and the FQDN is supported and does not cause issues. The important requirement is that the node selector matches the current `kubernetes.io/hostname` label so that the LSO can properly discover and manage the local volumes.
 
     ```
-    oc -n openshift-local-storage patch localvolumediscovery auto-discover-devices --type='json' -p='[{"op":"add","path":"/spec/nodeSelector/nodeSelectorTerms/0/matchExpressions/0/values/-","value":"ip-10-0-138-133.ap-south-1.compute.internal"},{"op":"add","path":"/spec/nodeSelector/nodeSelectorTerms/0/matchExpressions/0/values/-","value":"ip-10-0-166-173.ap-south-1.compute.internal"},{"op":"add","path":"/spec/nodeSelector/nodeSelectorTerms/0/matchExpressions/0/values/-","value":"ip-10-0-219-190.ap-south-1.compute.internal"}]'
+    FQDN_1=ip-10-0-138-133.ap-south-1.compute.internal
+    FQDN_2=ip-10-0-166-173.ap-south-1.compute.internal
+    FQDN_3=ip-10-0-219-190.ap-south-1.compute.internal
+    LVD=auto-discover-devices
+    NS=openshift-local-storage
+    SPEC_PATH=/spec/nodeSelector/nodeSelectorTerms/0/matchExpressions/0/values/-   
+    
+    oc -n ${NS} patch localvolumediscovery ${LVD} --type='json' -p='[{"op":"add","path":"'${SPEC_PATH}'","value":"'${FQDN_1}'"},{"op":"add","path":"''${SPEC_PATH}","value":"'${FQDN_2}'"},{"op":"add","path":"'${SPEC_PATH}'","value":"''${FQDN_3}"}]'
 
     ```
