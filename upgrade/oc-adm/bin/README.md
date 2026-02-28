@@ -9,7 +9,7 @@
 ### 1.1. From the `jumphost` execute the following commands:
 
 ```
-GITHUB_BRANCH=oc-adm
+GITHUB_BRANCH=v1.2
 GITHUB_REPO=protech
 GITHUB_USER=sebastian-colomar
 
