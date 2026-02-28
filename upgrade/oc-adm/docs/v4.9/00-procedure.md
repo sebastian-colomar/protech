@@ -25,17 +25,45 @@ Red Hat references:
 
 ---
 
-## 1. Fully disconnected (air-gapped) mirror registry:
+Before continuing, set the `RELEASE` environment variable to match the CURRENT cluster version, which is `4.8.37`.
+```
+export RELEASE=4.8.37
 
-  Before continuing, set the `RELEASE` environment variable to match the CURRENT cluster version, which is `4.8.37`.
-  ```
-  export RELEASE=4.8.37
+```
+You can now continue with the following steps:
 
-  ```
-  You can now continue with the following steps:
-  - [Fully disconnected (air-gapped) mirror registry](../01-mirroring.md)
+## 1. [Fully disconnected (air-gapped) mirror registry](../01-mirroring.md)
+## 2. [Verify the mirroring process](../02-mirror-validation.md)
+## 2B. [Connect to the new local mirror for the first time](02b-mirror-switch.md)
 
-## 2. [Updating a cluster in a disconnected environment](../03-upgrade.md)
-## 3. [Upgrade OCS to Red Hat OpenShift Data Foundation (ODF)](04-ocs2odf.md)
-## 4. [Upgrade Elastic Search and Cluster Logging](../06-logging.md)
-## 5. [Upgrade AKO operator (as an example of external operators)](../07-ako.md)
+---
+
+Now that your cluster is fully using the sources from the new local mirror, you can begin the actual upgrade.
+
+To do this, run the mirroring process again. This time, set the target release to `4.9.59`.
+
+Before continuing, set the `RELEASE` environment variable to match the DESIRED cluster version, which is `4.9.59`.
+```
+export RELEASE=4.9.59
+
+```
+You can now continue with the following steps:
+
+## 1-bis. [Fully disconnected (air-gapped) mirror registry](../01-mirroring.md)
+## 2-bis. [Verify the mirroring process](../02-mirror-validation.md)
+
+---
+
+### IMPORTANT
+> Upgrading to an OCP version higher than 4.8 requires manual acknowledgment from the administrator. For more information, see Preparing to upgrade to OpenShift Container Platform 4.9:
+   - https://access.redhat.com/articles/6329921
+
+```
+oc -n openshift-config patch cm admin-acks --patch '{"data":{"ack-4.8-kube-1.22-api-removals-in-4.9":"true"}}' --type=merge
+
+```
+
+## 3. [Updating a cluster in a disconnected environment](../03-upgrade.md)
+## 4. [Upgrade OCS to ODF (Red Hat OpenShift Data Foundation)](04-ocs2odf.md)
+## 5. [Upgrade Elastic Search and Cluster Logging](05-logging.md)
+## 6. [Upgrade AKO operator (as an example of external operators)](../06-ako.md)

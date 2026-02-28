@@ -53,6 +53,8 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 
 1B.3. Run the source index image that you want to prune in a container:
    ```
+   echo started '1B.3. Run the source index image that you want to prune in a container:'
+
    unalias cp mv rm || true
    
    mkdir -p ${REMOVABLE_MEDIA_PATH}/containers
@@ -81,15 +83,19 @@ An index image, based on the Operator bundle format, is a containerized snapshot
    done
    sleep 10
 
+   echo finished '1B.3. Run the source index image that you want to prune in a container:'
+
    ```
 
 1B.4. Use the grpcurl command to get a list of the packages provided by the index:
    ```
+   echo started '1B.4. Use the grpcurl command to get a list of the packages provided by the index:'
+
    remote_transfer() {
       MIRROR_HOST=mirror.sebastian-colomar.com
       ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo mkdir -p ${REMOVABLE_MEDIA_PATH}"
       ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo chown -R ${REMOTE_USER}. ${REMOVABLE_MEDIA_PATH}"
-      scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$@" ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
+      scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -v "$@" ${REMOTE_USER}@${MIRROR_HOST}:${REMOVABLE_MEDIA_PATH}
       ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${REMOTE_USER}@${MIRROR_HOST} "sudo chown -R ${USER}. ${REMOVABLE_MEDIA_PATH}"
    }
    
@@ -99,13 +105,15 @@ An index image, based on the Operator bundle format, is a containerized snapshot
       remote_transfer ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt
    done
 
+   echo finished '1B.4. Use the grpcurl command to get a list of the packages provided by the index:'
+
    ```
    
 1B.5. Inspect the `${RH_INDEX}-${version}.txt` file and identify which package names from this list you want to keep in your pruned index.
 
    Alternatively, list your current subscriptions:
    ```
-   export PKGS=$(oc-${OCP_RELEASE_OLD} get subscriptions -A -o jsonpath='{range .items[*]}{.spec.name}{"\n"}{end}' | sort -u | paste -sd, -)
+   export PKGS=$(oc get subscriptions -A -o jsonpath='{range .items[*]}{.spec.name}{"\n"}{end}' | sort -u | paste -sd, -)
 
    ```
 
@@ -117,6 +125,8 @@ An index image, based on the Operator bundle format, is a containerized snapshot
    
    rm -fv ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar
    podman save -o ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar ${CONTAINER_IMAGE}:${CONTAINER_IMAGE_TAG}
+
+   remote_transfer ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar
    
    tee /etc/containers/registries.conf.d/99-localhost-insecure.conf >/dev/null <<EOF
    [[registry]]
@@ -126,146 +136,79 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 
    ```
 
-1B.7. Run the following command to prune the source index of all but the specified packages and push the new index image to your target registry:
+1B.7. Prune the source index of all but the specified packages and push the new index image to your target registry. Then mirror the content to local files. AFter that, copy the directory that is generated in your current directory to removable media. Finally, upload the generated tarball to the mirror host:
    ```
+   echo started '1B.7. Prune the source index of all but the specified packages and push the new index image to your target registry. Then mirror the content to local files. AFter that, copy the directory that is generated in your current directory to removable media. Finally, upload the generated tarball to the mirror host:'
+
    ln -sfnT ${BINARY_PATH}/oc-${RELEASE} ${BINARY_PATH}/oc-${VERSION}
    ln -sfnT ${BINARY_PATH}/opm-${RELEASE} ${BINARY_PATH}/opm-${VERSION}
-   
+
    index_image_prune() {
-      export INDEX_CONTAINER_NAME=${RH_INDEX}-${VERSION}-${pkg}
-      export INDEX_IMAGE=${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}   
-      export INDEX_IMAGE_PRUNED=localhost:${MIRROR_PORT}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}
+      INDEX_CONTAINER_NAME=${RH_INDEX}-${VERSION}-${pkg}
+      INDEX_IMAGE=${RH_REGISTRY}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}   
+      INDEX_IMAGE_PRUNED=localhost:${MIRROR_PORT}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}
       opm-${VERSION} index prune -f ${INDEX_IMAGE} -p ${pkg} -t ${INDEX_IMAGE_PRUNED}  
       podman push ${INDEX_IMAGE_PRUNED} --remove-signatures
       podman run -d --name ${INDEX_CONTAINER_NAME} -p 50051 --replace --rm ${INDEX_IMAGE_PRUNED}
       sleep 10
-      export node_port=$( podman port ${INDEX_CONTAINER_NAME} | cut -d: -f2 )
+      node_port=$( podman port ${INDEX_CONTAINER_NAME} | cut -d: -f2 )
       podman run --network host --rm docker.io/fullstorydev/grpcurl:latest -plaintext localhost:${node_port} api.Registry/ListPackages | grep '"name"' | cut -d '"' -f4 | sort -u | tee ${REMOVABLE_MEDIA_PATH}/${INDEX_CONTAINER_NAME}.txt
    }
    
-   # CERTIFIED OPERATOR INDEX
-   export RH_INDEX=certified-operator-index
-   for pkg in ${PKGS_CERTIFIED}; do
-      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
-         index_image_prune
-      else
-         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
-      fi
-   done
-   
-   # REDHAT OPERATOR INDEX
-   export RH_INDEX=redhat-operator-index
-   for pkg in ${PKGS_REDHAT}; do
-      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
-         index_image_prune
-      else
-         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
-      fi
-   done
-
-   ```
-
-1B.8. Inspect the `${RH_INDEX}-${version}-pruned.txt` file and identify which package names from this list you want to keep in your pruned index.
-
-1B.9. Run the following command on your workstation with unrestricted network access to mirror the content to local files:
-   ```
    index_image_download() {
-      export MIRROR_OLM_REPOSITORY=mirror-${pkg}
-      export MIRROR_INDEX_REPOSITORY=${MIRROR_OLM_REPOSITORY}-${VERSION}
+      INDEX_IMAGE_PRUNED=localhost:${MIRROR_PORT}/${RH_REPOSITORY}/${RH_INDEX}:${VERSION}
+      MIRROR_OLM_REPOSITORY=mirror-${pkg}
+      MIRROR_INDEX_REPOSITORY=${MIRROR_OLM_REPOSITORY}-${VERSION}
       mkdir -p ${REMOVABLE_MEDIA_PATH}/${MIRROR_OLM_REPOSITORY}-${VERSION}
       cd ${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}
       oc-${VERSION} adm catalog mirror ${INDEX_IMAGE_PRUNED} file://${MIRROR_INDEX_REPOSITORY} -a ${LOCAL_SECRET_JSON} --index-filter-by-os=linux/${ARCH_CATALOG} --insecure
    }
    
-   # CERTIFIED OPERATOR INDEX
-   export RH_INDEX=certified-operator-index
-   for pkg in ${PKGS_CERTIFIED}; do
-      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
-         index_image_download
-      else
-         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
-      fi
-   done
-   
-   # REDHAT OPERATOR INDEX
-   export RH_INDEX=redhat-operator-index
-   for pkg in ${PKGS_REDHAT}; do
-      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
-         index_image_download
-      else
-         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
-      fi
-   done
-   
-   ```
-
-1B.10. Copy the directory that is generated in your current directory to removable media:
-   ```
    index_image_tar() {
+      MIRROR_OLM_REPOSITORY=mirror-${pkg}
+      MIRROR_INDEX_REPOSITORY=${MIRROR_OLM_REPOSITORY}-${VERSION}
       cd ${REMOVABLE_MEDIA_PATH}
       tar cfv ${MIRROR_INDEX_REPOSITORY}.tar ${MIRROR_INDEX_REPOSITORY}     
    }
    
-   # CERTIFIED OPERATOR INDEX
-   export RH_INDEX=certified-operator-index
-   for pkg in ${PKGS_CERTIFIED}; do
-      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
-         index_image_tar
-      else
-         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
-      fi
-   done
-   
-   # REDHAT OPERATOR INDEX
-   export RH_INDEX=redhat-operator-index
-   for pkg in ${PKGS_REDHAT}; do
-      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
-         index_image_tar
-      else
-         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
-      fi
-   done
-
-   ```
-
-1B.11. Upload the generated tarball to the mirror host:
-   ```
    index_image_transfer() {
-      remote_transfer ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar ${REMOVABLE_MEDIA_PATH}/${INDEX_CONTAINER_NAME}.txt ${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}.tar   
+      INDEX_CONTAINER_NAME=${RH_INDEX}-${VERSION}-${pkg}
+      MIRROR_OLM_REPOSITORY=mirror-${pkg}
+      MIRROR_INDEX_REPOSITORY=${MIRROR_OLM_REPOSITORY}-${VERSION}
+      remote_transfer ${REMOVABLE_MEDIA_PATH}/${INDEX_CONTAINER_NAME}.txt ${REMOVABLE_MEDIA_PATH}/${MIRROR_INDEX_REPOSITORY}.tar
    }
    
-   # CERTIFIED OPERATOR INDEX
+   index_image_process() {
+      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
+         index_image_prune
+         index_image_download
+         index_image_tar
+         index_image_transfer
+      else
+         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
+      fi
+   }
+
+   ```
+   ```
+   remote_transfer ${REMOVABLE_MEDIA_PATH}/${CONTAINER_NAME}.tar
+
+   ```
+   ```
+   echo started '# CERTIFIED OPERATOR INDEX'
+
    export RH_INDEX=certified-operator-index
    for pkg in ${PKGS_CERTIFIED}; do
-      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
-         index_image_transfer
-      else
-         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
-      fi
+      index_image_process
    done
    
-   # REDHAT OPERATOR INDEX
+   ```
+   ```
+   echo started '# REDHAT OPERATOR INDEX'
+
    export RH_INDEX=redhat-operator-index
    for pkg in ${PKGS_REDHAT}; do
-      if grep $pkg ${REMOVABLE_MEDIA_PATH}/${RH_INDEX}-${VERSION}.txt; then
-         index_image_transfer
-      else
-         echo Skipping $pkg: not in ${RH_INDEX}-${VERSION}
-      fi
+      index_image_process
    done
 
    ```
-
-## 1B.12 (ONLY IF NECESSARY) Disabling the default OperatorHub sources 
-
-Operator catalogs that source content provided by Red Hat and community projects are configured for OperatorHub by default during an OpenShift Container Platform installation. In a restricted network environment, you must disable the default catalogs as a cluster administrator. You can then configure OperatorHub to use local catalog sources.
-
-### Procedure
-
-- (ONLY IF NECESSARY) Disable the sources for the default catalogs by adding `disableAllDefaultSources: true` to the OperatorHub object:
-   ```
-   oc-${RELEASE} patch OperatorHub cluster --type json -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
-   
-   ```
-
-

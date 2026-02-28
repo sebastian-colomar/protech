@@ -9,30 +9,49 @@
 ### 1.1. From the `jumphost` execute the following commands:
 
 ```
-GITHUB_BRANCH=main
+GITHUB_BRANCH=oc-adm
 GITHUB_REPO=protech
 GITHUB_USER=sebastian-colomar
 
 ```
 ```
+cd ${HOME}
 rm -rf ${GITHUB_REPO}
 git clone --branch ${GITHUB_BRANCH} --single-branch -- https://github.com/${GITHUB_USER}/${GITHUB_REPO}
 
 ```
-### 1.2. You can now run the mirroring script:
+### 1.2. Check that the image pull secret is in the right location:
+
 ```
+ls -l ${HOME}/auth/pull-secret.json
+
+cat ${HOME}/auth/pull-secret.json
+
+```
+
+### 1.3. You can now run the mirroring script:
+
+> WARNING
+> 
+> The RELEASE variable for the version you want to mirror should already be exported
+
+```
+if [ -z "${RELEASE}" ]; then
+  echo "ERROR: RELEASE is not set or empty"
+  exit 1
+fi
+
 export HOST=jumphost
-export RELEASE=4.8.37
-#export RELEASE=4.9.59
-#export RELEASE=4.10.64
-SCRIPT=upgrade/oc-adm/bin/mirroring.sh
+export KUBECONFIG=/root/auth/kubeconfig
+SCRIPT_PATH=upgrade/oc-adm/bin
+SCRIPT=mirroring.sh
 
 ```
 ```
-nohup bash ${GITHUB_REPO}/${SCRIPT} 1> ${HOST}.log 2> ${HOST}-errors.log &
+nohup bash ${HOME}/${GITHUB_REPO}/${SCRIPT_PATH}/${SCRIPT} 1> ${HOME}/${SCRIPT}.log 2> ${HOME}/${SCRIPT}-errors.log &
 
 ```
-### 1.3. After it finishes, you can copy the upgrade repository to the mirror host:
+### 1.4. After it finishes, you can copy the upgrade repository and the pull secrets to the mirror host:
 ```
 MIRROR_HOST=mirror.sebastian-colomar.com
 REMOTE_USER=ec2-user
@@ -40,11 +59,14 @@ SSH_KEY=${HOME}/auth/key.txt
 
 ```
 ```
+cd ${HOME}
 tar cfvz ${GITHUB_REPO}.tgz ${GITHUB_REPO}
-scp -i ${SSH_KEY} ${GITHUB_REPO}.tgz ${REMOTE_USER}@${MIRROR_HOST}:
+scp -i ${SSH_KEY} -v ${GITHUB_REPO}.tgz ${REMOTE_USER}@${MIRROR_HOST}:
+
+scp -i ${SSH_KEY} -r ${HOME}/auth ${REMOTE_USER}@${MIRROR_HOST}:
 
 ```
-### 1.4. You can now log in to the mirror host and continue the mirroring process there:
+### 1.5. You can now log in to the mirror host and continue the mirroring process there:
 ```
 ssh -i ${SSH_KEY} ${REMOTE_USER}@${MIRROR_HOST}
 
@@ -60,81 +82,54 @@ REMOTE_USER=ec2-user
 
 ```
 ```
-mkdir -p ${GITHUB_REPO}
 sudo mv -fv /home/${REMOTE_USER}/${GITHUB_REPO}.tgz ${HOME}
-tar fvxz ${GITHUB_REPO}.tgz -C ${GITHUB_REPO} --strip-components=1
 
 ```
-### 2.2. You can now run the mirroring script:
 ```
+mkdir -p ${HOME}/auth
+sudo mv -fv /home/${REMOTE_USER}/auth/* ${HOME}/auth
+
+```
+```
+sudo rmdir /home/${REMOTE_USER}/auth
+
+```
+```
+cd ${HOME}
+tar fvxz ${GITHUB_REPO}.tgz
+
+```
+
+### 2.2. Check that the image pull secret is in the right location:
+
+```
+ls -l ${HOME}/auth/pull-secret.json
+
+cat ${HOME}/auth/pull-secret.json
+
+```
+
+### 2.3. You can now run the mirroring script:
+
+### WARNING
+> The RELEASE variable for the version you want to mirror should already be exported
+
+```
+if [ -z "${RELEASE}" ]; then
+  echo "ERROR: RELEASE is not set or empty"
+  exit 1
+fi
+
 export HOST=mirror
-export RELEASE=4.8.37
-#export RELEASE=4.9.59
-#export RELEASE=4.10.64
-SCRIPT=upgrade/oc-adm/bin/mirroring.sh
+export KUBECONFIG=/root/auth/kubeconfig
+SCRIPT_PATH=upgrade/oc-adm/bin
+SCRIPT=mirroring.sh
 
 ```
 ```
-nohup bash ${GITHUB_REPO}/${SCRIPT} 1> ${HOST}.log 2> ${HOST}-errors.log &
+nohup bash ${HOME}/${GITHUB_REPO}/${SCRIPT_PATH}/${SCRIPT} 1> ${HOME}/${SCRIPT}.log 2> ${HOME}/${SCRIPT}-errors.log &
 
 ```
-## 3. Verify the mirroring process
 
-You should now have a valid disconnected mirror of the selected `RELEASE`.
-To make sure everything worked correctly, check the following resources:
-- `CatalogSources`:
-  - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1alpha1~CatalogSource/instances
-  ```
-  oc get catsrc -n openshift-marketplace | grep v$( echo ${RELEASE} | cut -d. -f1 )-$( echo ${RELEASE} | cut -d. -f2 )
-  
-  ```
-- `ImageContentSourcePolicies`:
-  - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/cluster/operator.openshift.io~v1alpha1~ImageContentSourcePolicy/instances
-  ```
-  oc get imagecontentsourcepolicy | grep v$( echo ${RELEASE} | cut -d. -f1 )-$( echo ${RELEASE} | cut -d. -f2 )
-  
-  ```
-You may also find it helpful to review the following related resources:
-- `Subscriptions`:
-  - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1alpha1~Subscription/instances
-  ```
-  oc get sub -A | grep v$( echo ${RELEASE} | cut -d. -f1 )-$( echo ${RELEASE} | cut -d. -f2 )
-  
-  ```
-- `PackageManifests`:
-  - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/packages.operators.coreos.com~v1~PackageManifest/instances
-  ```
-  oc get packagemanifest -A
-  
-  ```
-- `Operators`:
-  - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/cluster/operators.coreos.com~v1~Operator/instances
-  ```
-  oc get operator
-  
-  ```
-- `OperatorGroups`:
-  - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1~OperatorGroup/instances
-  ```
-  oc get og -A
-  
-  ```
-- `OperatorConditions`:
-  - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v2~OperatorCondition/instances
-  ```
-  oc get condition -A
-  
-  ```
-- `InstallPlans`:
-  - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1alpha1~InstallPlan/instances
-  ```
-  oc get ip -A
-  
-  ```
-- `ClusterServiceVersions`:
-  - https://console-openshift-console.apps.hub.sebastian-colomar.com/api-resource/all-namespaces/operators.coreos.com~v1alpha1~ClusterServiceVersion/instances
-  ```
-  oc get csv -A
-  
-  ```
-  
+## 3. Mirror validation
+  - [Verify the mirroring process](../docs/02-mirror-validation.md)

@@ -4,40 +4,51 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 ---
 
-# 4.1. Upgrade OCS to Red Hat OpenShift Data Foundation (ODF)
+# 4.1. Upgrade OCS to ODF (Red Hat OpenShift Data Foundation)
 
 ## REFERENCES:
 - https://www.ibm.com/docs/en/cloud-paks/cloudpak-data-system/2.0.0?topic=ocp-ocs-upgrade-in-connected-environment-by-using-red-hat-openshift-console-ui
-- https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation/4.9/html/upgrading_to_openshift_data_foundation/updating-ocs-to-odf_rhodf
+- https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation/5.9/html/upgrading_to_openshift_data_foundation/updating-ocs-to-odf_rhodf
 
 
 ## Procedure
 
 4.1.1. Check that the current custom catalog source of the ocs-operator and local-storage-operator are using the custom mirror catalog as shown:
-   
-    oc get sub local-storage-operator -n openshift-local-storage -o jsonpath='{.spec.source}{" / "}{.spec.sourceNamespace}{" / "}{.spec.channel}{"\n"}'
-    
-    oc get sub ocs-operator -n openshift-storage -o jsonpath='{.spec.source}{" / "}{.spec.sourceNamespace}{" / "}{.spec.channel}{"\n"}'
+```
+NS=openshift-local-storage
+SUB=local-storage-operator
 
+oc get sub ${SUB} -n ${NS} -o jsonpath='{.spec.source}{" / "}{.spec.sourceNamespace}{" / "}{.spec.channel}{"\n"}'
+
+```
+```
+NS=openshift-storage
+SUB=ocs-operator
+
+oc get sub ${SUB} -n ${NS} -o jsonpath='{.spec.source}{" / "}{.spec.sourceNamespace}{" / "}{.spec.channel}{"\n"}'
+
+```
     
 4.1.2. Ensure that the OpenShift Container Platform cluster has been successfully updated to version 4.9.59.
+```
+oc get clusterversion
 
-    oc get clusterversion
-
+```
 4.1.3. Ensure that the OpenShift Container Storage cluster is healthy and data is resilient:
+```
+oc -n openshift-storage exec deploy/rook-ceph-tools -- ceph status
 
-    oc -n openshift-storage rsh `oc get pods -n openshift-storage | grep ceph-tool | cut -d ' ' -f1` ceph status
-
+```
 4.1.4. Navigate to "Storage Overview" and check both "Block and File" and "Object" tabs for the green tick on the status card. Green tick indicates that the storage cluster, object service and data resiliency are all healthy:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/ocs-dashboards/block-file
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/ocs-dashboards/object
 
 4.1.5. Ensure that all OpenShift Container Storage Pods, including the operator pods, are in Running state in the `openshift-storage` namespace:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-storage/pods
+```
+oc -n openshift-storage get po
 
-    ```
-    oc -n openshift-storage get po
-    ```
+```
 
 4.1.6. Ensure that you have sufficient time to complete the OpenShift Data Foundation update process, as the update time varies depending on the number of OSDs that run in the cluster.
 
@@ -69,20 +80,44 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-storage/pods
 
 4.1.14. Enable the ODF console plugin:
+```
+oc patch console.operator cluster --type json -p '[{"op": "add", "path": "/spec/plugins", "value": ["odf-console"]}]'
 
-    oc patch console.operator cluster -n openshift-storage --type json -p '[{"op": "add", "path": "/spec/plugins", "value": ["odf-console"]}]'
+```
+4.1.15. Fix the MCG operator subscription:
+```
+CHANNEL=stable-4.9
+NAMESPACE=openshift-storage
+SOURCE=mirror-mcg-operator-v4-9
+SOURCE_NAMESPACE=openshift-marketplace
+SUB=mcg-operator
 
-4.1.15. Verify that the OpenShift Data Foundation cluster is healthy and data is resilient:
+oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NAMESPACE}'"}}'
+
+```
+
+4.1.16. UPDATE the OCS operator subscription:
+```
+CHANNEL=stable-4.9
+NAMESPACE=openshift-storage
+SOURCE=mirror-ocs-operator-v4-9
+SOURCE_NAMESPACE=openshift-marketplace
+SUB=ocs-operator
+
+oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NAMESPACE}'"}}'
+
+```
+4.1.17. Verify that the OpenShift Data Foundation cluster is healthy and data is resilient:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/odf/cluster
 
-4.1.16. Navigate to Storage OpenShift Data foundation Storage Systems tab and then click on the storage system name:
+4.1.18. Navigate to Storage OpenShift Data foundation Storage Systems tab and then click on the storage system name:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/odf/cluster/systems
 
-4.1.17. Check both Block and File and Object tabs for the green tick on the status card. Green tick indicates that the storage cluster, object service and data resiliency are all healthy:
+4.1.19. Check both Block and File and Object tabs for the green tick on the status card. Green tick indicates that the storage cluster, object service and data resiliency are all healthy:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/odf/system/ocs.openshift.io~v1~storagecluster/ocs-storagecluster/overview/block-file
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/odf/system/ocs.openshift.io~v1~storagecluster/ocs-storagecluster/overview/object
 
-
+---
 
 # 4.2. Upgrade the local-storage component to 4.9
 
@@ -94,15 +129,23 @@ WARNING:
 4.2.1. Go to the installed operators under `openshift-local-storage` namespace and click Local Storage operator:
 - https://console-openshift-console.apps.hub.sebastian-colomar.com/k8s/ns/openshift-local-storage/operators.coreos.com~v1alpha1~ClusterServiceVersion/local-storage-operator.4.8.0-202212051626
 
-4.2.2. Go to the subscription and update the channel and the source to use 4.9:
+4.2.2. UPDATE the OpenShift Local Storage operator:
+```
+CHANNEL=4.9
+NAMESPACE=openshift-local-storage
+SOURCE=mirror-local-storage-operator-v4-9
+SOURCE_NAMESPACE=openshift-marketplace
+SUB=local-storage-operator
 
-    oc -n openshift-local-storage patch subscription local-storage-operator --type=merge -p '{"spec":{"channel":"4.9","source":"mirror-redhat-operator-index-v4-9","sourceNamespace":"openshift-marketplace"}}'
+oc -n ${NAMESPACE} patch sub ${SUB} --type=merge -p '{"spec":{"channel":"'${CHANNEL}'","source":"'${SOURCE}'","sourceNamespace":"'${SOURCE_NAMESPACE}'"}}'
 
+```
 4.2.3. Verify the successful update:
+```
+oc -n openshift-local-storage get sub
 
-    oc -n openshift-local-storage get sub
+oc -n openshift-local-storage get csv
 
-    oc -n openshift-local-storage get csv
+oc -n openshift-local-storage get po
 
-    oc -n openshift-local-storage get po
-
+```

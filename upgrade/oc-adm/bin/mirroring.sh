@@ -1,6 +1,10 @@
-set -eux
+set -euvx
 : "${HOST:?HOST must be defined}"
 : "${RELEASE:?RELEASE must be defined}"
+
+date
+
+echo STARTED 'MIRRORING SCRIPT (@'${HOST}')'
 
 export KUBECONFIG=${HOME}/auth/kubeconfig
 
@@ -11,3 +15,7 @@ source ${BIN}/values.sh
 for script in ${BIN_HOST}/*.sh; do
   source ${script}
 done
+
+echo FINISHED 'MIRRORING SCRIPT (@'${HOST}')'
+
+date

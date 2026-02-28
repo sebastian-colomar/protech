@@ -33,15 +33,23 @@ Make sure that:
   oc get co
   
   ```
-- Configuring the Rook-Ceph Toolbox in OpenShift Data Foundation 4.8:
+- Configuring the Rook-Ceph Toolbox in OpenShift Data Foundation:
   ```
   oc patch OCSInitialization ocsinit -n openshift-storage --type json --patch  '[{ "op": "replace", "path": "/spec/enableCephTools", "value": true }]'
   
   ```
 - OpenShift Container Storage (OCS) ceph status is HEALTH_OK by running the following command:
   ```
-  oc -n openshift-storage rsh `oc-${OCP_RELEASE_OLD} get pods -n openshift-storage | grep ceph-tool | cut -d ' ' -f1` ceph status
+  oc -n openshift-storage exec deploy/rook-ceph-tools -- ceph status
   
+  ```
+  ```
+  oc -n openshift-storage exec deploy/rook-ceph-tools -- ceph progress
+  
+  ```
+  ```
+  oc -n openshift-storage exec deploy/rook-ceph-tools -- ceph health detail
+    
   ```
 
 NOTE:
@@ -51,57 +59,63 @@ NOTE:
 
 #### Procedure
 
-3.1. Validate that the ImageContentSourcePolicy has been rendered into a MachineConfig and successfully rolled out to all nodes before proceeding:
-   ```
-   export MIRROR_HOST=mirror.hub.sebastian-colomar.com
+3.1. Set the necessary environment variables:
 
-   for n in oc get nodes -o name); do echo "== $n =="; oc debug "$n" -q -- chroot /host grep -R "${MIRROR_HOST}:${MIRROR_PORT}"'"' /etc/containers || echo "Not found"; done
+WARNING
+> The RELEASE variable for the version you want to mirror should already be exported
 
-   ```
-   
-3.2. Retrieve the sha256 sum value for the release from the image signature ConfigMap:
+  ```
+  if [ -z "${RELEASE}" ]; then
+    echo "ERROR: RELEASE is not set or empty"
+    exit 1
+  fi
 
-   ```
-   if [ -z "${RELEASE}" ]; then
-     echo "ERROR: RELEASE is not set or empty"
-     exit 1
-   fi
+  MAJOR=$( echo ${RELEASE} | cut -d. -f1 )
+  MINOR=$( echo ${RELEASE} | cut -d. -f2 )
+  MIRROR_HOST=mirror.hub.sebastian-colomar.com
+  MIRROR_PORT=5000
+  OCP_REPOSITORY=ocp
+  REMOVABLE_MEDIA_PATH=/mnt/mirror
 
-   LOCAL_REGISTRY=${MIRROR_HOST}:${MIRROR_PORT}
-   OCP_REPOSITORY=ocp
-   RELEASE_NAME=ocp-release
+  LOCAL_REGISTRY=${MIRROR_HOST}:${MIRROR_PORT}
+  MIRROR_OCP_REPOSITORY=mirror-${OCP_REPOSITORY}-${RELEASE}
+  VERSION=v${MAJOR}.${MINOR}
 
-   MIRROR_OCP_REPOSITORY=mirror-${OCP_REPOSITORY}
+  ```
+3.2. Validate that the ImageContentSourcePolicy has been rendered into a MachineConfig and successfully rolled out to all nodes before proceeding:
 
-   SHA256_SUM_VALUE=$( cut -d'"' -f14 ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}-${RELEASE}/config/signature-sha256-*.yaml | cut -d- -f2 )
+> WARNING
+>
+> THIS STEP IS VERY IMPORTANT
+>
+> IF ANY NODES WERE NOT UPDATED WITH THE CORRECT IMAGE CONTENT SOURCE POLICY BEFORE STARTING THE UPGRADE,
+> THE CLUSTER MAY BECOME UNSTABLE OR BROKEN.
 
-   ```
+- [Verify the mirroring process](02-mirror-validation.md)
 
 3.3. To Select the channel, run this patch command on the CLI:
 
    ```
-   if [ -z "${VERSION}" ]; then
-     echo "ERROR: VERSION is not set or empty"
-     exit 1
-   fi
-
-   oc patch clusterversion version --type merge -p '{"spec": {"channel": "stable-'${VERSION}'"}}'
+   oc patch clusterversion version --type merge -p '{"spec": {"channel": "stable-'${MAJOR}.${MINOR}'"}}'
 
    ```
 
-3.4. Upgrading to an OCP version higher than 4.8 requires manual acknowledgment from the administrator. For more information, see Preparing to upgrade to OpenShift Container Platform 4.9:
-   - https://access.redhat.com/articles/6329921
+3.4. Retrieve the sha256 sum value for the release from the image signature ConfigMap:
 
    ```
-   oc -n openshift-config patch cm admin-acks --patch '{"data":{"ack-4.8-kube-1.22-api-removals-in-4.9":"true"}}' --type=merge
+   SHA256_SUM_VALUE=$( cut -d'"' -f14 ${REMOVABLE_MEDIA_PATH}/${MIRROR_OCP_REPOSITORY}/config/signature-sha256-*.yaml | cut -d- -f2 )
 
    ```
   
- 3.5. UPDATE THE CLUSTER:
+3.5. UPDATE THE CLUSTER:
 
    WARNING:
    > THIS WILL UPDATE THE CLUSTER
 
+   Now you can update the cluster clicking the blue button with the label "Update":
+   - https://console-openshift-console.apps.hub.sebastian-colomar.com/settings/cluster
+
+   If that is not an option you can proceed manually with the upgrade:
    ```
    oc adm upgrade --allow-explicit-upgrade --to-image ${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY}-${RELEASE}@sha256:${SHA256_SUM_VALUE}
 
@@ -110,7 +124,7 @@ NOTE:
 3.6. (ONLY IF NECESSARY) Force an explicit upgrade with version set:
 
    ```
-   oc patch clusterversion version --type=merge -p '{"spec":{"desiredUpdate":{"image":"'${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY}@sha256:${SHA256_SUM_VALUE}'","version":"'${OCP_RELEASE_NEW}'","force":true}}}'
+   oc patch clusterversion version --type=merge -p '{"spec":{"desiredUpdate":{"image":"'${LOCAL_REGISTRY}/${MIRROR_OCP_REPOSITORY}@sha256:${SHA256_SUM_VALUE}'","version":"'${RELEASE}'","force":true}}}'
 
    ```
 
@@ -127,3 +141,19 @@ NOTE:
    oc -n openshift-cluster-version logs deploy/cluster-version-operator -f
 
    ```
+
+3.9. Troubleshooting
+
+  WARNING
+  > We strongly recommend contacting support before performing any action described in this section.
+
+  - The upgrade may get stuck due to Pod Disruption Budgets (PDBs) in the OCS (OpenShift Container Storage) cluster.
+  
+    If this happens, manual intervention may be required. You can drain the affected node using the `--disable-eviction` option.
+    
+    WARNING
+    > THIS COMMAND CAN UNBLOCK THE UPGRADE BUT MAY ALSO BREAK OR DESTABILIZE THE CLUSTER IF USED INCORRECTLY
+  
+    ```bash
+    oc adm drain ${HOSTNAME} --ignore-daemonsets --disable-eviction
+    ```

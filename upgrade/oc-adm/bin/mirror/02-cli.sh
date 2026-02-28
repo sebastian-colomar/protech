@@ -1,6 +1,6 @@
 date
 
-# 3.3. Install the OpenShift CLI:
+echo STARTED Install the OpenShift CLI:
 
 cd ${HOME}
 mkdir -p ${BINARY_PATH}
@@ -26,5 +26,7 @@ ln -sfnT ${BINARY_PATH}/opm-${RELEASE} ${BINARY_PATH}/opm-${VERSION}
 
 ln -sfnT ${BINARY_PATH}/oc-${RELEASE} ${BINARY_PATH}/oc
 ln -sfnT ${BINARY_PATH}/opm-${RELEASE} ${BINARY_PATH}/opm
+
+echo FINISHED Install the OpenShift CLI:
 
 date
