@@ -147,14 +147,28 @@ WARNING
   WARNING
   > We strongly recommend contacting support before performing any action described in this section.
 
-  The upgrade may get stuck due to Pod Disruption Budgets (PDBs) in the OCS (OpenShift Container Storage) cluster.
+  - The upgrade may get stuck due to Pod Disruption Budgets (PDBs) in the OCS (OpenShift Container Storage) cluster.
   
-  If this happens, manual intervention may be required. You can drain the affected node using the `--disable-eviction` option.
+    If this happens, manual intervention may be required. You can drain the affected node using the `--disable-eviction` option.
+    
+    WARNING
+    > THIS COMMAND CAN UNBLOCK THE UPGRADE BUT MAY ALSO BREAK OR DESTABILIZE THE CLUSTER IF USED INCORRECTLY
   
-  WARNING
-  > THIS COMMAND CAN UNBLOCK THE UPGRADE BUT MAY ALSO BREAK OR DESTABILIZE THE CLUSTER IF USED INCORRECTLY
+    ```bash
+    oc adm drain ${HOSTNAME} --ignore-daemonsets --disable-eviction
+    ```
 
-  ```bash
-  oc adm drain ${HOSTNAME} --ignore-daemonsets --disable-eviction
-  ```
+  - The upgrade can fail or become unstable due to a misconfiguration in the Local Storage Operator (LSO).
   
+    In this case, during the upgrade, the `kubernetes.io/hostname` label on several nodes changed from the short hostname (for example, `ip-10-0-219-190`) to the fully qualified domain name (FQDN), such as `ip-10-0-219-190.ap-south-1.compute.internal`.
+  
+    Because the `LocalVolumeSet` (LVS) and `LocalVolumeDiscovery` (LVD) resources were configured to match the original short hostnames, this label change caused a mismatch in the node selectors. As a result, the LSO could no longer detect the local disks on those nodes.
+  
+    When the disks were no longer discovered, the Ceph pods in the OpenShift Data Foundation (ODF) cluster lost access to their underlying storage devices. This led to degraded or unstable Ceph storage.
+  
+    The solution was to update both the LVS and LVD resources to include the new hostnames (FQDNs) in the node selector configuration. Keeping both the short hostname and the FQDN is supported and does not cause issues. The important requirement is that the node selector matches the current `kubernetes.io/hostname` label so that the LSO can properly discover and manage the local volumes.
+
+    ```
+    oc -n openshift-local-storage patch localvolumediscovery auto-discover-devices --type='json' -p='[{"op":"add","path":"/spec/nodeSelector/nodeSelectorTerms/0/matchExpressions/0/values/-","value":"ip-10-0-138-133.ap-south-1.compute.internal"},{"op":"add","path":"/spec/nodeSelector/nodeSelectorTerms/0/matchExpressions/0/values/-","value":"ip-10-0-166-173.ap-south-1.compute.internal"},{"op":"add","path":"/spec/nodeSelector/nodeSelectorTerms/0/matchExpressions/0/values/-","value":"ip-10-0-219-190.ap-south-1.compute.internal"}]'
+
+    ```
