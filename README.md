@@ -11,10 +11,11 @@ Instructions to upgrade an existing **OpenShift 4.8.37 cluster** in an air-gappe
 
 This section explains how to:
 
-* Create a disconnected mirror of the target release
-* Mirror images to the internal registry
-* Configure `ImageContentSourcePolicy`
-* Run the upgrade using the `oc` CLI
-* Validate the cluster after the upgrade
+* Create a disconnected mirror of the target OpenShift release
+* Mirror release images and Operator catalogs to the internal registry
+* Update `ImageContentSourcePolicy` and `CatalogSource`
+* Upgrade the cluster using the `oc` CLI
+* Update Operators through OLM (Operator Lifecycle Manager)
+* Validate cluster and Operator health after the upgrade
 
-All images must be available in the internal registry before starting the upgrade.
+All release images and Operator images must be mirrored and available in the internal registry before starting the upgrade.
