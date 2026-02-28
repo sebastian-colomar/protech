@@ -7,7 +7,9 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 # ETCD backup for OCP version 4.8.37
 
 Red Hat references:
-- https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/html/backup_and_restore/control-plane-backup-and-restore
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/pdf/backup_and_restore/OpenShift_Container_Platform-4.8-Backup_and_restore-en-US.pdf
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.9/pdf/backup_and_restore/OpenShift_Container_Platform-4.9-Backup_and_restore-en-US.pdf
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.10/pdf/backup_and_restore/OpenShift_Container_Platform-4.10-Backup_and_restore-en-US.pdf
 
 # Control plane backup and restore
 
