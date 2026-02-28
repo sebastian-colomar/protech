@@ -8,7 +8,12 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 ## REFERENCES:
 - https://www.ibm.com/docs/en/cloud-paks/cloudpak-data-system/2.0.0?topic=ocp-ocs-upgrade-in-connected-environment-by-using-red-hat-openshift-console-ui
-- https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation/5.9/html/upgrading_to_openshift_data_foundation/updating-ocs-to-odf_rhodf
+
+Updating OpenShift Container Storage:
+- https://docs.redhat.com/en/documentation/red_hat_openshift_container_storage/4.8/pdf/updating_openshift_container_storage/Red_Hat_OpenShift_Container_Storage-4.8-Updating_OpenShift_Container_Storage-en-US.pdf
+
+Upgrading to OpenShift Data Foundation:
+- https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation/4.9/pdf/upgrading_to_openshift_data_foundation/Red_Hat_OpenShift_Data_Foundation-4.9-Upgrading_to_OpenShift_Data_Foundation-en-US.pdf
 
 
 ## Procedure
