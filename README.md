@@ -1,13 +1,20 @@
-# OpenShift Upgrade from Version 4.8
+# OpenShift Upgrade from Version 4.8 in an Air-Gapped Environment
 
 ## cluster-disaster-recovery
 
-This section contains instructions to create an **etcd backup** and to restore the cluster from that backup. These steps are required to protect the cluster state before performing any risky operation, such as an upgrade.
-
-## etc/ocp
-
-This section explains how to deploy an **OpenShift 4.8.37 cluster on AWS**.
+Instructions to create and verify an **etcd backup**, and to restore the cluster if needed.
+Always back up etcd before starting the upgrade.
 
 ## upgrade
 
-This section provides instructions to upgrade an existing **OpenShift 4.8.37 cluster** to a newer version. It covers pre-upgrade checks, image source configuration, and the upgrade procedure using the `oc` CLI.
+Instructions to upgrade an existing **OpenShift 4.8.37 cluster** in an air-gapped environment.
+
+This section explains how to:
+
+* Create a disconnected mirror of the target release
+* Mirror images to the internal registry
+* Configure `ImageContentSourcePolicy`
+* Run the upgrade using the `oc` CLI
+* Validate the cluster after the upgrade
+
+All images must be available in the internal registry before starting the upgrade.
