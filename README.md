@@ -1,4 +1,4 @@
-Folders:
+# OpenShift Upgrade from version 4.8
 
 - cluster-disaster-recovery:
   - Instructions to create an ETCD backup and restore from the backup
