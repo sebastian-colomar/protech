@@ -21,13 +21,10 @@ Installing:
 Updating clusters:
 - https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/pdf/updating_clusters/OpenShift_Container_Platform-4.8-Updating_clusters-en-US.pdf
 - https://docs.redhat.com/en/documentation/openshift_container_platform/4.9/pdf/updating_clusters/OpenShift_Container_Platform-4.9-Updating_clusters-en-US.pdf
-- https://docs.redhat.com/en/documentation/openshift_container_platform/4.10/pdf/updating_clusters/OpenShift_Container_Platform-4.10-Updating_clusters-en-US.pdf
 
 Operators:
 - https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/pdf/operators/OpenShift_Container_Platform-4.8-Operators-en-US.pdf
 - https://docs.redhat.com/en/documentation/openshift_container_platform/4.9/pdf/operators/OpenShift_Container_Platform-4.9-Operators-en-US.pdf
-- https://docs.redhat.com/en/documentation/openshift_container_platform/4.10/pdf/operators/OpenShift_Container_Platform-4.10-Operators-en-US.pdf
-
 
 ---
 
