@@ -30,8 +30,8 @@ An index image, based on the Operator bundle format, is a containerized snapshot
 
 1B.1. The environment variables should already be set from the previous step.
 
-   - If you start a new session, you must set them again as described in step `1.3` of the document below:
-      - [Getting your Jumphost ready](01-ocp.md)
+   - If you start a new session, you must set them again as described in step `1A.3` of the document below:
+      - [Getting your Jumphost ready](01a-ocp.md)
 
 
 1B.2. Allow unsigned registries for the Certified Operator Index:
