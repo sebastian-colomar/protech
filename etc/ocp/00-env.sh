@@ -7,7 +7,7 @@ export master_type=t3a.xlarge
 export Publish=External
 export ServiceNetworkCIDR=172.30.0.0/16
 export version=4.8.37
-export worker_type=m6a.4xlarge
+export worker_type=m5ad.4xlarge
 # openshift-install-4.8.37 coreos print-stream-json | tee stream.json
 # jq -r '.architectures.x86_64.images.aws.regions | to_entries[] | "\(.key) \(.value.image)"' stream.json | sort | tee regions_amis.txt
 # while read -r region ami; do printf "%-15s %-20s : " "$region" "$ami"; aws ec2 describe-images --region "$region" --image-ids "$ami" --query 'Images[0].State' --output text 2>/dev/null | grep -q available && echo "AVAILABLE" || echo "NOT FOUND"; done < regions_amis.txt
