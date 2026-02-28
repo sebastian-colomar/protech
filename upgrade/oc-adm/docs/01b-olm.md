@@ -7,8 +7,9 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 # 1B. Using Operator Lifecycle Manager on restricted networks 
 
 ## Red Hat references:
-> - https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/html/operators/administrator-tasks
-> - https://docs.redhat.com/en/documentation/openshift_container_platform/4.9/html/operators/administrator-tasks
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/pdf/operators/OpenShift_Container_Platform-4.8-Operators-en-US.pdf
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.9/pdf/operators/OpenShift_Container_Platform-4.9-Operators-en-US.pdf
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.10/pdf/operators/OpenShift_Container_Platform-4.10-Operators-en-US.pdf
 
 NOTE:
 > Run this whole procedure on a Linux machine with internet access and at least 1 TB of mounted storage.
