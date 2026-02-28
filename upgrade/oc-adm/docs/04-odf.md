@@ -153,7 +153,7 @@ WARNING:
 
 
 ```
-CHANNEL=v${MAJOR}.${MINOR}
+CHANNEL=${MAJOR}.${MINOR}
 NS=openshift-local-storage
 SOURCE_NS=openshift-marketplace
 SUB=local-storage-operator
