@@ -125,7 +125,7 @@ oc -n ${NS} get po
 4.1.14. (IF NECESSARY) Enable the ODF console plugin:
 
 ```
-oc patch console.operator cluster -n openshift-storage --type json -p '[{"op": "add", "path": "/spec/plugins", "value": ["odf-console"]}]'
+oc patch console.operator cluster --type json -p '[{"op": "add", "path": "/spec/plugins", "value": ["odf-console"]}]'
 
 ```
 4.1.15. Verify the state of the pods on the OpenShift Web Console. Wait for all the pods in the openshift-storage namespace to restart and reach Running state:
