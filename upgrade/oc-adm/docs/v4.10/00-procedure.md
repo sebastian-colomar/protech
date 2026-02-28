@@ -12,12 +12,18 @@ It is provided on an "as-is" basis, without any express or implied warranties, a
 
 # Upgrade from version 4.9.59 to 4.10.64
 
-Red Hat references:
-- https://docs.redhat.com/en/documentation/openshift_container_platform/4.9/html/installing/installing-mirroring-installation-images
-- https://docs.redhat.com/en/documentation/openshift_container_platform/4.9/html/updating_clusters/updating-a-cluster-in-a-disconnected-environment
-- https://docs.redhat.com/en/documentation/openshift_container_platform/4.9/html/operators/administrator-tasks
-- https://docs.redhat.com/en/documentation/openshift_container_platform/4.10/html/operators/administrator-tasks
+## Red Hat references:
 
+Installing:
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.9/pdf/installing/OpenShift_Container_Platform-4.9-Installing-en-US.pdf
+
+Updating clusters:
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.9/pdf/updating_clusters/OpenShift_Container_Platform-4.9-Updating_clusters-en-US.pdf
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.10/pdf/updating_clusters/OpenShift_Container_Platform-4.10-Updating_clusters-en-US.pdf
+
+Operators:
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.9/pdf/operators/OpenShift_Container_Platform-4.9-Operators-en-US.pdf
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.10/pdf/operators/OpenShift_Container_Platform-4.10-Operators-en-US.pdf
 
 ---
 
