@@ -176,6 +176,6 @@ WARNING
     NS=openshift-local-storage
     SPEC_PATH=/spec/nodeSelector/nodeSelectorTerms/0/matchExpressions/0/values/-   
     
-    oc -n ${NS} patch localvolumediscovery ${LVD} --type='json' -p='[{"op":"add","path":"'${SPEC_PATH}'","value":"'${FQDN_1}'"},{"op":"add","path":"''${SPEC_PATH}","value":"'${FQDN_2}'"},{"op":"add","path":"'${SPEC_PATH}'","value":"''${FQDN_3}"}]'
+    oc -n ${NS} patch localvolumediscovery ${LVD} --type='json' -p='[{"op":"add","path":"'${SPEC_PATH}'","value":"'${FQDN_1}'"},{"op":"add","path":"'${SPEC_PATH}'","value":"'${FQDN_2}'"},{"op":"add","path":"'${SPEC_PATH}'","value":"'${FQDN_3}'"}]'
 
     ```
